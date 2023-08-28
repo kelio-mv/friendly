@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Gantari:wght@400;500;600&display=swap");
+
+/* CSS Reset */
+/* Sources: https://tailwindcss.com/docs/preflight https://youtube.com/shorts/2lyDv0wOQuQ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  font: inherit;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+img,
+picture,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button {
+  outline: none;
+}
+
+/* End of CSS Reset */
+
+:root {
+  background: var(--bg-100);
+  color: var(--clr-100);
+  font: 16px "Gantari", system-ui, sans-serif;
+  line-height: 1.25;
+
+  --bg-000: rgb(12, 12, 12);
+  --bg-100: rgb(18, 18, 18);
+  --bg-200: rgb(30, 30, 30);
+  --bg-300: rgb(42, 42, 42);
+  --bg-400: rgb(54, 54, 54);
+  --clr-100: rgb(236, 236, 236);
+  --clr-200: rgb(212, 212, 212);
+  --clr-300: rgb(188, 188, 188);
+  --clr-400: rgb(164, 164, 164);
+  --clr-500: rgb(140, 140, 140);
+}
+
+#root > * {
+  height: 100%;
+}
