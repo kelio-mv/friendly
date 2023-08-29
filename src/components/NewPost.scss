@@ -1,0 +1,14 @@
+.new-post {
+  display: flex;
+  flex-direction: column;
+
+  &__textarea {
+    flex-grow: 1;
+    padding: 1rem;
+    background: var(--bg-200);
+    color: inherit;
+    border: none;
+    outline: none;
+    resize: none;
+  }
+}
