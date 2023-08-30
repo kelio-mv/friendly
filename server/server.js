@@ -6,15 +6,14 @@ io.on("connection", (socket) => {
   socket.on("sign-in", (username, password) => {
     const [user, userId] = storage.getUser(username);
 
-    if (user) {
-      if (user.pw === password) {
-        socket.userId = userId;
-        socket.emit("auth-response");
-      } else {
-        socket.emit("auth-response", "Sua senha está incorreta!");
-      }
+    if (user && user.pw === password) {
+      socket.userId = userId;
+      socket.emit("auth-response");
     } else {
-      socket.emit("auth-response", "Seu nome de usuário não foi encontrado!");
+      socket.emit("auth-response", [
+        "Dados Incorretos",
+        "O nome de usuário ou senha estão incorretos.",
+      ]);
     }
   });
 
@@ -22,7 +21,7 @@ io.on("connection", (socket) => {
     const [user] = storage.getUser(username);
 
     if (user) {
-      socket.emit("auth-response", "Seu nome de usuário já foi utilizado!");
+      socket.emit("auth-response", ["Nome Indisponível", "Este nome de usuário já está em uso."]);
     } else {
       socket.userId = storage.addUser(username, password);
       socket.emit("auth-response");

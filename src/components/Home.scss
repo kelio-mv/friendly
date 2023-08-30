@@ -52,11 +52,15 @@
     border-radius: 0.25rem;
     color: white;
     font-size: calc(1rem + 2px);
-    cursor: pointer;
     margin-bottom: 1rem;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: #115e59;
+      cursor: pointer;
+    }
+
+    &:disabled {
+      opacity: 0.5;
     }
   }
 
