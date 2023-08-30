@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
+import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
 
@@ -15,6 +16,12 @@ class Main extends React.Component {
   };
 
   componentDidMount() {
+    socket.on("disconnect", () => {
+      if (this.state.display !== "Home") {
+        this.setState({ display: "Home" });
+      }
+    });
+
     socket.on("set_posts", (posts) => {
       this.setState({ posts });
       this.requestMissingUsers(posts);
@@ -76,6 +83,7 @@ class Main extends React.Component {
             newPost={() => this.setState({ display: "NewPost" })}
             logout={() => {
               socket.close();
+              storage.deleteCredentials();
               this.setState({ display: "Home" });
             }}
           />
@@ -98,9 +106,17 @@ class Main extends React.Component {
 
 export default Main;
 
-// Conexão automática
 // Comentários
 // Inverter ordem dos posts
 // Avatar ou imagem?
 // Adicionar aviso de "estado de desenvolvimento"
 // Adicionar convite de feedback
+
+/*
+Desconectado:
+- 45s após apagar a tela automaticamente
+- 3m40s após apagar a tela propositalmente
+- Instantaneamente ao faltar memória ram (acontece tbm com apps)
+- No caso de falta de ram, não é possível reconectar, pois o processo é finalizado
+- A solução é salvar o que se está aberto em localStorage, e ao invés de reconectar, reiniciar o app
+*/

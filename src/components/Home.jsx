@@ -1,15 +1,16 @@
 import React from "react";
 import Modal from "./Modal";
+import storage from "../storage";
 import socket from "../socket";
 import "./Home.scss";
 
 class Home extends React.Component {
   state = {
-    username: "",
-    password: "",
+    username: storage.username,
+    password: storage.password,
     showPassword: false,
     signUp: false,
-    connecting: false,
+    connecting: storage.credentials,
     errorMessage: [],
   };
 
@@ -29,12 +30,24 @@ class Home extends React.Component {
     socket.on("auth-response", (errorMessage) => {
       if (errorMessage) {
         socket.close();
+        storage.deleteCredentials();
         this.setState({ connecting: false, errorMessage });
       } else {
-        socket.removeAllListeners("connect");
+        const { username, password } = this.state;
+        storage.saveCredentials(username, password);
         this.props.onAuth();
       }
     });
+
+    if (storage.credentials) {
+      socket.connect();
+    }
+  }
+
+  componentWillUnmount() {
+    socket.off("connect");
+    socket.off("connect_error");
+    socket.off("auth-response");
   }
 
   render() {
