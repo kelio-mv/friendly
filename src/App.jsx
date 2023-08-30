@@ -74,6 +74,10 @@ class Main extends React.Component {
             {...{ users, posts }}
             openPost={(postId) => this.setState({ display: "Post", postId })}
             newPost={() => this.setState({ display: "NewPost" })}
+            logout={() => {
+              socket.close();
+              this.setState({ display: "Home" });
+            }}
           />
         );
 
@@ -94,7 +98,6 @@ class Main extends React.Component {
 
 export default Main;
 
-// Botão sair
 // Conexão automática
 // Comentários
 // Inverter ordem dos posts

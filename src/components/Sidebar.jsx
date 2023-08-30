@@ -28,7 +28,7 @@ function Sidebar(props) {
           <img src="settings.svg" />
           Configurações
         </div>
-        <div className="sidebar__item">
+        <div className="sidebar__item" onClick={props.logout}>
           <img src="logout.svg" />
           Sair
         </div>

@@ -24,7 +24,7 @@ function Feed(props) {
             />
           )
       )}
-      <Sidebar open={showSidebar} close={() => setShowSidebar(false)} />
+      <Sidebar open={showSidebar} close={() => setShowSidebar(false)} logout={props.logout} />
     </div>
   );
 }

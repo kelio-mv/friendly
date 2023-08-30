@@ -31,6 +31,7 @@ class Home extends React.Component {
         socket.close();
         this.setState({ connecting: false, errorMessage });
       } else {
+        socket.removeAllListeners("connect");
         this.props.onAuth();
       }
     });
