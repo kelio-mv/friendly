@@ -8,23 +8,23 @@ function Sidebar(props) {
   return (
     <div className="sidebar">
       <div className="sidebar__content">
-        <div className="sidebar__item">
+        <div className="sidebar__item sidebar__item--disabled">
           <img src="install.svg" />
           Instalar
         </div>
-        <div className="sidebar__item">
+        <div className="sidebar__item sidebar__item--disabled">
           <img src="share.svg" />
           Compartilhar
         </div>
-        <div className="sidebar__item">
+        <div className="sidebar__item sidebar__item--disabled">
           <img src="contact.svg" />
           Contato
         </div>
-        <div className="sidebar__item">
+        <div className="sidebar__item sidebar__item--disabled">
           <img src="pending.svg" />
           Planejamento
         </div>
-        <div className="sidebar__item">
+        <div className="sidebar__item sidebar__item--disabled">
           <img src="settings.svg" />
           Configurações
         </div>

@@ -9,6 +9,7 @@ class Storage {
       this.users = JSON.parse(fs.readFileSync("users.json"));
       this.posts = JSON.parse(fs.readFileSync("posts.json"));
     } catch {
+      // this code is dangerous as you might break the json
       fs.writeFileSync("users.json", "[]");
       fs.writeFileSync("posts.json", "[]");
     }
@@ -49,6 +50,17 @@ class Storage {
     this.posts.push(post);
     fs.writeFileSync("posts.json", JSON.stringify(this.posts));
     return post;
+  }
+
+  addComment(postId, userId, content) {
+    const comment = {
+      uid: userId,
+      date: Math.floor(new Date() / 1000),
+      content,
+    };
+    this.posts[postId].comments.push(comment);
+    fs.writeFileSync("posts.json", JSON.stringify(this.posts));
+    return comment;
   }
 }
 

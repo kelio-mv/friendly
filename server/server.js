@@ -43,10 +43,16 @@ io.on("connection", (socket) => {
     socket.emit("add_users", response);
   });
 
-  socket.on("add_post", (content) => {
+  socket.on("post", (content) => {
     const post = storage.addPost(socket.userId, content);
-    socket.emit("add_post_response", post);
+    socket.emit("post_response", post);
     socket.broadcast.emit("add_post", post);
+  });
+
+  socket.on("comment", (postId, content) => {
+    const comment = storage.addComment(postId, socket.userId, content);
+    socket.emit("add_comment", postId, comment);
+    socket.broadcast.emit("add_comment", postId, comment);
   });
 });
 

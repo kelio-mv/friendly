@@ -16,12 +16,6 @@ class Main extends React.Component {
   };
 
   componentDidMount() {
-    socket.on("disconnect", () => {
-      if (this.state.display !== "Home") {
-        this.setState({ display: "Home" });
-      }
-    });
-
     socket.on("set_posts", (posts) => {
       this.setState({ posts });
       this.requestMissingUsers(posts);
@@ -32,16 +26,28 @@ class Main extends React.Component {
       this.requestMissingUsers([post]);
     });
 
+    socket.on("add_comment", (postId, comment) => {
+      const posts = { ...this.state.posts };
+      posts[postId].comments.push(comment);
+      this.setState({ posts });
+    });
+
     socket.on("add_users", (users) => {
       this.setState({ users: { ...this.state.users, ...users } });
     });
 
-    socket.on("add_post_response", (post) => {
+    socket.on("post_response", (post) => {
       this.setState({
         display: "Post",
         posts: [...this.state.posts, post],
         postId: this.state.posts.length,
       });
+    });
+
+    socket.on("disconnect", () => {
+      if (this.state.display !== "Home") {
+        this.setState({ display: "Home" });
+      }
     });
   }
 
@@ -94,6 +100,7 @@ class Main extends React.Component {
           <Post
             users={users}
             post={posts[postId]}
+            postId={postId}
             close={() => this.setState({ display: "Feed", postId: null })}
           />
         );
@@ -107,7 +114,6 @@ class Main extends React.Component {
 export default Main;
 
 // Comentários
-// Inverter ordem dos posts
 // Avatar ou imagem?
 // Adicionar aviso de "estado de desenvolvimento"
 // Adicionar convite de feedback

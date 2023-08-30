@@ -34,11 +34,16 @@ object {
 }
 
 input,
+textarea,
 button {
   outline: none;
 }
 
 /* End of CSS Reset */
+
+body {
+  overscroll-behavior: contain;
+}
 
 :root {
   background: var(--bg-100);

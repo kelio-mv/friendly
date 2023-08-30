@@ -1,3 +1,9 @@
+.flex-page {
+  // Used in Feed and NewPost
+  display: flex;
+  flex-direction: column;
+}
+
 .top-bar {
   display: flex;
   gap: 0.875rem;
@@ -15,3 +21,53 @@
     flex-grow: 1;
   }
 }
+
+.feed__body {
+  overflow: auto;
+}
+
+.post {
+  &__body {
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  &__footer {
+    display: flex;
+    padding: 0 1rem;
+    background: var(--bg-200);
+    border-top: 1px solid var(--bg-300);
+  }
+
+  &__textarea {
+    flex-grow: 1;
+    padding: 1rem 0;
+    background: none;
+    color: inherit;
+    border: none;
+    resize: none;
+  }
+
+  &__send {
+    filter: invert(1);
+    cursor: pointer;
+  }
+}
+
+.new-post__textarea {
+  flex-grow: 1;
+  padding: 1rem;
+  background: var(--bg-200);
+  color: inherit;
+  border: none;
+  resize: none;
+}
+
+/*
+Possíveis causas do bug dos 18px:
+
+- align-items stretch do flex-page
+- webkit-font-size-adjust
+- Estilos article__body
+- Elemento Article
+*/
