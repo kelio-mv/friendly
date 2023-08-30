@@ -48,9 +48,16 @@ io.on("connection", (socket) => {
     socket.emit("add_post_response", post);
     socket.broadcast.emit("add_post", post);
   });
-
-  socket.onAny((...args) => console.log("Received:", ...args));
-  socket.onAnyOutgoing((...args) => console.log("Sent:", ...args));
 });
 
 console.log("Server is running");
+
+/*
+function isUserConnected(userId) {
+  for (const [id, socket] of io.of("/").sockets) {
+    if (socket.userId === userId) {
+      return true;
+    }
+  }
+}
+*/

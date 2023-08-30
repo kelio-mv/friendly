@@ -1,0 +1,36 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  img {
+    filter: invert(1);
+  }
+
+  &__content {
+    width: 17rem;
+    padding: 0.25rem;
+    background: var(--bg-200);
+    font-size: 1.125rem;
+  }
+
+  &__item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+
+    &:hover {
+      background: var(--bg-300);
+      cursor: pointer;
+    }
+  }
+
+  &__background {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}

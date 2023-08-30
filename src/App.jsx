@@ -94,9 +94,10 @@ class Main extends React.Component {
 
 export default Main;
 
+// Botão sair
+// Conexão automática
+// Comentários
+// Inverter ordem dos posts
+// Avatar ou imagem?
 // Adicionar aviso de "estado de desenvolvimento"
 // Adicionar convite de feedback
-// Avatar ou imagem?
-// Impedir usuário de logar quando já estiver online
-// Comentários
-// Botão sair

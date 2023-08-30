@@ -25,7 +25,6 @@ class Storage {
   }
 
   getUserById(userId) {
-    // This function will crash the server when receive an invalid userId
     const { name, picture } = this.users[userId];
     return { name, picture };
   }
