@@ -17,7 +17,7 @@ function Feed(props) {
               key={i}
               data={post}
               user={props.users[post.uid]}
-              onClick={() => props.displayPost(i)}
+              onClick={() => props.openPost(i)}
             />
           )
       )}
