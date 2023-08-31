@@ -34,7 +34,7 @@ class Storage {
     this.users.push({
       name: username,
       pw: password,
-      picture: null,
+      picture: "avatar.png",
     });
     fs.writeFileSync("users.json", JSON.stringify(this.users));
     return this.users.length - 1;

@@ -134,11 +134,10 @@ class App extends React.Component {
 export default App;
 
 /*
+Colocar imagem de perfil
 Exibir número de novos comentários
 Converter user/post/comment pra array com um padrão de interface
-Colocar imagem de perfil
-Adicionar aviso de "estado de desenvolvimento"
-Adicionar convite de feedback
+Adicionar aviso de "estado de desenvolvimento" e convite de feedback
 */
 
 /*

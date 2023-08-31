@@ -21,9 +21,9 @@
   &__picture {
     width: 48px;
     height: 48px;
-    background-color: var(--bg-200);
     background-size: cover;
     border-radius: 50%;
+    filter: invert(1);
   }
 
   &__date {

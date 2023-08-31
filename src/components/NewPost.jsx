@@ -13,7 +13,7 @@ function NewPost(props) {
         <div className="top-bar__grow"></div>
         <img
           src="send.svg"
-          className={(!content.trim() || sending) && "new-post__send--disabled"}
+          className={!content.trim() || sending ? "new-post__send--disabled" : null}
           onClick={() => {
             setSending(true);
             socket.emit("post", content.trim());
