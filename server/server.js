@@ -30,15 +30,15 @@ io.on("connection", (socket) => {
 
   socket.on("ready", () => {
     const userId = socket.userId;
-    socket.emit("add_users", { [userId]: storage.getUserById(userId) });
-    socket.emit("set_posts", storage.posts);
+    socket.emit("set_user", userId, storage.getUserData(userId));
+    socket.emit("add_posts", storage.posts);
   });
 
   socket.on("get_users", (userIds) => {
     const response = {};
 
     for (const userId of userIds) {
-      response[userId] = storage.getUserById(userId);
+      response[userId] = storage.getUserData(userId);
     }
     socket.emit("add_users", response);
   });
@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
   socket.on("post", (content) => {
     const post = storage.addPost(socket.userId, content);
     socket.emit("post_response", post);
-    socket.broadcast.emit("add_post", post);
+    socket.broadcast.emit("add_posts", [post]);
   });
 
   socket.on("comment", (postId, content) => {

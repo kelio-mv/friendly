@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Article from "./Article";
 import Sidebar from "./Sidebar";
+import storage from "../storage";
 
 function Feed(props) {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -29,7 +30,12 @@ function Feed(props) {
         )}
       </div>
 
-      <Sidebar open={showSidebar} close={() => setShowSidebar(false)} logout={props.logout} />
+      <Sidebar
+        open={showSidebar}
+        close={() => setShowSidebar(false)}
+        user={props.users[storage.userId]}
+        logout={props.logout}
+      />
     </div>
   );
 }

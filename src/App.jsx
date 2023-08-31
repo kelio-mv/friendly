@@ -17,14 +17,18 @@ class App extends React.Component {
   postBodyRef = React.createRef();
 
   componentDidMount() {
-    socket.on("set_posts", (posts) => {
-      this.setState({ posts });
-      this.requestMissingUsers(posts);
+    socket.on("set_user", (userId, user) => {
+      storage.setUserId(userId);
+      this.setState({ users: { [userId]: user } });
     });
 
-    socket.on("add_post", (post) => {
-      this.setState({ posts: [...this.state.posts, post] });
-      this.requestMissingUsers([post]);
+    socket.on("add_users", (users) => {
+      this.setState({ users: { ...this.state.users, ...users } });
+    });
+
+    socket.on("add_posts", (posts) => {
+      this.setState({ posts: [...this.state.posts, ...posts] });
+      this.requestMissingUsers(posts);
     });
 
     socket.on("add_comment", (postId, comment) => {
@@ -42,10 +46,7 @@ class App extends React.Component {
 
       posts[postId].comments.push(comment);
       this.setState({ posts }, callback);
-    });
-
-    socket.on("add_users", (users) => {
-      this.setState({ users: { ...this.state.users, ...users } });
+      this.requestMissingUsers([comment]);
     });
 
     socket.on("post_response", (post) => {
@@ -66,26 +67,28 @@ class App extends React.Component {
 
     socket.on("disconnect", () => {
       if (this.state.display !== "Home") {
-        this.setState({ display: "Home" });
+        this.setState({ display: "Home", users: {}, posts: [], postId: null });
       }
     });
   }
 
-  requestMissingUsers(posts) {
+  requestMissingUsers(articles) {
     const { users } = this.state;
     const missingUsers = new Set();
 
-    posts.forEach((post) => {
-      // if (post === null) return;
-      if (!(post.uid in users)) {
-        missingUsers.add(post.uid);
+    articles.forEach((article) => {
+      // if (!article) return;
+      if (!(article.uid in users)) {
+        missingUsers.add(article.uid);
       }
-      post.comments.forEach((comment) => {
-        // if (comment === null) return;
-        if (!(comment.uid in users)) {
-          missingUsers.add(comment.uid);
-        }
-      });
+      if ("comments" in article) {
+        article.comments.forEach((comment) => {
+          // if (!comment) return;
+          if (!(comment.uid in users)) {
+            missingUsers.add(comment.uid);
+          }
+        });
+      }
     });
     if (missingUsers.size > 0) {
       socket.emit("get_users", Array.from(missingUsers));

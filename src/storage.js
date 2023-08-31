@@ -11,6 +11,10 @@ class Storage {
     this.credentials = null;
     localStorage.removeItem("friendly");
   }
+
+  setUserId(userId) {
+    this.userId = userId;
+  }
 }
 
 export default new Storage();

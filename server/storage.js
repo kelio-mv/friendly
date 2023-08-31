@@ -25,7 +25,7 @@ class Storage {
     return [];
   }
 
-  getUserById(userId) {
+  getUserData(userId) {
     const { name, picture } = this.users[userId];
     return { name, picture };
   }

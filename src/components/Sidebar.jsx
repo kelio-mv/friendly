@@ -8,6 +8,11 @@ function Sidebar(props) {
   return (
     <div className="sidebar">
       <div className="sidebar__content">
+        <div className="sidebar__header">
+          <img src={props.user.picture} className="sidebar__picture" />
+          <p>@{props.user.name}</p>
+        </div>
+
         <div className="sidebar__item sidebar__item--disabled">
           <img src="install.svg" />
           Instalar

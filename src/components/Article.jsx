@@ -40,8 +40,14 @@ function parseDate(date) {
   if (elapsed < 3600) {
     return `há ${Math.floor(elapsed / 60)} minutos`;
   }
+  if (elapsed < 7200) {
+    return "há 1 hora";
+  }
   if (elapsed < 86400) {
     return `há ${Math.floor(elapsed / 3600)} horas`;
+  }
+  if (elapsed < 172800) {
+    return "há 1 dia";
   }
   return `há ${Math.floor(elapsed / 86400)} dias`;
 }
