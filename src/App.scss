@@ -51,16 +51,28 @@
   &__send {
     filter: invert(1);
     cursor: pointer;
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 }
 
-.new-post__textarea {
-  flex-grow: 1;
-  padding: 1rem;
-  background: var(--bg-200);
-  color: inherit;
-  border: none;
-  resize: none;
+.new-post {
+  &__send--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &__textarea {
+    flex-grow: 1;
+    padding: 1rem;
+    background: var(--bg-200);
+    color: inherit;
+    border: none;
+    resize: none;
+  }
 }
 
 /*

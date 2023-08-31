@@ -10,10 +10,11 @@ function Feed(props) {
     <div className="flex-page">
       <div className="top-bar">
         <img src="menu.svg" onClick={() => setShowSidebar(true)} />
-        <h1>Home</h1>
-        <div className="top-bar__grow"> </div>
+        <h1>Recentes</h1>
+        <div className="top-bar__grow"></div>
         <img src="add.svg" onClick={props.newPost} />
       </div>
+
       <div className="feed__body">
         {posts.map(
           (post, i) =>

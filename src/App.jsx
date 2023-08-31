@@ -7,7 +7,7 @@ import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
 
-class Main extends React.Component {
+class App extends React.Component {
   state = {
     display: "Home",
     users: {},
@@ -111,12 +111,16 @@ class Main extends React.Component {
   }
 }
 
-export default Main;
+export default App;
 
-// Comentários
-// Avatar ou imagem?
-// Adicionar aviso de "estado de desenvolvimento"
-// Adicionar convite de feedback
+/*
+Desativar botão enviar em post/comentário enquanto estiver enviando
+Rolar página automaticamente no comentário
+Converter user/post/comment pra array com um padrão de interface
+Colocar imagem de perfil
+Adicionar aviso de "estado de desenvolvimento"
+Adicionar convite de feedback
+*/
 
 /*
 Desconectado:

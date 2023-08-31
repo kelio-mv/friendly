@@ -52,9 +52,16 @@ class Home extends React.Component {
 
   render() {
     const { username, password, showPassword, signUp, connecting, errorMessage } = this.state;
+    const pattern = /[^a-zA-Z0-9_]/g;
+    const disableButton =
+      connecting ||
+      username.length < 3 ||
+      password.length < 6 ||
+      username.startsWith("_") ||
+      username.endsWith("_");
 
     return (
-      <div className="home">
+      <div className="home" style={connecting ? { pointerEvents: "none" } : {}}>
         <img src="chat.png" className="home__logo" />
 
         <h1 className="home__greeting">Bem-vindo ao Friendly</h1>
@@ -65,9 +72,9 @@ class Home extends React.Component {
           type="text"
           className="home__input"
           placeholder="Nome de usuário"
-          maxLength={16}
           value={username}
-          onChange={(e) => this.setState({ username: e.target.value.trim() })}
+          onChange={(e) => this.setState({ username: e.target.value.replace(pattern, "") })}
+          maxLength={16}
         />
 
         <div className="home__pw-container">
@@ -75,9 +82,9 @@ class Home extends React.Component {
             type={showPassword ? "text" : "password"}
             className="home__input"
             placeholder="Senha"
-            maxLength={16}
             value={password}
-            onChange={(e) => this.setState({ password: e.target.value.trim() })}
+            onChange={(e) => this.setState({ password: e.target.value.replace(pattern, "") })}
+            maxLength={16}
           />
 
           <img
@@ -93,7 +100,7 @@ class Home extends React.Component {
             this.setState({ connecting: true });
             socket.connect();
           }}
-          disabled={connecting}
+          disabled={disableButton}
         >
           {signUp ? "Cadastrar-se" : "Entrar"}
         </button>

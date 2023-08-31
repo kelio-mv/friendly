@@ -53,14 +53,15 @@
     color: white;
     font-size: calc(1rem + 2px);
     margin-bottom: 1rem;
+    cursor: pointer;
 
-    &:hover:not(:disabled) {
+    &:hover {
       background: #115e59;
-      cursor: pointer;
     }
 
     &:disabled {
       opacity: 0.5;
+      pointer-events: none;
     }
   }
 

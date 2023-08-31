@@ -10,7 +10,11 @@ function NewPost(props) {
         <img src="cancel.svg" onClick={props.discard} />
         <h1>Nova publicação</h1>
         <div className="top-bar__grow"></div>
-        <img src="send.svg" onClick={() => socket.emit("post", content)} />
+        <img
+          src="send.svg"
+          className={!content.trim() && "new-post__send--disabled"}
+          onClick={() => socket.emit("post", content.trim())}
+        />
       </div>
 
       <textarea
@@ -18,6 +22,7 @@ function NewPost(props) {
         placeholder="Escreva algo..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        maxLength="1000"
       />
     </div>
   );
