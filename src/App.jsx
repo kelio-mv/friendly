@@ -27,7 +27,7 @@ class Main extends React.Component {
     });
 
     socket.on("add_comment", (postId, comment) => {
-      const posts = { ...this.state.posts };
+      const posts = [...this.state.posts];
       posts[postId].comments.push(comment);
       this.setState({ posts });
     });
