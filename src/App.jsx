@@ -56,6 +56,14 @@ class App extends React.Component {
       });
     });
 
+    socket.on("comment_response", (postId, comment) => {
+      // would this break if the user receives the message after leaving the post?
+      const posts = [...this.state.posts];
+      const pb = this.postBodyRef.current;
+      posts[postId].comments.push(comment);
+      this.setState({ posts }, () => pb.scrollTo(0, pb.scrollHeight));
+    });
+
     socket.on("disconnect", () => {
       if (this.state.display !== "Home") {
         this.setState({ display: "Home" });
@@ -126,7 +134,7 @@ class App extends React.Component {
 export default App;
 
 /*
-Rolar página automaticamente no comentário do usuário
+Exibir número de novos comentários
 Converter user/post/comment pra array com um padrão de interface
 Colocar imagem de perfil
 Adicionar aviso de "estado de desenvolvimento"

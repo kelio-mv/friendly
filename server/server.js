@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
 
   socket.on("comment", (postId, content) => {
     const comment = storage.addComment(postId, socket.userId, content);
-    socket.emit("add_comment", postId, comment);
+    socket.emit("comment_response", postId, comment);
     socket.broadcast.emit("add_comment", postId, comment);
   });
 });
