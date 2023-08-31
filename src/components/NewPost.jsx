@@ -3,6 +3,7 @@ import socket from "../socket";
 
 function NewPost(props) {
   const [content, setContent] = useState("");
+  const [sending, setSending] = useState(false);
 
   return (
     <div className="flex-page">
@@ -12,8 +13,11 @@ function NewPost(props) {
         <div className="top-bar__grow"></div>
         <img
           src="send.svg"
-          className={!content.trim() && "new-post__send--disabled"}
-          onClick={() => socket.emit("post", content.trim())}
+          className={(!content.trim() || sending) && "new-post__send--disabled"}
+          onClick={() => {
+            setSending(true);
+            socket.emit("post", content.trim());
+          }}
         />
       </div>
 

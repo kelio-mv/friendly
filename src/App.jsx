@@ -114,7 +114,6 @@ class App extends React.Component {
 export default App;
 
 /*
-Desativar botão enviar em post/comentário enquanto estiver enviando
 Rolar página automaticamente no comentário
 Converter user/post/comment pra array com um padrão de interface
 Colocar imagem de perfil
