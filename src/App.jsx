@@ -14,6 +14,7 @@ class App extends React.Component {
     posts: [],
     postId: null,
   };
+  postBodyRef = React.createRef();
 
   componentDidMount() {
     socket.on("set_posts", (posts) => {
@@ -28,8 +29,19 @@ class App extends React.Component {
 
     socket.on("add_comment", (postId, comment) => {
       const posts = [...this.state.posts];
+      let callback;
+
+      if (postId === this.state.postId) {
+        const pb = this.postBodyRef.current;
+        const lc = pb.lastElementChild;
+
+        if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+          callback = () => pb.scrollTo(0, pb.scrollHeight);
+        }
+      }
+
       posts[postId].comments.push(comment);
-      this.setState({ posts });
+      this.setState({ posts }, callback);
     });
 
     socket.on("add_users", (users) => {
@@ -74,6 +86,7 @@ class App extends React.Component {
 
   render() {
     const { display, users, posts, postId } = this.state;
+    const { postBodyRef } = this;
 
     switch (display) {
       case "Home":
@@ -98,9 +111,8 @@ class App extends React.Component {
       case "Post":
         return (
           <Post
-            users={users}
+            {...{ users, postId, postBodyRef }}
             post={posts[postId]}
-            postId={postId}
             close={() => this.setState({ display: "Feed", postId: null })}
           />
         );
@@ -114,7 +126,7 @@ class App extends React.Component {
 export default App;
 
 /*
-Rolar página automaticamente no comentário
+Rolar página automaticamente no comentário do usuário
 Converter user/post/comment pra array com um padrão de interface
 Colocar imagem de perfil
 Adicionar aviso de "estado de desenvolvimento"

@@ -19,7 +19,7 @@ function Post(props) {
         <h1>Publicação</h1>
       </div>
 
-      <div className="post__body">
+      <div className="post__body" ref={props.postBodyRef}>
         <Article data={props.post} user={props.users[props.post.uid]} />
         {props.post.comments.map((comment, i) => (
           <Article key={i} data={comment} user={props.users[comment.uid]} />
@@ -28,8 +28,8 @@ function Post(props) {
 
       <div className="post__footer">
         <textarea
-          ref={commentRef}
           className="post__textarea"
+          ref={commentRef}
           placeholder="Comente algo..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
