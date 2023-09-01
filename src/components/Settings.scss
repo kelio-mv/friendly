@@ -1,0 +1,22 @@
+.settings {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  &__picture {
+    width: 64px;
+    border-radius: 50%;
+  }
+
+  &__remove {
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 4rem;
+    background: #0f766e;
+    color: inherit;
+    border: none;
+    border-radius: 9999px;
+  }
+}

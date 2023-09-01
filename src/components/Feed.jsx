@@ -35,6 +35,7 @@ function Feed(props) {
         close={() => setShowSidebar(false)}
         user={props.users[storage.userId]}
         logout={props.logout}
+        openSettings={props.openSettings}
       />
     </div>
   );

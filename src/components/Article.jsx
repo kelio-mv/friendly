@@ -2,17 +2,19 @@ import "./Article.scss";
 
 function Article(props) {
   if (props.user) {
+    const picture = props.user.picture;
+
     return (
       <article
         className={`article ${props.highlight ? "article--highlight" : ""}`}
         onClick={props.onClick}
       >
         <header className="article__header">
-          <div
-            style={{ backgroundImage: `url(${props.user.picture})` }}
+          <img
+            src={picture}
             className="article__picture"
+            style={picture === "avatar.png" ? { filter: "invert(1)" } : {}}
           />
-
           <div>
             <p>@{props.user.name}</p>
             <p className="article__date">{parseDate(props.data.date)}</p>

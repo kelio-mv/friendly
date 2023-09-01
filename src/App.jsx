@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
+import Settings from "./components/Settings";
 import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
@@ -116,6 +117,7 @@ class App extends React.Component {
               storage.deleteCredentials();
               this.setState({ display: "Home" });
             }}
+            openSettings={() => this.setState({ display: "Settings" })}
           />
         );
 
@@ -130,6 +132,11 @@ class App extends React.Component {
 
       case "NewPost":
         return <NewPost discard={() => this.setState({ display: "Feed" })} />;
+
+      case "Settings":
+        return (
+          <Settings user={users[storage.userId]} close={() => this.setState({ display: "Feed" })} />
+        );
     }
   }
 }
@@ -137,6 +144,7 @@ class App extends React.Component {
 export default App;
 
 /*
+Remover home__access do componente Settings
 Colocar imagem de perfil
 Exibir número de novos comentários
 Converter user/post/comment pra array com um padrão de interface

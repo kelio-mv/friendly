@@ -54,6 +54,13 @@ io.on("connection", (socket) => {
     socket.emit("comment_response", postId, comment);
     socket.broadcast.emit("add_comment", postId, comment);
   });
+
+  socket.on("set_user", ({ picture }, callback) => {
+    const newUser = storage.setUserData(socket.userId, { picture });
+    socket.emit("add_users", { [socket.userId]: newUser });
+    callback();
+    socket.broadcast.emit("add_users", { [socket.userId]: newUser });
+  });
 });
 
 console.log("Server is running");

@@ -30,6 +30,13 @@ class Storage {
     return { name, picture };
   }
 
+  setUserData(userId, { picture }) {
+    const user = this.users[userId];
+    user.picture = picture;
+    fs.writeFileSync("users.json", JSON.stringify(this.users));
+    return { name: user.name, picture: user.picture };
+  }
+
   addUser(username, password) {
     this.users.push({
       name: username,

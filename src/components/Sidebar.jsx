@@ -9,7 +9,11 @@ function Sidebar(props) {
     <div className="sidebar">
       <div className="sidebar__content">
         <div className="sidebar__header">
-          <img src={props.user.picture} className="sidebar__picture" />
+          <img
+            src={props.user.picture}
+            className="sidebar__picture"
+            style={props.user.picture === "avatar.png" ? { filter: "invert(1)" } : {}}
+          />
           <p>@{props.user.name}</p>
         </div>
 
@@ -29,7 +33,7 @@ function Sidebar(props) {
           <img src="pending.svg" />
           Planejamento
         </div>
-        <div className="sidebar__item sidebar__item--disabled">
+        <div className="sidebar__item" onClick={props.openSettings}>
           <img src="settings.svg" />
           Configurações
         </div>
