@@ -72,7 +72,7 @@ class Settings extends React.Component {
             title="Imagem de perfil"
             footer={
               <button
-                className="btn btn--primary"
+                className="btn btn--primary btn--sm"
                 onClick={() => {
                   socket.emit("set_user", { picture }, () => {
                     this.savedSettings = JSON.stringify(this.state.settings);
@@ -80,12 +80,11 @@ class Settings extends React.Component {
                   });
                 }}
                 disabled={JSON.stringify(settings) === savedSettings}
-                style={{ minWidth: "unset" }}
               >
                 Salvar
               </button>
             }
-            back={() => this.setState({ display: "" })}
+            back={() => this.setState({ display: "", settings: JSON.parse(savedSettings) })}
           >
             <div className="settings__grow" />
             <img
