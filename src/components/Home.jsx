@@ -95,7 +95,7 @@ class Home extends React.Component {
         </div>
 
         <button
-          className="home__access"
+          className="home__btn btn btn--primary"
           onClick={() => {
             this.setState({ connecting: true });
             socket.connect();

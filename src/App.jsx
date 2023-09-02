@@ -19,7 +19,7 @@ class App extends React.Component {
 
   componentDidMount() {
     socket.on("set_user", (userId, user) => {
-      storage.setUserId(userId);
+      storage.userId = userId;
       this.setState({ users: { [userId]: user } });
     });
 
@@ -144,8 +144,9 @@ class App extends React.Component {
 export default App;
 
 /*
-Remover home__access do componente Settings
-Colocar imagem de perfil
+Padronizar modals e picture, sidebar e settings
+Settings -> Discard\Cancel
+Nome de usuário / Senha atual | Senha atual / Nova senha
 Exibir número de novos comentários
 Converter user/post/comment pra array com um padrão de interface
 Adicionar aviso de "estado de desenvolvimento" e convite de feedback

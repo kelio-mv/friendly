@@ -44,25 +44,8 @@
     cursor: pointer;
   }
 
-  &__access {
-    width: 16rem;
-    padding: 0.5rem 0;
-    background: #0f766e;
-    border: none;
-    border-radius: 0.25rem;
-    color: white;
-    font-size: calc(1rem + 2px);
+  &__btn {
     margin-bottom: 1rem;
-    cursor: pointer;
-
-    &:hover {
-      background: #115e59;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
   }
 
   &__switch-mode {
