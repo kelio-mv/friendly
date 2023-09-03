@@ -144,11 +144,16 @@ class App extends React.Component {
 export default App;
 
 /*
-Padronizar modals e picture, sidebar e settings
-Settings -> Discard\Cancel
+Criar componente pra username e senha
+Verificação de username pelo server
+Padronizar modals, picture, sidebar e settings
 Nome de usuário / Senha atual | Senha atual / Nova senha
 Exibir número de novos comentários
-Converter user/post/comment pra array com um padrão de interface
+Implementar sqlite
+Terminar Sidebar
+Duração dos posts
+Exclusão de contas inativas
+Mensagens privadas
 Adicionar aviso de "estado de desenvolvimento" e convite de feedback
 */
 

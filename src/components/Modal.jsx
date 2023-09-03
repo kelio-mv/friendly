@@ -3,8 +3,8 @@ import "./Modal.scss";
 function Modal(props) {
   return (
     props.open && (
-      <div className="modal">
-        <div className="modal__content">
+      <div className="modal" onClick={props.close}>
+        <div className="modal__content" onClick={(e) => e.stopPropagation()}>
           <div className="modal__header">{props.header}</div>
           <div className="modal__body">{props.children}</div>
           <div className="modal__footer">{props.footer}</div>

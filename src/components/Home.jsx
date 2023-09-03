@@ -124,7 +124,11 @@ class Home extends React.Component {
         <Modal
           open={errorMessage.length > 0}
           header={errorMessage[0]}
-          footer={<p onClick={() => this.setState({ errorMessage: [] })}>OK</p>}
+          footer={
+            <p className="modal__btn" onClick={() => this.setState({ errorMessage: [] })}>
+              OK
+            </p>
+          }
         >
           {errorMessage[1]}
         </Modal>

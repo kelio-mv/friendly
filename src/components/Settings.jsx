@@ -1,5 +1,6 @@
 import React from "react";
-import SettingsTab from "./SettingsTab";
+import Modal from "./Modal";
+import ModalButton from "./ModalButton";
 import storage from "../storage";
 import socket from "../socket";
 import "./Settings.scss";
@@ -7,18 +8,14 @@ import "./Settings.scss";
 class Settings extends React.Component {
   state = {
     display: "",
-    settings: {
-      picture: this.props.user.picture,
-      username: "",
-      password: "",
-    },
+    saving: false,
+    profilePicture: this.props.user.picture,
+    newUsername: "",
+    currentPassword: "",
+    newPassword: "",
   };
-  savedSettings = JSON.stringify(this.state.settings);
+  savedProfilePicture = this.state.profilePicture;
   fileRef = React.createRef();
-
-  setSettings(settings) {
-    this.setState({ settings: { ...this.state.settings, ...settings } });
-  }
 
   onFileLoad(file) {
     if (!file) return;
@@ -38,7 +35,7 @@ class Settings extends React.Component {
         const x = (img.width - size) / 2;
         const y = (img.height - size) / 2;
         ctx.drawImage(img, x, y, size, size, 0, 0, options.size, options.size);
-        this.setSettings({ picture: canvas.toDataURL("image/jpeg", options.quality) });
+        this.setState({ profilePicture: canvas.toDataURL("image/jpeg", options.quality) });
       };
       img.src = reader.result;
     };
@@ -46,16 +43,23 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { display, settings } = this.state;
-    const { picture, username, password } = settings;
-    const { savedSettings, fileRef } = this;
-    const pattern = /[^a-zA-Z0-9_]/g;
+    const { display, saving } = this.state;
+    const { profilePicture, newUsername, currentPassword, newPassword } = this.state;
+    const { savedProfilePicture, fileRef } = this;
+    // const pattern = /[^a-zA-Z0-9_]/g;
 
-    switch (display) {
-      case "":
-        return (
-          <SettingsTab title="Configurações" back={this.props.close} home>
-            <div className="settings__item" onClick={() => this.setState({ display: "Picture" })}>
+    return (
+      <>
+        <div className="flex-page">
+          <div className="top-bar">
+            <img src="back.svg" onClick={this.props.close} />
+            <h1>Configurações</h1>
+          </div>
+          <div className="settings__body">
+            <div
+              className="settings__item"
+              onClick={() => this.setState({ display: "ProfilePicture" })}
+            >
               <img src="picture.svg" />
               Imagem de perfil
             </div>
@@ -67,33 +71,33 @@ class Settings extends React.Component {
               <img src="password.svg" />
               Senha
             </div>
-          </SettingsTab>
-        );
+          </div>
+        </div>
 
-      case "Picture":
-        return (
-          <SettingsTab
-            title="Imagem de perfil"
-            footer={
-              <button
-                className="btn btn--primary btn--sm"
-                onClick={() => {
-                  socket.emit("set_user", { prop: "picture", picture }, () => {
-                    this.savedSettings = JSON.stringify(this.state.settings);
-                    this.setState({ display: "" });
-                  });
-                }}
-                disabled={JSON.stringify(settings) === savedSettings}
-              >
-                Salvar
-              </button>
-            }
-            back={() => this.setState({ display: "", settings: JSON.parse(savedSettings) })}
-          >
+        <Modal
+          open={display === "ProfilePicture"}
+          header="Imagem de perfil"
+          footer={
+            <ModalButton
+              onClick={() => {
+                this.setState({ saving: true });
+                socket.emit("set_user", { prop: "picture", picture: profilePicture }, () => {
+                  this.savedProfilePicture = profilePicture;
+                  this.setState({ display: "", saving: false });
+                });
+              }}
+              disabled={profilePicture === savedProfilePicture || saving}
+            >
+              Salvar
+            </ModalButton>
+          }
+          close={() => this.setState({ display: "", profilePicture: savedProfilePicture })}
+        >
+          <div className="settings__modal">
             <img
-              src={picture}
+              src={profilePicture}
               className="settings__picture"
-              style={picture === "avatar.png" ? { filter: "invert(1)" } : {}}
+              style={profilePicture === "avatar.png" ? { filter: "invert(1)" } : {}}
             />
             <input
               type="file"
@@ -102,67 +106,68 @@ class Settings extends React.Component {
               onChange={(e) => this.onFileLoad(e.target.files[0])}
               style={{ display: "none" }}
             />
-            <button className="btn btn--secondary" onClick={() => fileRef.current.click()}>
+            <button className="btn btn--primary" onClick={() => fileRef.current.click()}>
               Enviar imagem
             </button>
             <button
               className="btn btn--danger"
               onClick={() => {
                 fileRef.current.value = "";
-                this.setSettings({ picture: "avatar.png" });
+                this.setState({ profilePicture: "avatar.png" });
               }}
-              disabled={picture === "avatar.png"}
+              disabled={profilePicture === "avatar.png"}
             >
               Remover
             </button>
-          </SettingsTab>
-        );
+          </div>
+        </Modal>
 
-      case "Username":
-        return (
-          <SettingsTab
-            title="Nome de usuário"
-            footer={
-              <button
-                className="btn btn--primary btn--sm"
-                onClick={() => {
-                  socket.emit("set_user", { prop: "name", name: username }, () => {
-                    storage.saveCredentials(username, storage.password);
-                    this.setState({ display: "", username: "", password: "" });
+        <Modal
+          open={display === "Username"}
+          header="Nome de usuário"
+          footer={
+            <ModalButton
+              onClick={() => {
+                this.setState({ saving: true });
+                socket.emit("set_user", { prop: "name", name: newUsername }, () => {
+                  storage.saveCredentials(newUsername, storage.password);
+                  this.setState({
+                    display: "",
+                    saving: false,
+                    newUsername: "",
+                    currentPassword: "",
                   });
-                }}
-                disabled={
-                  JSON.stringify(settings) === savedSettings ||
-                  username.length < 3 ||
-                  username.startsWith("_") ||
-                  username.endsWith("_")
-                }
-              >
-                Salvar
-              </button>
-            }
-            back={() => this.setState({ display: "", settings: JSON.parse(savedSettings) })}
-          >
-            <p className="settings__username-label">Seu nome de usuário: @{this.props.user.name}</p>
+                });
+              }}
+              disabled={saving || !newUsername || !currentPassword}
+            >
+              Salvar
+            </ModalButton>
+          }
+          close={() => this.setState({ display: "", newUsername: "", currentPassword: "" })}
+        >
+          <div className="settings__modal">
+            <p>@{this.props.user.name}</p>
             <input
               type="text"
               className="text-input"
-              placeholder="Editar nome de usuário"
-              value={username}
-              onChange={(e) => this.setSettings({ username: e.target.value })}
+              placeholder="Novo nome de usuário"
+              value={newUsername}
+              onChange={(e) => this.setState({ newUsername: e.target.value })}
               maxLength={16}
             />
             <input
               type="password"
               className="text-input"
               placeholder="Senha atual"
-              value={password}
-              onChange={(e) => this.setSettings({ password: e.target.value })}
+              value={currentPassword}
+              onChange={(e) => this.setState({ currentPassword: e.target.value })}
               maxLength={16}
             />
-          </SettingsTab>
-        );
-    }
+          </div>
+        </Modal>
+      </>
+    );
   }
 }
 

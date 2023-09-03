@@ -10,18 +10,20 @@
   background: rgba(0, 0, 0, 0.75);
 
   &__content {
-    width: 20rem;
+    max-width: 20rem;
     background: var(--bg-200);
     border-radius: 0.5rem;
   }
 
   &__header {
-    padding: 0.75rem 1rem 0 1rem;
+    padding: 0.75rem 1rem 0.75rem;
     font-size: 1.25rem;
+    border-bottom: 1px solid var(--bg-400);
   }
 
   &__body {
-    padding: 0.75rem 1rem 2rem 1rem;
+    min-height: 5rem;
+    padding: 0.75rem 1rem;
     color: var(--clr-300);
   }
 
@@ -29,10 +31,15 @@
     display: flex;
     justify-content: flex-end;
     padding: 0.75rem 1rem;
-    color: #14b8a6;
+  }
 
-    & > * {
-      cursor: pointer;
+  &__btn {
+    color: #14b8a6;
+    cursor: pointer;
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
   }
 }
