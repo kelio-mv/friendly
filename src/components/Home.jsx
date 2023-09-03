@@ -1,5 +1,6 @@
 import React from "react";
 import Modal from "./Modal";
+import TextField from "./TextField";
 import storage from "../storage";
 import socket from "../socket";
 import "./Home.scss";
@@ -8,7 +9,6 @@ class Home extends React.Component {
   state = {
     username: storage.username,
     password: storage.password,
-    showPassword: false,
     signUp: false,
     connecting: storage.credentials,
     errorMessage: [],
@@ -51,14 +51,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { username, password, showPassword, signUp, connecting, errorMessage } = this.state;
-    const pattern = /[^a-zA-Z0-9_]/g;
-    const disableButton =
-      connecting ||
-      username.length < 3 ||
-      password.length < 6 ||
-      username.startsWith("_") ||
-      username.endsWith("_");
+    const { username, password, signUp, connecting, errorMessage } = this.state;
 
     return (
       <div className="home" style={connecting ? { pointerEvents: "none" } : {}}>
@@ -68,31 +61,19 @@ class Home extends React.Component {
 
         <p className="home__description">Um lugar para desabafar e fazer novos amigos</p>
 
-        <input
-          type="text"
-          className="text-input"
+        <TextField
+          type="username"
           placeholder="Nome de usuário"
           value={username}
-          onChange={(e) => this.setState({ username: e.target.value.replace(pattern, "") })}
-          maxLength={16}
+          onChange={(v) => this.setState({ username: v })}
         />
 
-        <div className="home__pw-container">
-          <input
-            type={showPassword ? "text" : "password"}
-            className="text-input"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => this.setState({ password: e.target.value.replace(pattern, "") })}
-            maxLength={16}
-          />
-
-          <img
-            src={showPassword ? "hide_password.svg" : "show_password.svg"}
-            className="home__pw-visibility"
-            onClick={() => this.setState({ showPassword: !showPassword })}
-          />
-        </div>
+        <TextField
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(v) => this.setState({ password: v })}
+        />
 
         <button
           className="home__btn btn btn--primary"
@@ -100,7 +81,7 @@ class Home extends React.Component {
             this.setState({ connecting: true });
             socket.connect();
           }}
-          disabled={disableButton}
+          disabled={connecting}
         >
           {signUp ? "Cadastrar-se" : "Entrar"}
         </button>

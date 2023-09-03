@@ -18,19 +18,6 @@
     color: var(--clr-300);
   }
 
-  &__pw-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-
-  &__pw-visibility {
-    position: absolute;
-    right: 0.5rem;
-    filter: invert(0.5);
-    cursor: pointer;
-  }
-
   &__btn {
     margin-bottom: 1rem;
   }

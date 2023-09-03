@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "./Modal";
 import ModalButton from "./ModalButton";
+import TextField from "./TextField";
 import storage from "../storage";
 import socket from "../socket";
 import "./Settings.scss";
@@ -46,7 +47,6 @@ class Settings extends React.Component {
     const { display, saving } = this.state;
     const { profilePicture, newUsername, currentPassword, newPassword } = this.state;
     const { savedProfilePicture, fileRef } = this;
-    // const pattern = /[^a-zA-Z0-9_]/g;
 
     return (
       <>
@@ -148,21 +148,21 @@ class Settings extends React.Component {
         >
           <div className="settings__modal">
             <p>@{this.props.user.name}</p>
-            <input
-              type="text"
-              className="text-input"
-              placeholder="Novo nome de usuário"
+
+            <TextField
+              type="username"
+              placeholder="Editar nome de usuário"
               value={newUsername}
-              onChange={(e) => this.setState({ newUsername: e.target.value })}
-              maxLength={16}
+              onChange={(v) => this.setState({ newUsername: v })}
+              modalChild
             />
-            <input
+
+            <TextField
               type="password"
-              className="text-input"
               placeholder="Senha atual"
               value={currentPassword}
-              onChange={(e) => this.setState({ currentPassword: e.target.value })}
-              maxLength={16}
+              onChange={(v) => this.setState({ currentPassword: v })}
+              modalChild
             />
           </div>
         </Modal>

@@ -116,16 +116,3 @@ Possíveis causas do bug dos 18px:
     }
   }
 }
-
-.text-input {
-  width: 16rem;
-  padding: 0.5rem;
-  background: var(--bg-300);
-  color: inherit;
-  border: 2px solid transparent;
-  border-radius: 0.25rem;
-
-  &:focus {
-    border: 2px solid var(--bg-300);
-  }
-}

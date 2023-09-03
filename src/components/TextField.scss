@@ -1,0 +1,33 @@
+.text-field {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &__input {
+    width: 16rem;
+    padding: 0.5rem;
+    background: var(--bg-200);
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 0.25rem;
+
+    &:focus {
+      border: 2px solid var(--bg-300);
+    }
+  }
+
+  &__input--modal-child {
+    background: var(--bg-300);
+
+    &:focus {
+      border: 2px solid var(--bg-400);
+    }
+  }
+
+  &__pw-visibility {
+    position: absolute;
+    right: 0.5rem;
+    filter: invert(0.5);
+    cursor: pointer;
+  }
+}
