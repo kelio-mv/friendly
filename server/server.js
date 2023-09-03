@@ -3,31 +3,42 @@ const storage = require("./storage");
 const io = new Server(3000, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
-  socket.on("sign-in", (username, password) => {
+  socket.on("auth", (signUp, username, password, callback) => {
+    if (username.length < 3) {
+      callback(["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."]);
+      return;
+    }
+    if (password.length < 6) {
+      callback(["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."]);
+      return;
+    }
+
     const [user, userId] = storage.getUser(username);
 
-    if (user && user.pw === password) {
-      socket.userId = userId;
-      socket.emit("auth-response");
+    if (signUp) {
+      if (user) {
+        callback([
+          "Nome indisponível",
+          "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
+        ]);
+      } else {
+        socket.userId = storage.addUser(username, password);
+        callback();
+      }
     } else {
-      socket.emit("auth-response", [
-        "Senha incorreta",
-        "Sua senha está incorreta. Por favor, verifique a sua senha.",
-      ]);
-    }
-  });
-
-  socket.on("sign-up", (username, password) => {
-    const [user] = storage.getUser(username);
-
-    if (user) {
-      socket.emit("auth-response", [
-        "Nome indisponível",
-        "Este nome já está em uso. Por favor, escolha outro nome de usuário.",
-      ]);
-    } else {
-      socket.userId = storage.addUser(username, password);
-      socket.emit("auth-response");
+      if (user) {
+        if (user.pw === password) {
+          socket.userId = userId;
+          callback();
+        } else {
+          callback(["Senha incorreta", "Sua senha está incorreta. Por favor, verifique-a."]);
+        }
+      } else {
+        callback([
+          "Não encontrado",
+          "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
+        ]);
+      }
     }
   });
 

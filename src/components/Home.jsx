@@ -17,26 +17,27 @@ class Home extends React.Component {
   componentDidMount() {
     socket.on("connect", () => {
       const { signUp, username, password } = this.state;
-      socket.emit(signUp ? "sign-up" : "sign-in", username, password);
+      const callback = (errorMessage) => {
+        if (errorMessage) {
+          socket.close();
+          storage.deleteCredentials();
+          this.setState({ connecting: false, errorMessage });
+        } else {
+          storage.saveCredentials(username, password);
+          this.props.onAuth();
+        }
+      };
+      socket.emit("auth", signUp, username, password, callback);
     });
 
     socket.on("connect_error", () => {
       this.setState({
         connecting: false,
-        errorMessage: ["Erro de conexão", "Não foi possível se conectar ao servidor."],
+        errorMessage: [
+          "Erro de conexão",
+          "Não foi possível se conectar ao servidor. Por favor, tente novamente.",
+        ],
       });
-    });
-
-    socket.on("auth-response", (errorMessage) => {
-      if (errorMessage) {
-        socket.close();
-        storage.deleteCredentials();
-        this.setState({ connecting: false, errorMessage });
-      } else {
-        const { username, password } = this.state;
-        storage.saveCredentials(username, password);
-        this.props.onAuth();
-      }
     });
 
     if (storage.credentials) {

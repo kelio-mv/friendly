@@ -144,10 +144,9 @@ class App extends React.Component {
 export default App;
 
 /*
-Criar componente pra username e senha
 Verificação de username pelo server
 Padronizar modals, picture, sidebar e settings
-Nome de usuário / Senha atual | Senha atual / Nova senha
+Senha atual / Nova senha
 Exibir número de novos comentários
 Implementar sqlite
 Terminar Sidebar
