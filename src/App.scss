@@ -109,23 +109,35 @@ Possíveis causas do bug dos 18px:
 
   &--secondary {
     background: #0e7490;
-    border: 1px solid #0e7490;
 
     &:hover {
       background: #155e75;
-      border: 1px solid #155e75;
     }
   }
 
   &--danger {
-    border: 1px solid #dc3545;
+    padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+    border: 1px solid #991b1b;
 
     &:hover {
-      border: 1px solid #c92332;
+      border: 1px solid #b91c1c;
     }
   }
 
   &--sm {
     min-width: unset;
+  }
+}
+
+.text-input {
+  width: 16rem;
+  padding: 0.5rem;
+  background: var(--bg-200);
+  color: inherit;
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+
+  &:focus {
+    border: 2px solid var(--bg-300);
   }
 }

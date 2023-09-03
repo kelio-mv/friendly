@@ -5,6 +5,8 @@ class Storage {
   userId = null;
 
   saveCredentials(username, password) {
+    this.username = username;
+    this.password = password;
     localStorage.friendly = JSON.stringify({ username, password });
   }
 

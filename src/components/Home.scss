@@ -18,19 +18,6 @@
     color: var(--clr-300);
   }
 
-  &__input {
-    width: 16rem;
-    padding: 0.5rem;
-    background: var(--bg-200);
-    color: inherit;
-    border: 2px solid transparent;
-    border-radius: 0.25rem;
-
-    &:focus {
-      border: 2px solid var(--bg-300);
-    }
-  }
-
   &__pw-container {
     display: flex;
     align-items: center;

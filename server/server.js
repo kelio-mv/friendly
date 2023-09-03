@@ -55,8 +55,8 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("add_comment", postId, comment);
   });
 
-  socket.on("set_user", ({ picture }, callback) => {
-    const newUser = storage.setUserData(socket.userId, { picture });
+  socket.on("set_user", (args, callback) => {
+    const newUser = storage.setUserData(socket.userId, args);
     socket.emit("add_users", { [socket.userId]: newUser });
     callback();
     socket.broadcast.emit("add_users", { [socket.userId]: newUser });

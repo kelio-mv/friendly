@@ -34,8 +34,8 @@
     margin-bottom: 1rem;
   }
 
-  &__grow {
-    flex-grow: 1;
+  &__username-label {
+    margin-bottom: 1rem;
   }
 }
 
@@ -44,15 +44,16 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 1rem;
-    padding: 2rem 1rem 1rem;
+    padding: 1rem;
   }
 
   &__footer {
     display: flex;
     justify-content: flex-end;
-    padding: 0 0.875rem 0.875rem;
+    padding: 0.875rem;
     gap: 1rem;
   }
 }

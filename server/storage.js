@@ -30,9 +30,19 @@ class Storage {
     return { name, picture };
   }
 
-  setUserData(userId, { picture }) {
+  setUserData(userId, args) {
     const user = this.users[userId];
-    user.picture = picture;
+
+    switch (args.prop) {
+      case "picture":
+        user.picture = args.picture;
+        break;
+
+      case "name":
+        user.name = args.name;
+        break;
+    }
+
     fs.writeFileSync("users.json", JSON.stringify(this.users));
     return { name: user.name, picture: user.picture };
   }

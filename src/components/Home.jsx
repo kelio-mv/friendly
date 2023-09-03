@@ -70,7 +70,7 @@ class Home extends React.Component {
 
         <input
           type="text"
-          className="home__input"
+          className="text-input"
           placeholder="Nome de usuário"
           value={username}
           onChange={(e) => this.setState({ username: e.target.value.replace(pattern, "") })}
@@ -80,7 +80,7 @@ class Home extends React.Component {
         <div className="home__pw-container">
           <input
             type={showPassword ? "text" : "password"}
-            className="home__input"
+            className="text-input"
             placeholder="Senha"
             value={password}
             onChange={(e) => this.setState({ password: e.target.value.replace(pattern, "") })}
