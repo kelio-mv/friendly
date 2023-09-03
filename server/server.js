@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
       }
     } else {
       if (user) {
-        if (user.pw === password) {
+        if (user.password === password) {
           socket.userId = userId;
           callback();
         } else {
@@ -50,7 +50,6 @@ io.on("connection", (socket) => {
 
   socket.on("get_users", (userIds) => {
     const response = {};
-
     for (const userId of userIds) {
       response[userId] = storage.getUserData(userId);
     }
@@ -69,8 +68,19 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("add_comment", postId, comment);
   });
 
-  socket.on("set_user", (args, callback) => {
-    const newUser = storage.setUserData(socket.userId, args);
+  socket.on("update_user", (args, callback) => {
+    let newUser;
+
+    switch (args.prop) {
+      case "profilePicture":
+        newUser = storage.updateUser(socket.userId, { profilePicture: args.profilePicture });
+        break;
+
+      case "username":
+        newUser = storage.updateUser(socket.userId, { username: args.username });
+        break;
+    }
+
     socket.emit("add_users", { [socket.userId]: newUser });
     callback();
     socket.broadcast.emit("add_users", { [socket.userId]: newUser });

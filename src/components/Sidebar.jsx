@@ -10,11 +10,11 @@ function Sidebar(props) {
       <div className="sidebar__content">
         <div className="sidebar__header">
           <img
-            src={props.user.picture}
-            className="sidebar__picture"
-            style={props.user.picture === "avatar.png" ? { filter: "invert(1)" } : {}}
+            src={props.user.profilePicture}
+            className="sidebar__profilePicture"
+            style={props.user.profilePicture === "avatar.png" ? { filter: "invert(1)" } : {}}
           />
-          <p>@{props.user.name}</p>
+          <p>@{props.user.username}</p>
         </div>
 
         <div className="sidebar__item sidebar__item--disabled">

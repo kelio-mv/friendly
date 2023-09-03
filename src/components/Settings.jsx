@@ -10,12 +10,11 @@ class Settings extends React.Component {
   state = {
     display: "",
     saving: false,
-    profilePicture: this.props.user.picture,
-    newUsername: "",
+    profilePicture: this.props.user.profilePicture,
+    username: this.props.user.username,
     currentPassword: "",
-    newPassword: "",
+    password: "",
   };
-  savedProfilePicture = this.state.profilePicture;
   fileRef = React.createRef();
 
   onFileLoad(file) {
@@ -44,9 +43,10 @@ class Settings extends React.Component {
   }
 
   render() {
+    const { fileRef } = this;
+    const { user } = this.props;
     const { display, saving } = this.state;
-    const { profilePicture, newUsername, currentPassword, newPassword } = this.state;
-    const { savedProfilePicture, fileRef } = this;
+    const { profilePicture, username, currentPassword, password } = this.state;
 
     return (
       <>
@@ -81,17 +81,16 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                socket.emit("set_user", { prop: "picture", picture: profilePicture }, () => {
-                  this.savedProfilePicture = profilePicture;
+                socket.emit("update_user", { prop: "profilePicture", profilePicture }, () => {
                   this.setState({ display: "", saving: false });
                 });
               }}
-              disabled={profilePicture === savedProfilePicture || saving}
+              disabled={profilePicture === user.profilePicture || saving}
             >
               Salvar
             </ModalButton>
           }
-          close={() => this.setState({ display: "", profilePicture: savedProfilePicture })}
+          close={() => this.setState({ display: "", profilePicture: user.profilePicture })}
         >
           <div className="settings__modal">
             <img
@@ -129,31 +128,30 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                socket.emit("set_user", { prop: "name", name: newUsername }, () => {
-                  storage.saveCredentials(newUsername, storage.password);
+                socket.emit("update_user", { prop: "username", username, currentPassword }, () => {
+                  storage.saveCredentials(username, storage.password);
                   this.setState({
                     display: "",
                     saving: false,
-                    newUsername: "",
                     currentPassword: "",
                   });
                 });
               }}
-              disabled={saving || !newUsername || !currentPassword}
+              disabled={username === user.username || saving || !username || !currentPassword}
             >
               Salvar
             </ModalButton>
           }
-          close={() => this.setState({ display: "", newUsername: "", currentPassword: "" })}
+          close={() =>
+            this.setState({ display: "", username: this.props.user.username, currentPassword: "" })
+          }
         >
           <div className="settings__modal">
-            <p>@{this.props.user.name}</p>
-
             <TextField
               type="username"
               placeholder="Editar nome de usuário"
-              value={newUsername}
-              onChange={(v) => this.setState({ newUsername: v })}
+              value={username}
+              onChange={(v) => this.setState({ username: v })}
               modalChild
             />
 

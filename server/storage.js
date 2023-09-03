@@ -18,7 +18,7 @@ class Storage {
   getUser(username) {
     for (let userId = 0; userId < this.users.length; userId++) {
       const user = this.users[userId];
-      if (user.name === username) {
+      if (user.username === username) {
         return [user, userId];
       }
     }
@@ -26,32 +26,22 @@ class Storage {
   }
 
   getUserData(userId) {
-    const { name, picture } = this.users[userId];
-    return { name, picture };
+    const { username, profilePicture } = this.users[userId];
+    return { username, profilePicture };
   }
 
-  setUserData(userId, args) {
+  updateUser(userId, data) {
     const user = this.users[userId];
-
-    switch (args.prop) {
-      case "picture":
-        user.picture = args.picture;
-        break;
-
-      case "name":
-        user.name = args.name;
-        break;
-    }
-
+    Object.assign(user, data);
     fs.writeFileSync("users.json", JSON.stringify(this.users));
-    return { name: user.name, picture: user.picture };
+    return { username: user.username, profilePicture: user.profilePicture };
   }
 
   addUser(username, password) {
     this.users.push({
-      name: username,
-      pw: password,
-      picture: "avatar.png",
+      username,
+      password,
+      profilePicture: "avatar.png",
     });
     fs.writeFileSync("users.json", JSON.stringify(this.users));
     return this.users.length - 1;

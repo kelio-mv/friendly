@@ -2,7 +2,7 @@ import "./Article.scss";
 
 function Article(props) {
   if (props.user) {
-    const picture = props.user.picture;
+    const picture = props.user.profilePicture;
 
     return (
       <article
@@ -16,7 +16,7 @@ function Article(props) {
             style={picture === "avatar.png" ? { filter: "invert(1)" } : {}}
           />
           <div>
-            <p>@{props.user.name}</p>
+            <p>@{props.user.username}</p>
             <p className="article__date">{parseDate(props.data.date)}</p>
           </div>
         </header>
