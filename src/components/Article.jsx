@@ -1,3 +1,4 @@
+import ProfilePicture from "./ProfilePicture";
 import "./Article.scss";
 
 function Article(props) {
@@ -10,11 +11,7 @@ function Article(props) {
         onClick={props.onClick}
       >
         <header className="article__header">
-          <img
-            src={picture}
-            className="article__picture"
-            style={picture === "avatar.png" ? { filter: "invert(1)" } : {}}
-          />
+          <ProfilePicture src={picture} small />
           <div>
             <p>@{props.user.username}</p>
             <p className="article__date">{parseDate(props.data.date)}</p>

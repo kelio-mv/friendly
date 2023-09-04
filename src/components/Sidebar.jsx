@@ -1,3 +1,4 @@
+import ProfilePicture from "./ProfilePicture";
 import "./Sidebar.scss";
 
 function Sidebar(props) {
@@ -9,11 +10,7 @@ function Sidebar(props) {
     <div className="sidebar">
       <div className="sidebar__content">
         <div className="sidebar__header">
-          <img
-            src={props.user.profilePicture}
-            className="sidebar__profilePicture"
-            style={props.user.profilePicture === "avatar.png" ? { filter: "invert(1)" } : {}}
-          />
+          <ProfilePicture src={props.user.profilePicture} style={{ margin: "0 auto 0.75rem" }} />
           <p>@{props.user.username}</p>
         </div>
 

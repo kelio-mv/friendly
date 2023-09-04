@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "./Modal";
 import ModalButton from "./ModalButton";
+import ProfilePicture from "./ProfilePicture";
 import TextField from "./TextField";
 import storage from "../storage";
 import socket from "../socket";
@@ -94,11 +95,7 @@ class Settings extends React.Component {
           close={() => this.setState({ display: "", profilePicture: user.profilePicture })}
         >
           <div className="settings__modal">
-            <img
-              src={profilePicture}
-              className="settings__picture"
-              style={profilePicture === "avatar.png" ? { filter: "invert(1)" } : {}}
-            />
+            <ProfilePicture src={profilePicture} />
             <input
               type="file"
               accept="image/*"

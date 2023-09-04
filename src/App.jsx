@@ -144,19 +144,24 @@ class App extends React.Component {
 export default App;
 
 /*
-Verificação de username pelo server
-Padronizar modals, picture, sidebar e settings
-Senha atual / Nova senha
+Terminar Sidebar
 Exibir número de novos comentários
 Implementar sqlite
-Terminar Sidebar
+Mensagens privadas
 Duração dos posts
 Exclusão de contas inativas
-Mensagens privadas
 Adicionar aviso de "estado de desenvolvimento" e convite de feedback
 */
 
 /*
+Design experimental para tela de configurações:
+- Remover imagem de perfil e botão salvar do Modal e deixar no meio da tela
+- Imagem será atualizada na confirmação do servidor
+- Remover username do input e colocar na tela inicial
+- Colocar senha em formato de asteriscos na tela inicial
+- Colocar botões de editar em formato de lápis com círculo de fundo
+- Se o design não ficar bom: Padronizar Sidebar e Settings
+
 Desconectado:
 - 45s após apagar a tela automaticamente
 - 3m40s após apagar a tela propositalmente

@@ -12,6 +12,23 @@ function Post(props) {
     comment.style.height = comment.scrollHeight + "px";
   }, [comment]);
 
+  function onKeyDown(e) {
+    // Send the comment when a desktop user presses Enter
+    if ("ontouchstart" in document.documentElement) {
+      return;
+    }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendComment();
+    }
+  }
+
+  function sendComment() {
+    socket.emit("comment", props.postId, comment.trim());
+    setComment("");
+    commentRef.current.focus();
+  }
+
   return (
     <div className="flex-page">
       <div className="top-bar">
@@ -35,14 +52,12 @@ function Post(props) {
           onChange={(e) => setComment(e.target.value)}
           rows="1"
           maxLength="500"
+          onKeyDown={onKeyDown}
         />
         <img
           src="send.svg"
           className={`post__send ${comment.trim() ? "" : "post__send--disabled"}`}
-          onClick={() => {
-            socket.emit("comment", props.postId, comment.trim());
-            setComment("");
-          }}
+          onClick={sendComment}
         />
       </div>
     </div>
