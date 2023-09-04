@@ -14,7 +14,7 @@ function Sidebar(props) {
           <p>@{props.user.username}</p>
         </div>
 
-        <div className="sidebar__item sidebar__item--disabled">
+        <div className="sidebar__item" onClick={props.openInstall}>
           <img src="install.svg" />
           Instalar
         </div>

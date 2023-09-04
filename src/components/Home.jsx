@@ -56,7 +56,7 @@ class Home extends React.Component {
 
     return (
       <div className="home" style={connecting ? { pointerEvents: "none" } : {}}>
-        <img src="chat.png" className="home__logo" />
+        <img src="logo.png" className="home__logo" />
 
         <h1 className="home__greeting">Bem-vindo ao Friendly</h1>
 

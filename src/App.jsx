@@ -1,9 +1,11 @@
 import React from "react";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
+import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
 import Settings from "./components/Settings";
+import Modal from "./components/Modal";
 import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
@@ -11,6 +13,7 @@ import "./App.scss";
 class App extends React.Component {
   state = {
     display: "Home",
+    modal: null,
     users: {},
     posts: [],
     postId: null,
@@ -97,47 +100,68 @@ class App extends React.Component {
   }
 
   render() {
-    const { display, users, posts, postId } = this.state;
+    const { display, modal, users, posts, postId } = this.state;
     const { postBodyRef } = this;
 
-    switch (display) {
-      case "Home":
-        return (
+    return (
+      <>
+        {display === "Home" && (
           <Home onAuth={() => this.setState({ display: "Feed" }, () => socket.emit("ready"))} />
-        );
+        )}
 
-      case "Feed":
-        return (
+        {display === "Feed" && (
           <Feed
             {...{ users, posts }}
+            openSidebar={() => this.setState({ modal: "Sidebar" })}
+            openNewPost={() => this.setState({ display: "NewPost" })}
             openPost={(postId) => this.setState({ display: "Post", postId })}
-            newPost={() => this.setState({ display: "NewPost" })}
-            logout={() => {
-              socket.close();
-              storage.deleteCredentials();
-              this.setState({ display: "Home" });
-            }}
-            openSettings={() => this.setState({ display: "Settings" })}
           />
-        );
+        )}
 
-      case "Post":
-        return (
+        {display === "Post" && (
           <Post
             {...{ users, postId, postBodyRef }}
             post={posts[postId]}
             close={() => this.setState({ display: "Feed", postId: null })}
           />
-        );
+        )}
 
-      case "NewPost":
-        return <NewPost discard={() => this.setState({ display: "Feed" })} />;
+        {display === "NewPost" && <NewPost discard={() => this.setState({ display: "Feed" })} />}
 
-      case "Settings":
-        return (
+        {display === "Settings" && (
           <Settings user={users[storage.userId]} close={() => this.setState({ display: "Feed" })} />
-        );
-    }
+        )}
+
+        <Sidebar
+          open={modal === "Sidebar"}
+          close={() => this.setState({ modal: null })}
+          user={users[storage.userId]}
+          openInstall={() => this.setState({ modal: "Install" })}
+          openSettings={() => this.setState({ display: "Settings", modal: null })}
+          logout={() => {
+            socket.close();
+            storage.deleteCredentials();
+            this.setState({ display: "Home", modal: null });
+          }}
+        />
+
+        <Modal
+          open={modal === "Install"}
+          header="Instalar o app"
+          close={() => this.setState({ modal: null })}
+        >
+          <div className="install">
+            <ol>
+              <li>Abra o menu do seu navegador.</li>
+              <li>Clique em Adicionar à tela inicial.</li>
+              <li>Feche o seu navegador.</li>
+              <li>Abra o Friendly pela tela inicial.</li>
+            </ol>
+            <p>Caso seu navegador não tenha essa função, use o Chrome ou o Safari.</p>
+          </div>
+        </Modal>
+      </>
+    );
   }
 }
 
@@ -147,13 +171,20 @@ export default App;
 Terminar Sidebar
 Exibir número de novos comentários
 Implementar sqlite
+Carregamento dinâmico de posts e comentários
 Mensagens privadas
 Duração dos posts
 Exclusão de contas inativas
 Adicionar aviso de "estado de desenvolvimento" e convite de feedback
+
+Instalar
+
+
 */
 
 /*
+<a href="https://www.flaticon.com/free-icons/talking" title="talking icons">Talking icons created by Freepik - Flaticon</a>
+
 Design experimental para tela de configurações:
 - Remover imagem de perfil e botão salvar do Modal e deixar no meio da tela
 - Imagem será atualizada na confirmação do servidor

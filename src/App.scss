@@ -1,5 +1,5 @@
 .flex-page {
-  // Used in Feed, NewPost and SettingsItem
+  // Used in Feed, Post, NewPost and Settings
   display: flex;
   flex-direction: column;
 }
@@ -114,5 +114,19 @@ Possíveis causas do bug dos 18px:
     &:hover {
       border: 1px solid #b91c1c;
     }
+  }
+}
+
+.install {
+  *:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  ol {
+    padding-left: 1rem;
+  }
+
+  p {
+    color: var(--clr-300);
   }
 }
