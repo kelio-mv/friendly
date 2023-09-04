@@ -129,6 +129,7 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
+                const data = { prop: "username", username, currentPassword };
                 const callback = (errorMessage) => {
                   if (errorMessage) {
                     this.setState({ errorMessage, saving: false });
@@ -142,22 +143,21 @@ class Settings extends React.Component {
                     });
                   }
                 };
-                socket.emit(
-                  "update_user",
-                  {
-                    prop: "username",
-                    username,
-                    currentPassword,
-                  },
-                  callback
-                );
+                socket.emit("update_user", data, callback);
               }}
               disabled={username === user.username || saving}
             >
               Salvar
             </ModalButton>
           }
-          close={() => this.setState({ display: "", username: user.username, currentPassword: "" })}
+          close={() =>
+            this.setState({
+              display: "",
+              errorMessage: "",
+              username: user.username,
+              currentPassword: "",
+            })
+          }
         >
           <div className="settings__modal">
             <TextField
