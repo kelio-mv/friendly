@@ -10,6 +10,7 @@ class Settings extends React.Component {
   state = {
     display: "",
     saving: false,
+    errorMessage: null,
     profilePicture: this.props.user.profilePicture,
     username: this.props.user.username,
     currentPassword: "",
@@ -45,7 +46,7 @@ class Settings extends React.Component {
   render() {
     const { fileRef } = this;
     const { user } = this.props;
-    const { display, saving } = this.state;
+    const { display, saving, errorMessage } = this.state;
     const { profilePicture, username, currentPassword, password } = this.state;
 
     return (
@@ -128,23 +129,35 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                socket.emit("update_user", { prop: "username", username, currentPassword }, () => {
-                  storage.saveCredentials(username, storage.password);
-                  this.setState({
-                    display: "",
-                    saving: false,
-                    currentPassword: "",
-                  });
-                });
+                const callback = (errorMessage) => {
+                  if (errorMessage) {
+                    this.setState({ errorMessage, saving: false });
+                  } else {
+                    storage.saveCredentials(username, storage.password);
+                    this.setState({
+                      display: "",
+                      saving: false,
+                      errorMessage: null,
+                      currentPassword: "",
+                    });
+                  }
+                };
+                socket.emit(
+                  "update_user",
+                  {
+                    prop: "username",
+                    username,
+                    currentPassword,
+                  },
+                  callback
+                );
               }}
-              disabled={username === user.username || saving || !username || !currentPassword}
+              disabled={username === user.username || saving}
             >
               Salvar
             </ModalButton>
           }
-          close={() =>
-            this.setState({ display: "", username: this.props.user.username, currentPassword: "" })
-          }
+          close={() => this.setState({ display: "", username: user.username, currentPassword: "" })}
         >
           <div className="settings__modal">
             <TextField
@@ -162,6 +175,8 @@ class Settings extends React.Component {
               onChange={(v) => this.setState({ currentPassword: v })}
               modalChild
             />
+
+            {errorMessage && <p className="settings__error">{errorMessage}</p>}
           </div>
         </Modal>
       </>

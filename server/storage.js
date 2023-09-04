@@ -30,6 +30,14 @@ class Storage {
     return { username, profilePicture };
   }
 
+  isUsernameUsed(username) {
+    for (const user of this.users) {
+      if (user.username === username) {
+        return true;
+      }
+    }
+  }
+
   updateUser(userId, data) {
     const user = this.users[userId];
     Object.assign(user, data);

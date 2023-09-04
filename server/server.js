@@ -4,18 +4,17 @@ const io = new Server(3000, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
   socket.on("auth", (signUp, username, password, callback) => {
-    if (username.length < 3) {
-      callback(["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."]);
-      return;
-    }
-    if (password.length < 6) {
-      callback(["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."]);
-      return;
-    }
-
     const [user, userId] = storage.getUser(username);
 
     if (signUp) {
+      if (username.length < 3) {
+        callback(["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."]);
+        return;
+      }
+      if (password.length < 6) {
+        callback(["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."]);
+        return;
+      }
       if (user) {
         callback([
           "Nome indisponível",
@@ -77,13 +76,30 @@ io.on("connection", (socket) => {
         break;
 
       case "username":
+        if (args.username.length < 3) {
+          callback("O nome de usuário precisa ter pelo menos 3 caracteres.");
+          return;
+        }
+
+        const user = storage.users[socket.userId];
+
+        if (args.currentPassword !== user.password) {
+          callback("Sua senha está incorreta. Por favor, verifique-a.");
+          return;
+        }
+        if (storage.isUsernameUsed(args.username)) {
+          callback("Este nome de usuário já está em uso. Por favor, escolha outro nome.");
+          return;
+        }
         newUser = storage.updateUser(socket.userId, { username: args.username });
         break;
     }
 
-    socket.emit("add_users", { [socket.userId]: newUser });
-    callback();
-    socket.broadcast.emit("add_users", { [socket.userId]: newUser });
+    if (newUser) {
+      socket.emit("add_users", { [socket.userId]: newUser });
+      callback();
+      socket.broadcast.emit("add_users", { [socket.userId]: newUser });
+    }
   });
 });
 
