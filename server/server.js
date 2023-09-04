@@ -68,6 +68,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("update_user", (args, callback) => {
+    const user = storage.users[socket.userId];
     let newUser;
 
     switch (args.prop) {
@@ -78,21 +79,23 @@ io.on("connection", (socket) => {
       case "username":
         if (args.username.length < 3) {
           callback("O nome de usuário precisa ter pelo menos 3 caracteres.");
-          return;
+        } else if (args.currentPassword !== user.password) {
+          callback("Sua senha está incorreta. Por favor, verifique-a.");
+        } else if (storage.isUsernameUsed(args.username)) {
+          callback("Este nome de usuário já está em uso. Por favor, escolha outro nome.");
+        } else {
+          newUser = storage.updateUser(socket.userId, { username: args.username });
         }
+        break;
 
-        const user = storage.users[socket.userId];
-
+      case "password":
         if (args.currentPassword !== user.password) {
           callback("Sua senha está incorreta. Por favor, verifique-a.");
-          return;
+        } else if (args.password.length < 6) {
+          callback("A senha precisa ter pelo menos 6 caracteres.");
+        } else {
+          newUser = storage.updateUser(socket.userId, { password: args.password });
         }
-        if (storage.isUsernameUsed(args.username)) {
-          callback("Este nome de usuário já está em uso. Por favor, escolha outro nome.");
-          return;
-        }
-        newUser = storage.updateUser(socket.userId, { username: args.username });
-        break;
     }
 
     if (newUser) {

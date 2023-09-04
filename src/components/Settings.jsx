@@ -68,7 +68,7 @@ class Settings extends React.Component {
               <img src="username.svg" />
               Nome de usuário
             </div>
-            <div className="settings__item">
+            <div className="settings__item" onClick={() => this.setState({ display: "Password" })}>
               <img src="password.svg" />
               Senha
             </div>
@@ -145,7 +145,7 @@ class Settings extends React.Component {
                 };
                 socket.emit("update_user", data, callback);
               }}
-              disabled={username === user.username || saving}
+              disabled={username === user.username || !username || !currentPassword || saving}
             >
               Salvar
             </ModalButton>
@@ -173,6 +173,65 @@ class Settings extends React.Component {
               placeholder="Senha atual"
               value={currentPassword}
               onChange={(v) => this.setState({ currentPassword: v })}
+              modalChild
+            />
+
+            {errorMessage && <p className="settings__error">{errorMessage}</p>}
+          </div>
+        </Modal>
+
+        <Modal
+          open={display === "Password"}
+          header="Senha"
+          footer={
+            <ModalButton
+              onClick={() => {
+                this.setState({ saving: true });
+                const data = { prop: "password", password, currentPassword };
+                const callback = (errorMessage) => {
+                  if (errorMessage) {
+                    this.setState({ errorMessage, saving: false });
+                  } else {
+                    storage.saveCredentials(storage.username, password);
+                    this.setState({
+                      display: "",
+                      saving: false,
+                      errorMessage: null,
+                      currentPassword: "",
+                      password: "",
+                    });
+                  }
+                };
+                socket.emit("update_user", data, callback);
+              }}
+              disabled={!currentPassword || !password || saving}
+            >
+              Salvar
+            </ModalButton>
+          }
+          close={() =>
+            this.setState({
+              display: "",
+              errorMessage: "",
+              currentPassword: "",
+              password: "",
+            })
+          }
+        >
+          <div className="settings__modal">
+            <TextField
+              type="password"
+              placeholder="Senha atual"
+              value={currentPassword}
+              onChange={(v) => this.setState({ currentPassword: v })}
+              modalChild
+            />
+
+            <TextField
+              type="password"
+              placeholder="Nova senha"
+              value={password}
+              onChange={(v) => this.setState({ password: v })}
               modalChild
             />
 
