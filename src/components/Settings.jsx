@@ -13,7 +13,7 @@ class Settings extends React.Component {
     saving: false,
     errorMessage: null,
     profilePicture: this.props.user.profilePicture,
-    username: this.props.user.username,
+    username: "",
     currentPassword: "",
     password: "",
   };
@@ -136,13 +136,14 @@ class Settings extends React.Component {
                       display: "",
                       saving: false,
                       errorMessage: null,
+                      username: "",
                       currentPassword: "",
                     });
                   }
                 };
                 socket.emit("update_user", data, callback);
               }}
-              disabled={username === user.username || !username || !currentPassword || saving}
+              disabled={!username || !currentPassword || saving}
             >
               Salvar
             </ModalButton>
@@ -151,7 +152,7 @@ class Settings extends React.Component {
             this.setState({
               display: "",
               errorMessage: "",
-              username: user.username,
+              username: "",
               currentPassword: "",
             })
           }
@@ -159,7 +160,7 @@ class Settings extends React.Component {
           <div className="settings__modal">
             <TextField
               type="username"
-              placeholder="Editar nome de usuário"
+              placeholder={user.username}
               value={username}
               onChange={(v) => this.setState({ username: v })}
               modalChild

@@ -3,15 +3,13 @@ import "./Article.scss";
 
 function Article(props) {
   if (props.user) {
-    const picture = props.user.profilePicture;
-
     return (
       <article
         className={`article ${props.highlight ? "article--highlight" : ""}`}
         onClick={props.onClick}
       >
         <header className="article__header">
-          <ProfilePicture src={picture} small />
+          <ProfilePicture src={props.user.profilePicture} small />
           <div>
             <p>@{props.user.username}</p>
             <p className="article__date">{parseDate(props.data.date)}</p>

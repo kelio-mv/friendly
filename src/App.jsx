@@ -4,8 +4,8 @@ import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
+import Install from "./components/Install";
 import Settings from "./components/Settings";
-import Modal from "./components/Modal";
 import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
@@ -136,7 +136,7 @@ class App extends React.Component {
           open={modal === "Sidebar"}
           close={() => this.setState({ modal: null })}
           user={users[storage.userId]}
-          openInstall={() => this.setState({ modal: "Install" })}
+          openInstall={() => this.setState({ display: "Install", modal: null })}
           openSettings={() => this.setState({ display: "Settings", modal: null })}
           logout={() => {
             socket.close();
@@ -145,21 +145,7 @@ class App extends React.Component {
           }}
         />
 
-        <Modal
-          open={modal === "Install"}
-          header="Instalar o app"
-          close={() => this.setState({ modal: null })}
-        >
-          <div className="install">
-            <ol>
-              <li>Abra o menu do seu navegador.</li>
-              <li>Clique em Adicionar à tela inicial.</li>
-              <li>Feche o seu navegador.</li>
-              <li>Abra o Friendly pela tela inicial.</li>
-            </ol>
-            <p>Caso seu navegador não tenha essa função, use o Chrome ou o Safari.</p>
-          </div>
-        </Modal>
+        {display === "Install" && <Install close={() => this.setState({ display: "Feed" })} />}
       </>
     );
   }
@@ -169,17 +155,13 @@ export default App;
 
 /*
 Terminar Sidebar
-Exibir número de novos comentários
 Implementar sqlite
+Exibir número de novos comentários
 Carregamento dinâmico de posts e comentários
-Mensagens privadas
-Duração dos posts
-Exclusão de contas inativas
 Adicionar aviso de "estado de desenvolvimento" e convite de feedback
-
-Instalar
-
-
+Mensagens privadas
+Exclusão de posts antigos e contas inativas
+Username / ProfilePicture: Article / Settings / Sidebar / Server
 */
 
 /*
