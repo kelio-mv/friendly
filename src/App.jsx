@@ -136,7 +136,7 @@ class App extends React.Component {
           open={modal === "Sidebar"}
           close={() => this.setState({ modal: null })}
           user={users[storage.userId]}
-          openInstall={() => this.setState({ display: "Install", modal: null })}
+          openInstall={() => this.setState({ modal: "Install" })}
           openSettings={() => this.setState({ display: "Settings", modal: null })}
           logout={() => {
             socket.close();
@@ -145,40 +145,10 @@ class App extends React.Component {
           }}
         />
 
-        {display === "Install" && <Install close={() => this.setState({ display: "Feed" })} />}
+        <Install open={modal === "Install"} close={() => this.setState({ modal: null })} />
       </>
     );
   }
 }
 
 export default App;
-
-/*
-Terminar Sidebar
-Implementar sqlite
-Exibir número de novos comentários
-Carregamento dinâmico de posts e comentários
-Adicionar aviso de "estado de desenvolvimento" e convite de feedback
-Mensagens privadas
-Exclusão de posts antigos e contas inativas
-Username / ProfilePicture: Article / Settings / Sidebar / Server
-*/
-
-/*
-<a href="https://www.flaticon.com/free-icons/talking" title="talking icons">Talking icons created by Freepik - Flaticon</a>
-
-Design experimental para tela de configurações:
-- Remover imagem de perfil e botão salvar do Modal e deixar no meio da tela
-- Imagem será atualizada na confirmação do servidor
-- Remover username do input e colocar na tela inicial
-- Colocar senha em formato de asteriscos na tela inicial
-- Colocar botões de editar em formato de lápis com círculo de fundo
-- Se o design não ficar bom: Padronizar Sidebar e Settings
-
-Desconectado:
-- 45s após apagar a tela automaticamente
-- 3m40s após apagar a tela propositalmente
-- Instantaneamente ao faltar memória ram (acontece tbm com apps)
-- No caso de falta de ram, não é possível reconectar, pois o processo é finalizado
-- A solução é salvar o que se está aberto em localStorage, e ao invés de reconectar, reiniciar o app
-*/
