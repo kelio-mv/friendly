@@ -18,7 +18,7 @@ function Sidebar(props) {
           <img src="install.svg" />
           Instalar
         </div>
-        <div className="sidebar__item sidebar__item--disabled">
+        <div className="sidebar__item" onClick={props.openShare}>
           <img src="share.svg" />
           Compartilhar
         </div>
