@@ -93,30 +93,29 @@ class Settings extends React.Component {
             </ModalButton>
           }
           close={() => this.setState({ display: "", profilePicture: user.profilePicture })}
+          center
         >
-          <div className="settings__modal">
-            <ProfilePicture src={profilePicture} />
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileRef}
-              onChange={(e) => this.onFileLoad(e.target.files[0])}
-              style={{ display: "none" }}
-            />
-            <button className="btn btn--primary" onClick={() => fileRef.current.click()}>
-              Enviar imagem
-            </button>
-            <button
-              className="btn btn--danger"
-              onClick={() => {
-                fileRef.current.value = "";
-                this.setState({ profilePicture: "avatar.png" });
-              }}
-              disabled={profilePicture === "avatar.png"}
-            >
-              Remover
-            </button>
-          </div>
+          <ProfilePicture src={profilePicture} />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileRef}
+            onChange={(e) => this.onFileLoad(e.target.files[0])}
+            style={{ display: "none" }}
+          />
+          <button className="btn btn--primary" onClick={() => fileRef.current.click()}>
+            Enviar imagem
+          </button>
+          <button
+            className="btn btn--danger"
+            onClick={() => {
+              fileRef.current.value = "";
+              this.setState({ profilePicture: "avatar.png" });
+            }}
+            disabled={profilePicture === "avatar.png"}
+          >
+            Remover
+          </button>
         </Modal>
 
         <Modal
@@ -156,26 +155,25 @@ class Settings extends React.Component {
               currentPassword: "",
             })
           }
+          center
         >
-          <div className="settings__modal">
-            <TextField
-              type="username"
-              placeholder={user.username}
-              value={username}
-              onChange={(v) => this.setState({ username: v })}
-              modalChild
-            />
+          <TextField
+            type="username"
+            placeholder={user.username}
+            value={username}
+            onChange={(v) => this.setState({ username: v })}
+            modalChild
+          />
 
-            <TextField
-              type="password"
-              placeholder="Senha atual"
-              value={currentPassword}
-              onChange={(v) => this.setState({ currentPassword: v })}
-              modalChild
-            />
+          <TextField
+            type="password"
+            placeholder="Senha atual"
+            value={currentPassword}
+            onChange={(v) => this.setState({ currentPassword: v })}
+            modalChild
+          />
 
-            {errorMessage && <p className="settings__error">{errorMessage}</p>}
-          </div>
+          {errorMessage && <p className="settings__error">{errorMessage}</p>}
         </Modal>
 
         <Modal
@@ -215,26 +213,25 @@ class Settings extends React.Component {
               password: "",
             })
           }
+          center
         >
-          <div className="settings__modal">
-            <TextField
-              type="password"
-              placeholder="Senha atual"
-              value={currentPassword}
-              onChange={(v) => this.setState({ currentPassword: v })}
-              modalChild
-            />
+          <TextField
+            type="password"
+            placeholder="Senha atual"
+            value={currentPassword}
+            onChange={(v) => this.setState({ currentPassword: v })}
+            modalChild
+          />
 
-            <TextField
-              type="password"
-              placeholder="Nova senha"
-              value={password}
-              onChange={(v) => this.setState({ password: v })}
-              modalChild
-            />
+          <TextField
+            type="password"
+            placeholder="Nova senha"
+            value={password}
+            onChange={(v) => this.setState({ password: v })}
+            modalChild
+          />
 
-            {errorMessage && <p className="settings__error">{errorMessage}</p>}
-          </div>
+          {errorMessage && <p className="settings__error">{errorMessage}</p>}
         </Modal>
       </>
     );

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Gantari:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gantari:wght@400&display=swap");
 
 /* CSS Reset */
 /* Sources: https://tailwindcss.com/docs/preflight https://youtube.com/shorts/2lyDv0wOQuQ */
@@ -30,6 +30,12 @@ iframe,
 embed,
 object {
   display: block;
+}
+
+img,
+picture,
+svg,
+video {
   max-width: 100%;
 }
 

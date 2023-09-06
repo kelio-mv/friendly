@@ -117,18 +117,8 @@ Possíveis causas do bug dos 18px:
   }
 }
 
-.install {
-  margin-top: 0.75rem;
-
-  *:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-
-  &--center {
-    text-align: center;
-  }
-
-  &__question {
-    font-size: 1.125rem;
-  }
+.share__heart {
+  display: inline;
+  filter: invert(1);
+  vertical-align: middle;
 }
