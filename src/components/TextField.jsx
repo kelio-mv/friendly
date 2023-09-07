@@ -23,12 +23,13 @@ function TextField(props) {
         maxLength={maxLength}
       />
       {props.type === "password" && (
-        <Icon
-          name={`visibility${showPassword ? "_off" : ""}`}
-          className="text-field__visibility"
-          onClick={() => setShowPassword(!showPassword)}
-          dimmed
-        />
+        <div className="text-field__visibility">
+          <Icon
+            name={`visibility${showPassword ? "_off" : ""}`}
+            onClick={() => setShowPassword(!showPassword)}
+            dimmed
+          />
+        </div>
       )}
     </div>
   );
