@@ -32,14 +32,10 @@
     cursor: pointer;
   }
 
-  &__alert {
+  &__ads {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     color: gray;
-  }
-
-  &__alert-icon {
-    filter: invert(0.5);
   }
 }

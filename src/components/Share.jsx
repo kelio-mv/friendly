@@ -1,11 +1,12 @@
 import Modal from "./Modal";
+import Icon from "./Icon";
 
 function Share(props) {
   return (
     <Modal open={props.open} header="Compartilhar" close={props.close} center>
       <p>
         Ao compartilhar o Friendly, você nos ajuda a formar uma comunidade maior e ainda mais
-        incrível <img src="heart.svg" className="share__heart" />
+        incrível <Icon name="favorite" inline />
       </p>
       <button
         className="btn btn--primary"

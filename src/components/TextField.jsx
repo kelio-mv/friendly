@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Icon from "./Icon";
 import "./TextField.scss";
 
 function TextField(props) {
@@ -22,10 +23,11 @@ function TextField(props) {
         maxLength={maxLength}
       />
       {props.type === "password" && (
-        <img
-          src={showPassword ? "hide_password.svg" : "show_password.svg"}
-          className="text-field__pw-visibility"
+        <Icon
+          name={`visibility${showPassword ? "_off" : ""}`}
+          className="text-field__visibility"
           onClick={() => setShowPassword(!showPassword)}
+          dimmed
         />
       )}
     </div>

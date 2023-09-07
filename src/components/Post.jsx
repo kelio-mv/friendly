@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Article from "./Article";
+import Icon from "./Icon";
 import socket from "../socket";
 
 function Post(props) {
@@ -32,7 +33,7 @@ function Post(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <img src="back.svg" onClick={props.close} />
+        <Icon name="arrow_back" onClick={props.close} />
         <h1>Publicação</h1>
       </div>
 
@@ -54,11 +55,7 @@ function Post(props) {
           maxLength="500"
           onKeyDown={onKeyDown}
         />
-        <img
-          src="send.svg"
-          className={`post__send ${comment.trim() ? "" : "post__send--disabled"}`}
-          onClick={sendComment}
-        />
+        <Icon name="send" onClick={sendComment} disabled={!comment.trim()} />
       </div>
     </div>
   );

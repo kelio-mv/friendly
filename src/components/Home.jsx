@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "./Modal";
 import TextField from "./TextField";
+import Icon from "./Icon";
 import storage from "../storage";
 import socket from "../socket";
 import "./Home.scss";
@@ -98,8 +99,8 @@ class Home extends React.Component {
           </span>
         </p>
 
-        <div className="home__alert">
-          <img src="heart.svg" className="home__alert-icon" />
+        <div className="home__ads">
+          <Icon name="favorite" dimmed />
           <p>Não exibimos anúncios</p>
         </div>
 

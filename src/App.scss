@@ -12,11 +12,6 @@
   color: white;
   font-size: 1.5rem;
 
-  img {
-    filter: invert(1);
-    cursor: pointer;
-  }
-
   &__grow {
     flex-grow: 1;
   }
@@ -47,32 +42,15 @@
     border: none;
     resize: none;
   }
-
-  &__send {
-    filter: invert(1);
-    cursor: pointer;
-
-    &--disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
 }
 
-.new-post {
-  &__send--disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  &__textarea {
-    flex-grow: 1;
-    padding: 1rem;
-    background: var(--bg-200);
-    color: inherit;
-    border: none;
-    resize: none;
-  }
+.new-post__textarea {
+  flex-grow: 1;
+  padding: 1rem;
+  background: var(--bg-200);
+  color: inherit;
+  border: none;
+  resize: none;
 }
 
 /*
@@ -115,10 +93,4 @@ Possíveis causas do bug dos 18px:
       border: 1px solid #b91c1c;
     }
   }
-}
-
-.share__heart {
-  display: inline;
-  filter: invert(1);
-  vertical-align: middle;
 }

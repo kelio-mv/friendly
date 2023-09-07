@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Icon from "./Icon";
 import socket from "../socket";
 
 function NewPost(props) {
@@ -8,16 +9,16 @@ function NewPost(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <img src="cancel.svg" onClick={props.discard} />
+        <Icon name="close" onClick={props.discard} />
         <h1>Nova publicação</h1>
-        <div className="top-bar__grow"></div>
-        <img
-          src="send.svg"
-          className={!content.trim() || sending ? "new-post__send--disabled" : null}
+        <div className="top-bar__grow" />
+        <Icon
+          name="send"
           onClick={() => {
             setSending(true);
             socket.emit("post", content.trim());
           }}
+          disabled={!content.trim() || sending}
         />
       </div>
 

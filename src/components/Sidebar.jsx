@@ -1,4 +1,5 @@
 import ProfilePicture from "./ProfilePicture";
+import Icon from "./Icon";
 import "./Sidebar.scss";
 
 function Sidebar(props) {
@@ -15,30 +16,36 @@ function Sidebar(props) {
         </div>
 
         <div className="sidebar__item" onClick={props.openInstall}>
-          <img src="install.svg" />
+          <Icon name="download" />
           Instalar
         </div>
+
         <div className="sidebar__item" onClick={props.openShare}>
-          <img src="share.svg" />
+          <Icon name="share" />
           Compartilhar
         </div>
+
         <div className="sidebar__item sidebar__item--disabled">
-          <img src="contact.svg" />
+          <Icon name="contact_support" />
           Contato
         </div>
+
         <div className="sidebar__item sidebar__item--disabled">
-          <img src="pending.svg" />
+          <Icon name="pending_actions" />
           Planejamento
         </div>
+
         <div className="sidebar__item" onClick={props.openSettings}>
-          <img src="settings.svg" />
+          <Icon name="settings" />
           Configurações
         </div>
+
         <div className="sidebar__item" onClick={props.logout}>
-          <img src="logout.svg" />
+          <Icon name="logout" />
           Sair
         </div>
       </div>
+
       <div className="sidebar__background" onClick={props.close} />
     </div>
   );

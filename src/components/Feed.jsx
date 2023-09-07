@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Article from "./Article";
+import Icon from "./Icon";
 import storage from "../storage";
 
 function Feed(props) {
@@ -8,10 +9,10 @@ function Feed(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <img src="menu.svg" onClick={props.openSidebar} />
+        <Icon name="menu" onClick={props.openSidebar} />
         <h1>Recentes</h1>
         <div className="top-bar__grow"></div>
-        <img src="add.svg" onClick={props.openNewPost} />
+        <Icon name="add_circle" onClick={props.openNewPost} />
       </div>
 
       <div className="feed__body">

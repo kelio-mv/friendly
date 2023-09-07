@@ -24,10 +24,8 @@
     }
   }
 
-  &__pw-visibility {
+  &__visibility {
     position: absolute;
     right: 0.5rem;
-    filter: invert(0.5);
-    cursor: pointer;
   }
 }

@@ -3,6 +3,7 @@ import Modal from "./Modal";
 import ModalButton from "./ModalButton";
 import ProfilePicture from "./ProfilePicture";
 import TextField from "./TextField";
+import Icon from "./Icon";
 import storage from "../storage";
 import socket from "../socket";
 import "./Settings.scss";
@@ -54,7 +55,7 @@ class Settings extends React.Component {
       <>
         <div className="flex-page">
           <div className="top-bar">
-            <img src="back.svg" onClick={this.props.close} />
+            <Icon name="arrow_back" onClick={this.props.close} />
             <h1>Configurações</h1>
           </div>
           <div className="settings__body">
@@ -62,15 +63,15 @@ class Settings extends React.Component {
               className="settings__item"
               onClick={() => this.setState({ display: "ProfilePicture" })}
             >
-              <img src="picture.svg" />
+              <Icon name="photo_camera" />
               Imagem de perfil
             </div>
             <div className="settings__item" onClick={() => this.setState({ display: "Username" })}>
-              <img src="username.svg" />
+              <Icon name="alternate_email" />
               Nome de usuário
             </div>
             <div className="settings__item" onClick={() => this.setState({ display: "Password" })}>
-              <img src="password.svg" />
+              <Icon name="key" />
               Senha
             </div>
           </div>
