@@ -20,12 +20,12 @@ function Sidebar(props) {
           Instalar
         </div>
 
-        <div className="sidebar__item" onClick={props.openShare}>
+        <div className="sidebar__item" onClick={props.share}>
           <Icon name="share" />
           Compartilhar
         </div>
 
-        <div className="sidebar__item sidebar__item--disabled">
+        <div className="sidebar__item" onClick={props.contact}>
           <Icon name="contact_support" />
           Contato
         </div>

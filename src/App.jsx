@@ -5,7 +5,6 @@ import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
 import Install from "./components/Install";
-import Share from "./components/Share";
 import Settings from "./components/Settings";
 import storage from "./storage";
 import socket from "./socket";
@@ -138,7 +137,14 @@ class App extends React.Component {
           close={() => this.setState({ modal: null })}
           user={users[storage.userId]}
           openInstall={() => this.setState({ modal: "Install" })}
-          openShare={() => this.setState({ modal: "Share" })}
+          share={() => {
+            navigator.share({
+              title: "Friendly",
+              text: "Junte-se à melhor comunidade da internet",
+              url: "https://kelio-mv.github.io/friendly/",
+            });
+          }}
+          contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
           openSettings={() => this.setState({ display: "Settings", modal: null })}
           logout={() => {
             socket.close();
@@ -148,8 +154,6 @@ class App extends React.Component {
         />
 
         <Install open={modal === "Install"} close={() => this.setState({ modal: null })} />
-
-        <Share open={modal === "Share"} close={() => this.setState({ modal: null })} />
       </>
     );
   }
