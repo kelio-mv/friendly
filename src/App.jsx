@@ -15,29 +15,24 @@ class App extends React.Component {
     display: "Home",
     modal: null,
     users: {},
-    posts: [],
+    posts: {},
     postId: null,
   };
   postBodyRef = React.createRef();
 
   componentDidMount() {
     socket.on("add_users", (users) => {
-      const newUsers = {};
-      users.forEach((user) => {
-        const { username, profilePicture } = user;
-        newUsers[user.id] = { username, profilePicture };
-      });
-      this.setState({ users: { ...this.state.users, ...newUsers } });
+      this.setState({ users: { ...this.state.users, ...users } });
     });
 
     socket.on("add_posts", (posts) => {
-      posts.forEach((post) => (post.comments = []));
-      this.setState({ posts: [...this.state.posts, ...posts] });
-      this.requestMissingUsers(posts);
+      Object.values(posts).forEach((post) => (post.comments = []));
+      this.setState({ posts: { ...this.state.posts, ...posts } });
+      this.requestUnfetchedUsers(Object.values(posts));
     });
 
     socket.on("add_comments", (comments) => {
-      const posts = [...this.state.posts];
+      const posts = { ...this.state.posts };
       let callback;
 
       // const pb = this.postBodyRef.current;
@@ -46,20 +41,12 @@ class App extends React.Component {
       // if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
       //   callback = () => pb.scrollTo(0, pb.scrollHeight);
       // }
-      console.log(comments);
+
       for (const comment of comments) {
         posts[comment.postId].comments.push(comment);
       }
       this.setState({ posts }, callback);
-      this.requestMissingUsers(comments);
-    });
-
-    socket.on("post_response", (post) => {
-      this.setState({
-        display: "Post",
-        posts: [...this.state.posts, post],
-        postId: this.state.posts.length,
-      });
+      this.requestUnfetchedUsers(comments);
     });
 
     socket.on("comment_response", (comment) => {
@@ -77,26 +64,11 @@ class App extends React.Component {
     });
   }
 
-  requestMissingUsers(articles) {
+  requestUnfetchedUsers(articles) {
     const { users } = this.state;
-    const missingUsers = new Set();
-
-    articles.forEach((article) => {
-      // if (!article) return;
-      if (!(article.userId in users)) {
-        missingUsers.add(article.userId);
-      }
-      if ("comments" in article) {
-        article.comments.forEach((comment) => {
-          // if (!comment) return;
-          if (!(comment.userId in users)) {
-            missingUsers.add(comment.userId);
-          }
-        });
-      }
-    });
-    if (missingUsers.size > 0) {
-      socket.emit("get_users", Array.from(missingUsers));
+    const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
+    if (unfetched.size > 0) {
+      socket.emit("get_users", Array.from(unfetched));
     }
   }
 
@@ -109,10 +81,9 @@ class App extends React.Component {
         {display === "Home" && (
           <Home
             onAuth={() => {
-              socket.emit("get_data", (user) => {
-                const { id, username, profilePicture } = user;
-                storage.userId = id;
-                this.setState({ display: "Feed", users: { [id]: { username, profilePicture } } });
+              socket.emit("get_data", (userId, user) => {
+                storage.userId = userId;
+                this.setState({ display: "Feed", users: { [userId]: user } });
               });
             }}
           />
@@ -124,7 +95,8 @@ class App extends React.Component {
             openSidebar={() => this.setState({ modal: "Sidebar" })}
             openNewPost={() => this.setState({ display: "NewPost" })}
             openPost={(postId) => {
-              socket.emit("get_comments", postId);
+              const fetchedComments = posts[postId].comments.map((c) => c.id);
+              socket.emit("get_comments", postId, fetchedComments);
               this.setState({ display: "Post", postId });
             }}
           />
@@ -134,16 +106,22 @@ class App extends React.Component {
           <Post
             {...{ users, postId, postBodyRef }}
             post={posts[postId]}
-            close={() => {
-              // temporary solution
-              const newPosts = [...posts];
-              newPosts[postId].comments = [];
-              this.setState({ display: "Feed", postId: null, posts: newPosts });
-            }}
+            close={() => this.setState({ display: "Feed", postId: null })}
           />
         )}
 
-        {display === "NewPost" && <NewPost discard={() => this.setState({ display: "Feed" })} />}
+        {display === "NewPost" && (
+          <NewPost
+            discard={() => this.setState({ display: "Feed" })}
+            onPost={(id, post) => {
+              this.setState({
+                display: "Post",
+                posts: { ...this.state.posts, [id]: { ...post, comments: [] } },
+                postId: id,
+              });
+            }}
+          />
+        )}
 
         {display === "Settings" && (
           <Settings user={users[storage.userId]} close={() => this.setState({ display: "Feed" })} />

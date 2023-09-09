@@ -38,28 +38,31 @@ io.on("connection", (socket) => {
   });
 
   socket.on("get_data", (callback) => {
-    const { id, username, profilePicture } = storage.getUser("id", socket.userId);
-    callback({ id, username, profilePicture });
-    socket.emit("add_posts", storage.getPosts());
+    const { username, profilePicture } = storage.getUser("id", socket.userId);
+    callback(socket.userId, { username, profilePicture });
+    socket.emit("add_posts", getPosts());
   });
 
   socket.on("get_users", (userIds) => {
-    const users = userIds.map((userId) => {
-      const { id, username, profilePicture } = storage.getUser("id", userId);
-      return { id, username, profilePicture };
+    const users = {};
+    userIds.forEach((userId) => {
+      const { username, profilePicture } = storage.getUser("id", userId);
+      users[userId] = { username, profilePicture };
     });
     socket.emit("add_users", users);
   });
 
-  socket.on("get_comments", (postId) => {
-    const comments = storage.getComments(postId);
-    if (comments) socket.emit("add_comments", comments);
+  socket.on("get_comments", (postId, except) => {
+    const comments = storage.getComments(postId).filter((c) => !except.includes(c.id));
+    if (comments.length > 0) {
+      socket.emit("add_comments", comments);
+    }
   });
 
-  socket.on("post", (content) => {
-    const post = storage.createPost(socket.userId, content);
-    socket.emit("post_response", post);
-    socket.broadcast.emit("add_posts", [post]);
+  socket.on("post", (content, callback) => {
+    const [id, post] = createPost(socket.userId, content);
+    callback(id, post);
+    socket.broadcast.emit("add_posts", { [id]: post });
   });
 
   socket.on("comment", (postId, content) => {
@@ -106,6 +109,22 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+function createPost(userId, content) {
+  const post = storage.createPost(userId, content);
+  const { id } = post;
+  delete post.id;
+  return [id, post];
+}
+
+function getPosts() {
+  const posts = {};
+  storage.getPosts().forEach((post) => {
+    posts[post.id] = post;
+    delete posts[post.id].id;
+  });
+  return posts;
+}
 
 console.log("Server is running");
 

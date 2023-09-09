@@ -16,7 +16,7 @@ function NewPost(props) {
           name="send"
           onClick={() => {
             setSending(true);
-            socket.emit("post", content.trim());
+            socket.emit("post", content.trim(), props.onPost);
           }}
           disabled={!content.trim() || sending}
         />

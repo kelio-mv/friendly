@@ -2,7 +2,7 @@ import Article from "./Article";
 import Icon from "./Icon";
 
 function Feed(props) {
-  const posts = props.posts.slice().reverse();
+  const posts = Object.entries(props.posts).sort((a, b) => b[0] - a[0]);
 
   return (
     <div className="flex-page">
@@ -14,20 +14,19 @@ function Feed(props) {
       </div>
 
       <div className="feed__body">
-        {posts.map(
-          (post, i) =>
-            post && (
-              <Article
-                key={i}
-                data={post}
-                user={props.users[post.userId]}
-                onClick={() => props.openPost(posts.length - 1 - i)}
-              />
-            )
-        )}
+        {posts.map(([id, post]) => (
+          <Article
+            key={id}
+            data={post}
+            user={props.users[post.userId]}
+            onClick={() => props.openPost(id)}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
 export default Feed;
+
+// Evitar execução repetida da função sort
