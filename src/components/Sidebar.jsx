@@ -10,40 +10,46 @@ function Sidebar(props) {
   return (
     <div className="sidebar">
       <div className="sidebar__content">
-        <div className="sidebar__header">
+        <header className="sidebar__header">
           <ProfilePicture src={props.user.profilePicture} style={{ margin: "0 auto 0.75rem" }} />
           <p>@{props.user.username}</p>
-        </div>
+        </header>
 
-        <div className="sidebar__item" onClick={props.openInstall}>
-          <Icon name="download" />
-          Instalar
-        </div>
+        <section className="sidebar__body">
+          <div className="sidebar__item" onClick={props.openInstall}>
+            <Icon name="download" />
+            Instalar
+          </div>
 
-        <div className="sidebar__item" onClick={props.share}>
-          <Icon name="share" />
-          Compartilhar
-        </div>
+          <div className="sidebar__item" onClick={props.share}>
+            <Icon name="share" />
+            Compartilhar
+          </div>
 
-        <div className="sidebar__item" onClick={props.contact}>
-          <Icon name="contact_support" />
-          Contato
-        </div>
+          <div className="sidebar__item" onClick={props.contact}>
+            <Icon name="contact_support" />
+            Contato
+          </div>
 
-        <div className="sidebar__item sidebar__item--disabled">
-          <Icon name="pending_actions" />
-          Planejamento
-        </div>
+          <div className="sidebar__item sidebar__item--disabled">
+            <Icon name="pending_actions" />
+            Planejamento
+          </div>
 
-        <div className="sidebar__item" onClick={props.openSettings}>
-          <Icon name="settings" />
-          Configurações
-        </div>
+          <div className="sidebar__item" onClick={props.openSettings}>
+            <Icon name="settings" />
+            Configurações
+          </div>
 
-        <div className="sidebar__item" onClick={props.logout}>
-          <Icon name="logout" />
-          Sair
-        </div>
+          <div className="sidebar__item" onClick={props.logout}>
+            <Icon name="logout" />
+            Sair
+          </div>
+        </section>
+
+        <footer className="sidebar__footer">
+          <Icon name="code" dimmed /> Em desenvolvimento
+        </footer>
       </div>
 
       <div className="sidebar__background" onClick={props.close} />

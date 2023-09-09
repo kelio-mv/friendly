@@ -38,9 +38,9 @@ function Post(props) {
       </div>
 
       <div className="post__body" ref={props.postBodyRef}>
-        <Article data={props.post} user={props.users[props.post.uid]} />
+        <Article data={props.post} user={props.users[props.post.userId]} />
         {props.post.comments.map((comment, i) => (
-          <Article key={i} data={comment} user={props.users[comment.uid]} />
+          <Article key={i} data={comment} user={props.users[comment.userId]} />
         ))}
       </div>
 

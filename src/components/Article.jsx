@@ -12,7 +12,7 @@ function Article(props) {
           <ProfilePicture src={props.user.profilePicture} small />
           <div>
             <p>@{props.user.username}</p>
-            <p className="article__date">{parseDate(props.data.date)}</p>
+            <p className="article__date">{parseDate(props.data.timestamp)}</p>
           </div>
         </header>
 

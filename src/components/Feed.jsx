@@ -1,7 +1,5 @@
-import { useState } from "react";
 import Article from "./Article";
 import Icon from "./Icon";
-import storage from "../storage";
 
 function Feed(props) {
   const posts = props.posts.slice().reverse();
@@ -22,7 +20,7 @@ function Feed(props) {
               <Article
                 key={i}
                 data={post}
-                user={props.users[post.uid]}
+                user={props.users[post.userId]}
                 onClick={() => props.openPost(posts.length - 1 - i)}
               />
             )

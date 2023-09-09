@@ -4,67 +4,68 @@ const io = new Server(3000, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
   socket.on("auth", (signUp, username, password, callback) => {
-    const [user, userId] = storage.getUser(username);
+    const user = storage.getUser("username", username);
+    let errorMessage;
 
     if (signUp) {
       if (username.length < 3) {
-        callback(["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."]);
-        return;
-      }
-      if (password.length < 6) {
-        callback(["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."]);
-        return;
-      }
-      if (user) {
-        callback([
+        errorMessage = ["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."];
+      } else if (password.length < 6) {
+        errorMessage = ["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."];
+      } else if (user) {
+        errorMessage = [
           "Nome indisponível",
           "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
-        ]);
+        ];
       } else {
-        socket.userId = storage.addUser(username, password);
-        callback();
+        socket.userId = storage.createUser(username, password);
       }
     } else {
       if (user) {
         if (user.password === password) {
-          socket.userId = userId;
-          callback();
+          socket.userId = user.id;
         } else {
-          callback(["Senha incorreta", "Sua senha está incorreta. Por favor, verifique-a."]);
+          errorMessage = ["Senha incorreta", "Sua senha está incorreta. Por favor, verifique-a."];
         }
       } else {
-        callback([
+        errorMessage = [
           "Não encontrado",
           "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
-        ]);
+        ];
       }
     }
+    callback(errorMessage);
   });
 
-  socket.on("ready", () => {
-    const userId = socket.userId;
-    socket.emit("set_user", userId, storage.getUserData(userId));
-    socket.emit("add_posts", storage.posts);
+  socket.on("get_data", (callback) => {
+    const { id, username, profilePicture } = storage.getUser("id", socket.userId);
+    callback({ id, username, profilePicture });
+    socket.emit("add_posts", storage.getPosts());
   });
 
   socket.on("get_users", (userIds) => {
-    const response = {};
-    for (const userId of userIds) {
-      response[userId] = storage.getUserData(userId);
-    }
-    socket.emit("add_users", response);
+    const users = userIds.map((userId) => {
+      const { id, username, profilePicture } = storage.getUser("id", userId);
+      return { id, username, profilePicture };
+    });
+    socket.emit("add_users", users);
+  });
+
+  socket.on("get_comments", (postId) => {
+    const comments = storage.getComments(postId);
+    if (comments) socket.emit("add_comments", comments);
   });
 
   socket.on("post", (content) => {
-    const post = storage.addPost(socket.userId, content);
+    const post = storage.createPost(socket.userId, content);
     socket.emit("post_response", post);
     socket.broadcast.emit("add_posts", [post]);
   });
 
   socket.on("comment", (postId, content) => {
-    const comment = storage.addComment(postId, socket.userId, content);
-    socket.emit("comment_response", postId, comment);
-    socket.broadcast.emit("add_comment", postId, comment);
+    const comment = storage.createComment(socket.userId, postId, content);
+    socket.emit("comment_response", comment);
+    // socket.broadcast.emit("add_comment", comment);
   });
 
   socket.on("update_user", (args, callback) => {
@@ -116,4 +117,5 @@ function isUserConnected(userId) {
     }
   }
 }
+- fix origin
 */

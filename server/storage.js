@@ -1,81 +1,73 @@
-const fs = require("fs");
+const Database = require("better-sqlite3");
 
 class Storage {
   constructor() {
-    this.users = [];
-    this.posts = [];
-
-    try {
-      this.users = JSON.parse(fs.readFileSync("users.json"));
-      this.posts = JSON.parse(fs.readFileSync("posts.json"));
-    } catch {
-      // this code is dangerous as you might break the json
-      fs.writeFileSync("users.json", "[]");
-      fs.writeFileSync("posts.json", "[]");
-    }
+    this.db = new Database("storage.db");
+    this.init();
   }
 
-  getUser(username) {
-    for (let userId = 0; userId < this.users.length; userId++) {
-      const user = this.users[userId];
-      if (user.username === username) {
-        return [user, userId];
-      }
-    }
-    return [];
+  init() {
+    this.db.exec(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username VARCHAR(16) NOT NULL,
+      password VARCHAR(16) NOT NULL,
+      profilePicture TEXT NOT NULL DEFAULT 'default_avatar.png'
+    )`);
+    this.db.exec(`CREATE TABLE IF NOT EXISTS posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      content TEXT NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users (id)
+    )`);
+    this.db.exec(`CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL,
+      postId INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      content TEXT NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users (id),
+      FOREIGN KEY (postId) REFERENCES posts (id)
+    )`);
   }
 
-  getUserData(userId) {
-    const { username, profilePicture } = this.users[userId];
-    return { username, profilePicture };
+  createUser(username, password) {
+    const stmt = this.db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    return stmt.run(username, password).lastInsertRowid;
   }
 
-  isUsernameUsed(username) {
-    for (const user of this.users) {
-      if (user.username === username) {
-        return true;
-      }
-    }
+  getUser(field, value) {
+    return this.db.prepare(`SELECT * FROM users WHERE ${field} = ?`).get(value);
   }
 
-  updateUser(userId, data) {
-    const user = this.users[userId];
-    Object.assign(user, data);
-    fs.writeFileSync("users.json", JSON.stringify(this.users));
-    return { username: user.username, profilePicture: user.profilePicture };
+  editUser(id, field, value) {
+    this.db.prepare(`UPDATE users SET ${field} = ? WHERE id = ?`).run(value, id);
   }
 
-  addUser(username, password) {
-    this.users.push({
-      username,
-      password,
-      profilePicture: "avatar.png",
-    });
-    fs.writeFileSync("users.json", JSON.stringify(this.users));
-    return this.users.length - 1;
+  createPost(userId, content) {
+    const stmt = this.db.prepare("INSERT INTO posts (userId, content) VALUES (?, ?)");
+    return this.getPost(stmt.run(userId, content).lastInsertRowid);
   }
 
-  addPost(userId, content) {
-    const post = {
-      uid: userId,
-      date: Math.floor(new Date() / 1000),
-      content,
-      comments: [],
-    };
-    this.posts.push(post);
-    fs.writeFileSync("posts.json", JSON.stringify(this.posts));
-    return post;
+  getPost(id) {
+    return this.db.prepare("SELECT * FROM posts WHERE id = ?").get(id);
   }
 
-  addComment(postId, userId, content) {
-    const comment = {
-      uid: userId,
-      date: Math.floor(new Date() / 1000),
-      content,
-    };
-    this.posts[postId].comments.push(comment);
-    fs.writeFileSync("posts.json", JSON.stringify(this.posts));
-    return comment;
+  getPosts() {
+    return this.db.prepare("SELECT * FROM posts").all();
+  }
+
+  createComment(userId, postId, content) {
+    const stmt = this.db.prepare("INSERT INTO comments (userId, postId, content) VALUES (?, ?, ?)");
+    return this.getComment(stmt.run(userId, postId, content).lastInsertRowid);
+  }
+
+  getComment(id) {
+    return this.db.prepare("SELECT * FROM comments WHERE id = ?").get(id);
+  }
+
+  getComments(postId) {
+    return this.db.prepare("SELECT * FROM comments WHERE postId = ?").all(postId);
   }
 }
 

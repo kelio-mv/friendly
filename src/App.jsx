@@ -21,36 +21,37 @@ class App extends React.Component {
   postBodyRef = React.createRef();
 
   componentDidMount() {
-    socket.on("set_user", (userId, user) => {
-      storage.userId = userId;
-      this.setState({ users: { [userId]: user } });
-    });
-
     socket.on("add_users", (users) => {
-      this.setState({ users: { ...this.state.users, ...users } });
+      const newUsers = {};
+      users.forEach((user) => {
+        const { username, profilePicture } = user;
+        newUsers[user.id] = { username, profilePicture };
+      });
+      this.setState({ users: { ...this.state.users, ...newUsers } });
     });
 
     socket.on("add_posts", (posts) => {
+      posts.forEach((post) => (post.comments = []));
       this.setState({ posts: [...this.state.posts, ...posts] });
       this.requestMissingUsers(posts);
     });
 
-    socket.on("add_comment", (postId, comment) => {
+    socket.on("add_comments", (comments) => {
       const posts = [...this.state.posts];
       let callback;
 
-      if (postId === this.state.postId) {
-        const pb = this.postBodyRef.current;
-        const lc = pb.lastElementChild;
+      // const pb = this.postBodyRef.current;
+      // const lc = pb.lastElementChild;
 
-        if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-          callback = () => pb.scrollTo(0, pb.scrollHeight);
-        }
+      // if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+      //   callback = () => pb.scrollTo(0, pb.scrollHeight);
+      // }
+      console.log(comments);
+      for (const comment of comments) {
+        posts[comment.postId].comments.push(comment);
       }
-
-      posts[postId].comments.push(comment);
       this.setState({ posts }, callback);
-      this.requestMissingUsers([comment]);
+      this.requestMissingUsers(comments);
     });
 
     socket.on("post_response", (post) => {
@@ -61,11 +62,11 @@ class App extends React.Component {
       });
     });
 
-    socket.on("comment_response", (postId, comment) => {
+    socket.on("comment_response", (comment) => {
       // would this break if the user receives the message after leaving the post?
       const posts = [...this.state.posts];
       const pb = this.postBodyRef.current;
-      posts[postId].comments.push(comment);
+      posts[comment.postId].comments.push(comment);
       this.setState({ posts }, () => pb.scrollTo(0, pb.scrollHeight));
     });
 
@@ -82,14 +83,14 @@ class App extends React.Component {
 
     articles.forEach((article) => {
       // if (!article) return;
-      if (!(article.uid in users)) {
-        missingUsers.add(article.uid);
+      if (!(article.userId in users)) {
+        missingUsers.add(article.userId);
       }
       if ("comments" in article) {
         article.comments.forEach((comment) => {
           // if (!comment) return;
-          if (!(comment.uid in users)) {
-            missingUsers.add(comment.uid);
+          if (!(comment.userId in users)) {
+            missingUsers.add(comment.userId);
           }
         });
       }
@@ -106,7 +107,15 @@ class App extends React.Component {
     return (
       <>
         {display === "Home" && (
-          <Home onAuth={() => this.setState({ display: "Feed" }, () => socket.emit("ready"))} />
+          <Home
+            onAuth={() => {
+              socket.emit("get_data", (user) => {
+                const { id, username, profilePicture } = user;
+                storage.userId = id;
+                this.setState({ display: "Feed", users: { [id]: { username, profilePicture } } });
+              });
+            }}
+          />
         )}
 
         {display === "Feed" && (
@@ -114,7 +123,10 @@ class App extends React.Component {
             {...{ users, posts }}
             openSidebar={() => this.setState({ modal: "Sidebar" })}
             openNewPost={() => this.setState({ display: "NewPost" })}
-            openPost={(postId) => this.setState({ display: "Post", postId })}
+            openPost={(postId) => {
+              socket.emit("get_comments", postId);
+              this.setState({ display: "Post", postId });
+            }}
           />
         )}
 
@@ -122,7 +134,12 @@ class App extends React.Component {
           <Post
             {...{ users, postId, postBodyRef }}
             post={posts[postId]}
-            close={() => this.setState({ display: "Feed", postId: null })}
+            close={() => {
+              // temporary solution
+              const newPosts = [...posts];
+              newPosts[postId].comments = [];
+              this.setState({ display: "Feed", postId: null, posts: newPosts });
+            }}
           />
         )}
 
