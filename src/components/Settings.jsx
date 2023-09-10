@@ -84,7 +84,7 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                socket.emit("update_user", { prop: "profilePicture", profilePicture }, () => {
+                socket.emit("edit_user", { field: "profilePicture", value: profilePicture }, () => {
                   this.setState({ display: "", saving: false });
                 });
               }}
@@ -111,9 +111,9 @@ class Settings extends React.Component {
             className="btn btn--danger"
             onClick={() => {
               fileRef.current.value = "";
-              this.setState({ profilePicture: "avatar.png" });
+              this.setState({ profilePicture: "default_avatar.png" });
             }}
-            disabled={profilePicture === "avatar.png"}
+            disabled={profilePicture === "default_avatar.png"}
           >
             Remover
           </button>
@@ -126,7 +126,7 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                const data = { prop: "username", username, currentPassword };
+                const data = { field: "username", value: username, currentPassword };
                 const callback = (errorMessage) => {
                   if (errorMessage) {
                     this.setState({ errorMessage, saving: false });
@@ -141,7 +141,7 @@ class Settings extends React.Component {
                     });
                   }
                 };
-                socket.emit("update_user", data, callback);
+                socket.emit("edit_user", data, callback);
               }}
               disabled={!username || !currentPassword || saving}
             >
@@ -184,7 +184,7 @@ class Settings extends React.Component {
             <ModalButton
               onClick={() => {
                 this.setState({ saving: true });
-                const data = { prop: "password", password, currentPassword };
+                const data = { field: "password", value: password, currentPassword };
                 const callback = (errorMessage) => {
                   if (errorMessage) {
                     this.setState({ errorMessage, saving: false });
@@ -199,7 +199,7 @@ class Settings extends React.Component {
                     });
                   }
                 };
-                socket.emit("update_user", data, callback);
+                socket.emit("edit_user", data, callback);
               }}
               disabled={!currentPassword || !password || saving}
             >

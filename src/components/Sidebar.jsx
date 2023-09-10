@@ -21,11 +21,11 @@ function Sidebar(props) {
     <div className="sidebar" style={styles.sidebar} onClick={props.close}>
       <div className="sidebar__content" style={styles.content} onClick={(e) => e.stopPropagation()}>
         <header className="sidebar__header">
-          <ProfilePicture src={props.user.profilePicture} style={{ margin: "0 auto 0.75rem" }} />
+          <ProfilePicture src={props.user.profilePicture} />
           <p>@{props.user.username}</p>
         </header>
 
-        <section className="sidebar__body">
+        <div className="sidebar__body">
           <div className="sidebar__item" onClick={props.openInstall}>
             <Icon name="download" />
             Instalar
@@ -55,7 +55,7 @@ function Sidebar(props) {
             <Icon name="logout" />
             Sair
           </div>
-        </section>
+        </div>
 
         <footer className="sidebar__footer">
           <Icon name="code" dimmed /> Em desenvolvimento

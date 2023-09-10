@@ -32,21 +32,24 @@ class App extends React.Component {
     });
 
     socket.on("add_comments", (comments) => {
-      // const pb = this.postBodyRef.current;
-      // const lc = pb.lastElementChild;
-      // let callback;
+      let callback;
 
-      // if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-      //   callback = () => pb.scrollTo(0, pb.scrollHeight);
-      // }
+      if (this.state.postId === comments[Object.keys(comments)[0]].postId) {
+        const pb = this.postBodyRef.current;
+        const lc = pb.lastElementChild;
 
-      this.setState({ comments: { ...this.state.comments, ...comments } });
+        if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+          callback = () => pb.scrollTo(0, pb.scrollHeight);
+        }
+      }
+
+      this.setState({ comments: { ...this.state.comments, ...comments } }, callback);
       this.requestUnfetchedUsers(Object.values(comments));
     });
 
     socket.on("disconnect", () => {
       if (this.state.display !== "Home") {
-        this.setState({ display: "Home", users: {}, posts: {}, postId: null });
+        this.setState({ display: "Home", users: {}, posts: {}, comments: {}, postId: null });
       }
     });
   }

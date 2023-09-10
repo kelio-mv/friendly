@@ -106,42 +106,40 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("add_comments", { [id]: comment });
   });
 
-  socket.on("update_user", (args, callback) => {
-    const user = storage.users[socket.userId];
-    let newUser;
+  socket.on("edit_user", ({ field, value, currentPassword }, callback) => {
+    const user = storage.getUser("id", socket.userId);
+    let errorMessage;
 
-    switch (args.prop) {
-      case "profilePicture":
-        newUser = storage.updateUser(socket.userId, { profilePicture: args.profilePicture });
-        break;
-
+    switch (field) {
       case "username":
-        if (args.username.length < 3) {
-          callback("O nome de usuário precisa ter pelo menos 3 caracteres.");
-        } else if (args.currentPassword !== user.password) {
-          callback("Sua senha está incorreta. Por favor, verifique-a.");
-        } else if (storage.isUsernameUsed(args.username)) {
-          callback("Este nome de usuário já está em uso. Por favor, escolha outro nome.");
-        } else {
-          newUser = storage.updateUser(socket.userId, { username: args.username });
+        if (value.length < 3) {
+          errorMessage = "O nome de usuário precisa ter pelo menos 3 caracteres.";
+        } else if (currentPassword !== user.password) {
+          errorMessage = "Sua senha está incorreta. Por favor, verifique-a.";
+        } else if (storage.getUser("username", value)) {
+          errorMessage = "Este nome de usuário já está em uso. Por favor, escolha outro nome.";
         }
         break;
 
       case "password":
-        if (args.currentPassword !== user.password) {
-          callback("Sua senha está incorreta. Por favor, verifique-a.");
-        } else if (args.password.length < 6) {
-          callback("A senha precisa ter pelo menos 6 caracteres.");
-        } else {
-          newUser = storage.updateUser(socket.userId, { password: args.password });
+        if (currentPassword !== user.password) {
+          errorMessage = "Sua senha está incorreta. Por favor, verifique-a.";
+        } else if (value.length < 6) {
+          errorMessage = "A senha precisa ter pelo menos 6 caracteres.";
         }
+        break;
     }
 
-    if (newUser) {
-      socket.emit("add_users", { [socket.userId]: newUser });
-      callback();
-      socket.broadcast.emit("add_users", { [socket.userId]: newUser });
+    if (!errorMessage) {
+      storage.editUser(socket.userId, field, value);
+      if (["profilePicture", "username"].includes(field)) {
+        const { username, profilePicture } = storage.getUser("id", socket.userId);
+        socket.emit("add_users", { [socket.userId]: { username, profilePicture } });
+        socket.broadcast.emit("add_users", { [socket.userId]: { username, profilePicture } });
+      }
     }
+
+    callback(errorMessage);
   });
 });
 
