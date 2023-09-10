@@ -25,7 +25,7 @@ function Post(props) {
   }
 
   function sendComment() {
-    socket.emit("comment", props.postId, comment.trim());
+    socket.emit("comment", props.postId, comment.trim(), props.onComment);
     setComment("");
     commentRef.current.focus();
   }
@@ -39,8 +39,8 @@ function Post(props) {
 
       <div className="post__body" ref={props.postBodyRef}>
         <Article data={props.post} user={props.users[props.post.userId]} />
-        {props.post.comments.map((comment, i) => (
-          <Article key={i} data={comment} user={props.users[comment.userId]} />
+        {props.comments.map(([id, comment]) => (
+          <Article key={id} data={comment} user={props.users[comment.userId]} />
         ))}
       </div>
 

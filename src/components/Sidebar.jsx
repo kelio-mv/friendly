@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import ProfilePicture from "./ProfilePicture";
 import Icon from "./Icon";
 import "./Sidebar.scss";
@@ -7,9 +8,18 @@ function Sidebar(props) {
     return;
   }
 
+  useEffect(() => {
+    setStyles({});
+  }, []);
+
+  const [styles, setStyles] = useState({
+    sidebar: { background: "none" },
+    content: { transform: "translateX(-100%)" },
+  });
+
   return (
-    <div className="sidebar">
-      <div className="sidebar__content">
+    <div className="sidebar" style={styles.sidebar} onClick={props.close}>
+      <div className="sidebar__content" style={styles.content} onClick={(e) => e.stopPropagation()}>
         <header className="sidebar__header">
           <ProfilePicture src={props.user.profilePicture} style={{ margin: "0 auto 0.75rem" }} />
           <p>@{props.user.username}</p>
@@ -51,8 +61,6 @@ function Sidebar(props) {
           <Icon name="code" dimmed /> Em desenvolvimento
         </footer>
       </div>
-
-      <div className="sidebar__background" onClick={props.close} />
     </div>
   );
 }

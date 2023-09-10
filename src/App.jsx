@@ -16,6 +16,7 @@ class App extends React.Component {
     modal: null,
     users: {},
     posts: {},
+    comments: {},
     postId: null,
   };
   postBodyRef = React.createRef();
@@ -26,40 +27,26 @@ class App extends React.Component {
     });
 
     socket.on("add_posts", (posts) => {
-      Object.values(posts).forEach((post) => (post.comments = []));
       this.setState({ posts: { ...this.state.posts, ...posts } });
       this.requestUnfetchedUsers(Object.values(posts));
     });
 
     socket.on("add_comments", (comments) => {
-      const posts = { ...this.state.posts };
-      let callback;
-
       // const pb = this.postBodyRef.current;
       // const lc = pb.lastElementChild;
+      // let callback;
 
       // if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
       //   callback = () => pb.scrollTo(0, pb.scrollHeight);
       // }
 
-      for (const comment of comments) {
-        posts[comment.postId].comments.push(comment);
-      }
-      this.setState({ posts }, callback);
-      this.requestUnfetchedUsers(comments);
-    });
-
-    socket.on("comment_response", (comment) => {
-      // would this break if the user receives the message after leaving the post?
-      const posts = [...this.state.posts];
-      const pb = this.postBodyRef.current;
-      posts[comment.postId].comments.push(comment);
-      this.setState({ posts }, () => pb.scrollTo(0, pb.scrollHeight));
+      this.setState({ comments: { ...this.state.comments, ...comments } });
+      this.requestUnfetchedUsers(Object.values(comments));
     });
 
     socket.on("disconnect", () => {
       if (this.state.display !== "Home") {
-        this.setState({ display: "Home", users: {}, posts: [], postId: null });
+        this.setState({ display: "Home", users: {}, posts: {}, postId: null });
       }
     });
   }
@@ -73,7 +60,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { display, modal, users, posts, postId } = this.state;
+    const { display, modal, users, posts, comments, postId } = this.state;
     const { postBodyRef } = this;
 
     return (
@@ -95,7 +82,10 @@ class App extends React.Component {
             openSidebar={() => this.setState({ modal: "Sidebar" })}
             openNewPost={() => this.setState({ display: "NewPost" })}
             openPost={(postId) => {
-              const fetchedComments = posts[postId].comments.map((c) => c.id);
+              const fetchedComments = Object.entries(comments)
+                .filter(([_, comment]) => comment.postId === postId)
+                .map(([id]) => parseInt(id));
+
               socket.emit("get_comments", postId, fetchedComments);
               this.setState({ display: "Post", postId });
             }}
@@ -106,6 +96,13 @@ class App extends React.Component {
           <Post
             {...{ users, postId, postBodyRef }}
             post={posts[postId]}
+            comments={Object.entries(comments).filter(([_, comment]) => comment.postId === postId)}
+            onComment={(id, comment) => {
+              // will this break if the user receives the message after leaving the post?
+              const pb = postBodyRef.current;
+              const callback = () => pb.scrollTo(0, pb.scrollHeight);
+              this.setState({ comments: { ...comments, [id]: comment } }, callback);
+            }}
             close={() => this.setState({ display: "Feed", postId: null })}
           />
         )}
@@ -116,7 +113,7 @@ class App extends React.Component {
             onPost={(id, post) => {
               this.setState({
                 display: "Post",
-                posts: { ...this.state.posts, [id]: { ...post, comments: [] } },
+                posts: { ...this.state.posts, [id]: post },
                 postId: id,
               });
             }}

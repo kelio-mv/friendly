@@ -2,6 +2,41 @@ const { Server } = require("socket.io");
 const storage = require("./storage");
 const io = new Server(3000, { cors: { origin: "*" } });
 
+function createPost(userId, content) {
+  const post = storage.createPost(userId, content);
+  const { id } = post;
+  delete post.id;
+  return [id, post];
+}
+
+function getPosts() {
+  const posts = {};
+  storage.getPosts().forEach((post) => {
+    posts[post.id] = post;
+    delete posts[post.id].id;
+  });
+  return posts;
+}
+
+function createComment(userId, postId, content) {
+  const comment = storage.createComment(userId, postId, content);
+  const { id } = comment;
+  delete comment.id;
+  return [id, comment];
+}
+
+function getComments(postId, except) {
+  const comments = {};
+  storage
+    .getComments(postId)
+    .filter((c) => !except.includes(c.id))
+    .forEach((comment) => {
+      comments[comment.id] = comment;
+      delete comments[comment.id].id;
+    });
+  return comments;
+}
+
 io.on("connection", (socket) => {
   socket.on("auth", (signUp, username, password, callback) => {
     const user = storage.getUser("username", username);
@@ -53,8 +88,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("get_comments", (postId, except) => {
-    const comments = storage.getComments(postId).filter((c) => !except.includes(c.id));
-    if (comments.length > 0) {
+    const comments = getComments(postId, except);
+    if (Object.keys(comments).length > 0) {
       socket.emit("add_comments", comments);
     }
   });
@@ -65,10 +100,10 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("add_posts", { [id]: post });
   });
 
-  socket.on("comment", (postId, content) => {
-    const comment = storage.createComment(socket.userId, postId, content);
-    socket.emit("comment_response", comment);
-    // socket.broadcast.emit("add_comment", comment);
+  socket.on("comment", (postId, content, callback) => {
+    const [id, comment] = createComment(socket.userId, postId, content);
+    callback(id, comment);
+    socket.broadcast.emit("add_comments", { [id]: comment });
   });
 
   socket.on("update_user", (args, callback) => {
@@ -109,22 +144,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
-function createPost(userId, content) {
-  const post = storage.createPost(userId, content);
-  const { id } = post;
-  delete post.id;
-  return [id, post];
-}
-
-function getPosts() {
-  const posts = {};
-  storage.getPosts().forEach((post) => {
-    posts[post.id] = post;
-    delete posts[post.id].id;
-  });
-  return posts;
-}
 
 console.log("Server is running");
 

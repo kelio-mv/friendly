@@ -27,3 +27,12 @@
   //   white-space: pre-wrap;
   // }
 }
+
+@keyframes article {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

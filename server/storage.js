@@ -4,6 +4,7 @@ class Storage {
   constructor() {
     this.db = new Database("storage.db");
     this.init();
+    // Salvar statements pra otimizar queries
   }
 
   init() {

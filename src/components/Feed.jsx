@@ -19,7 +19,7 @@ function Feed(props) {
             key={id}
             data={post}
             user={props.users[post.userId]}
-            onClick={() => props.openPost(id)}
+            onClick={() => props.openPost(parseInt(id))}
           />
         ))}
       </div>
