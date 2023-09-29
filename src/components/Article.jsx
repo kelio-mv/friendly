@@ -25,7 +25,7 @@ function Article(props) {
 }
 
 function parseDate(date) {
-  // This function is running too many times
+  // This function is probably running too many times
   const elapsed = new Date() / 1000 - date;
 
   if (elapsed < 60) {

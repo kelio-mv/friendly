@@ -9,7 +9,7 @@ function Feed(props) {
       <div className="top-bar">
         <Icon name="menu" onClick={props.openSidebar} />
         <h1>Recentes</h1>
-        <div className="top-bar__grow"></div>
+        <div className="top-bar__grow" />
         <Icon name="add_circle" onClick={props.openNewPost} />
       </div>
 
@@ -29,4 +29,11 @@ function Feed(props) {
 
 export default Feed;
 
-// Evitar execução repetida da função sort
+/*
+A função sort está sendo executada sempre que o componente atualiza
+Possíveis causas do antigo bug dos 18px:
+- align-items stretch do flex-page
+- webkit-font-size-adjust
+- Estilos article__body
+- Elemento Article
+*/

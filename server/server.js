@@ -153,5 +153,4 @@ function isUserConnected(userId) {
     }
   }
 }
-- fix origin
 */
