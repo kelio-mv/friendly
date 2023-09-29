@@ -20,6 +20,7 @@ function Feed(props) {
             data={post}
             user={props.users[post.userId]}
             onClick={() => props.openPost(parseInt(id))}
+            truncate
           />
         ))}
       </div>
