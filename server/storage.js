@@ -75,6 +75,10 @@ class Storage {
   getComments(postId) {
     return this.db.prepare("SELECT * FROM comments WHERE postId = ?").all(postId);
   }
+
+  deleteComment(commentId) {
+    this.db.prepare("DELETE FROM comments WHERE id = ?").run(commentId);
+  }
 }
 
 module.exports = new Storage();

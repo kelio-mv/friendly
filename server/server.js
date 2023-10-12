@@ -115,6 +115,12 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("del_post", postId);
   });
 
+  socket.on("del_comment", (commentId) => {
+    storage.deleteComment(commentId);
+    socket.emit("del_comment", commentId);
+    socket.broadcast.emit("del_comment", commentId);
+  });
+
   socket.on("edit_user", ({ field, value, currentPassword }, callback) => {
     const user = storage.getUser("id", socket.userId);
     let errorMessage;

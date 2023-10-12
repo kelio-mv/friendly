@@ -8,8 +8,8 @@ import socket from "../socket";
 
 function Post(props) {
   const [comment, setComment] = useState("");
+  const [selectedComment, setSelectedComment] = useState(null);
   const [confirmDeletion, setConfirmDeletion] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const commentRef = useRef();
 
   useEffect(() => {
@@ -38,20 +38,32 @@ function Post(props) {
   }
 
   return (
-    <div className="flex-page" style={deleting ? { pointerEvents: "none" } : {}}>
+    <div className="flex-page">
       <div className="top-bar">
         <Icon name="arrow_back" onClick={props.close} />
         <h1>Publicação</h1>
-        <div className="top-bar__grow"></div>
-        {props.post.userId === storage.userId && (
-          <Icon name="delete" onClick={() => setConfirmDeletion("post")} />
-        )}
       </div>
 
       <div className="post__body" ref={props.postBodyRef}>
-        <Article data={props.post} user={props.users[props.post.userId]} />
+        <Article
+          data={props.post}
+          user={props.users[props.post.userId]}
+          delete={props.post.userId === storage.userId ? () => setConfirmDeletion("post") : null}
+        />
         {props.comments.map(([id, comment]) => (
-          <Article key={id} data={comment} user={props.users[comment.userId]} />
+          <Article
+            key={id}
+            data={comment}
+            user={props.users[comment.userId]}
+            delete={
+              comment.userId === storage.userId
+                ? () => {
+                    setConfirmDeletion("comment");
+                    setSelectedComment(id);
+                  }
+                : null
+            }
+          />
         ))}
       </div>
 
@@ -70,22 +82,26 @@ function Post(props) {
       </div>
 
       <Modal
-        open={confirmDeletion}
+        open={confirmDeletion !== null}
         header="Confirmar exclusão"
         footer={
           <ModalButton
             onClick={() => {
-              setDeleting(true);
-              socket.emit("del_post", props.postId);
+              socket.emit(
+                confirmDeletion === "post" ? "del_post" : "del_comment",
+                confirmDeletion === "post" ? props.postId : selectedComment
+              );
+              setConfirmDeletion(null);
             }}
-            disabled={deleting}
           >
             Sim
           </ModalButton>
         }
         close={() => setConfirmDeletion(null)}
       >
-        Você tem certeza que quer apagar o seu post?
+        {`Você tem certeza que quer apagar este ${
+          confirmDeletion === "post" ? "post" : "comentário"
+        }?`}
       </Modal>
     </div>
   );

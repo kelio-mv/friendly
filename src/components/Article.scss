@@ -22,6 +22,10 @@
     color: var(--clr-300);
   }
 
+  &__grow {
+    flex-grow: 1;
+  }
+
   &__body {
     // word-break: break-word;
     white-space: pre-wrap;

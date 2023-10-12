@@ -59,6 +59,12 @@ class App extends React.Component {
       }
       this.setState({ posts, comments });
     });
+
+    socket.on("del_comment", (commentId) => {
+      const comments = { ...this.state.comments };
+      delete comments[commentId];
+      this.setState({ comments });
+    });
   }
 
   componentDidUpdate() {
