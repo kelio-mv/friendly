@@ -75,6 +75,9 @@ io.on("connection", (socket) => {
   socket.on("get_data", (callback) => {
     const { username, profilePicture } = storage.getUser("id", socket.userId);
     callback(socket.userId, { username, profilePicture });
+  });
+
+  socket.on("get_posts", () => {
     socket.emit("add_posts", getPosts());
   });
 
@@ -104,6 +107,12 @@ io.on("connection", (socket) => {
     const [id, comment] = createComment(socket.userId, postId, content);
     callback(id, comment);
     socket.broadcast.emit("add_comments", { [id]: comment });
+  });
+
+  socket.on("del_post", (postId) => {
+    storage.deletePost(postId);
+    socket.emit("del_post", postId);
+    socket.broadcast.emit("del_post", postId);
   });
 
   socket.on("edit_user", ({ field, value, currentPassword }, callback) => {

@@ -12,6 +12,7 @@ class Storage {
 
   deleteCredentials() {
     this.credentials = null;
+    this.userId = null;
     localStorage.removeItem("friendly");
   }
 }

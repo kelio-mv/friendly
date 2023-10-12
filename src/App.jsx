@@ -47,11 +47,22 @@ class App extends React.Component {
       this.requestUnfetchedUsers(Object.values(comments));
     });
 
-    socket.on("disconnect", () => {
-      if (this.state.display !== "Home") {
-        this.setState({ display: "Home", users: {}, posts: {}, comments: {}, postId: null });
+    socket.on("del_post", (postId) => {
+      if (this.state.postId === postId) {
+        this.setState({ display: "Feed", postId: null });
       }
+      const posts = { ...this.state.posts };
+      const comments = { ...this.state.comments };
+      delete posts[postId];
+      for (const id in comments) {
+        if (comments[id].postId === postId) delete comments[id];
+      }
+      this.setState({ posts, comments });
     });
+  }
+
+  componentDidUpdate() {
+    console.log(this.state.comments);
   }
 
   requestUnfetchedUsers(articles) {
@@ -71,10 +82,20 @@ class App extends React.Component {
         {display === "Home" && (
           <Home
             onAuth={() => {
-              socket.emit("get_data", (userId, user) => {
-                storage.userId = userId;
-                this.setState({ display: "Feed", users: { [userId]: user } });
-              });
+              // Get user data on the first connection
+              if (storage.userId === null) {
+                socket.emit("get_data", (userId, user) => {
+                  storage.userId = userId;
+                  this.setState({ display: "Feed", users: { [userId]: user } });
+                });
+              }
+              socket.emit("get_posts");
+            }}
+            onAuthError={() => {
+              // If the authentication fails on reconnect, return to Home
+              if (storage.userId !== null) {
+                this.setState({ display: "Home" });
+              }
             }}
           />
         )}
@@ -142,6 +163,7 @@ class App extends React.Component {
           contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
           openSettings={() => this.setState({ display: "Settings", modal: null })}
           logout={() => {
+            socket.off("disconnect");
             socket.close();
             storage.deleteCredentials();
             this.setState({ display: "Home", modal: null });

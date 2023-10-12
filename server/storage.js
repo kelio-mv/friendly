@@ -58,6 +58,11 @@ class Storage {
     return this.db.prepare("SELECT * FROM posts").all();
   }
 
+  deletePost(postId) {
+    this.db.prepare("DELETE FROM comments WHERE postId = ?").run(postId);
+    this.db.prepare("DELETE FROM posts WHERE id = ?").run(postId);
+  }
+
   createComment(userId, postId, content) {
     const stmt = this.db.prepare("INSERT INTO comments (userId, postId, content) VALUES (?, ?, ?)");
     return this.getComment(stmt.run(userId, postId, content).lastInsertRowid);

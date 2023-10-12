@@ -16,41 +16,30 @@ class Home extends React.Component {
   };
 
   componentDidMount() {
-    socket.on("connect", () => {
-      const { signUp, username, password } = this.state;
-      const callback = (errorMessage) => {
-        if (errorMessage) {
-          socket.close();
-          storage.deleteCredentials();
-          this.setState({ connecting: false, errorMessage });
-        } else {
-          storage.saveCredentials(username, password);
-          this.props.onAuth();
-        }
-      };
-      socket.emit("auth", signUp, username, password, callback);
-    });
-
-    socket.on("connect_error", () => {
-      this.setState({
-        connecting: false,
-        errorMessage: [
-          "Erro de conexão",
-          "Não foi possível se conectar ao servidor. Por favor, tente novamente.",
-        ],
-      });
-    });
+    socket.on("connect", this.auth);
 
     if (storage.credentials) {
       socket.connect();
     }
   }
 
-  componentWillUnmount() {
-    socket.off("connect");
-    socket.off("connect_error");
-    socket.off("auth-response");
-  }
+  auth = () => {
+    const { signUp, username, password } = this.state;
+    const callback = (errorMessage) => {
+      if (errorMessage) {
+        socket.close();
+        this.props.onAuthError();
+        storage.deleteCredentials();
+        this.setState({ connecting: false, errorMessage });
+      } else {
+        socket.off("connect");
+        socket.once("disconnect", this.auth);
+        storage.saveCredentials(username, password);
+        this.props.onAuth();
+      }
+    };
+    socket.emit("auth", signUp, username, password, callback);
+  };
 
   render() {
     const { username, password, signUp, connecting, errorMessage } = this.state;
