@@ -32,11 +32,6 @@ function Sidebar(props) {
             Contato
           </div>
 
-          <div className="sidebar__item sidebar__item--disabled">
-            <Icon name="pending_actions" />
-            Planejamento
-          </div>
-
           <div className="sidebar__item" onClick={props.openSettings}>
             <Icon name="settings" />
             Configurações

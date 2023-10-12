@@ -162,7 +162,7 @@ class App extends React.Component {
           share={() => {
             navigator.share({
               title: "Friendly",
-              text: "Junte-se à melhor comunidade da internet",
+              text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
               url: "https://kelio-mv.github.io/friendly/",
             });
           }}

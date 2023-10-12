@@ -1,6 +1,6 @@
 const { Server } = require("socket.io");
 const storage = require("./storage");
-const io = new Server(3000, { cors: { origin: "*" } });
+const io = new Server(3000, { cors: { origin: "https://kelio-mv.github.io" } });
 
 function createPost(userId, content) {
   const post = storage.createPost(userId, content);
