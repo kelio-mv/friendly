@@ -18,6 +18,7 @@ class App extends React.Component {
     posts: {},
     comments: {},
     postId: null,
+    newComments: 0,
   };
   postBodyRef = React.createRef();
 
@@ -40,6 +41,8 @@ class App extends React.Component {
 
         if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
           callback = () => pb.scrollTo(0, pb.scrollHeight);
+        } else {
+          this.setState({ newComments: this.state.newComments + 1 });
         }
       }
 
@@ -76,7 +79,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { display, modal, users, posts, comments, postId } = this.state;
+    const { display, modal, users, posts, comments, postId, newComments } = this.state;
     const { postBodyRef } = this;
 
     return (
@@ -120,7 +123,7 @@ class App extends React.Component {
 
         {display === "Post" && (
           <Post
-            {...{ users, postId, postBodyRef }}
+            {...{ users, postId, newComments, postBodyRef }}
             post={posts[postId]}
             comments={Object.entries(comments).filter(([_, comment]) => comment.postId === postId)}
             onComment={(id, comment) => {
@@ -129,7 +132,8 @@ class App extends React.Component {
               const callback = () => pb.scrollTo(0, pb.scrollHeight);
               this.setState({ comments: { ...comments, [id]: comment } }, callback);
             }}
-            close={() => this.setState({ display: "Feed", postId: null })}
+            resetNewComments={() => this.setState({ newComments: 0 })}
+            close={() => this.setState({ display: "Feed", postId: null, newComments: 0 })}
           />
         )}
 

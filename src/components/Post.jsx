@@ -44,7 +44,19 @@ function Post(props) {
         <h1>Publicação</h1>
       </div>
 
-      <div className="post__body" ref={props.postBodyRef}>
+      <div
+        className="post__body"
+        ref={props.postBodyRef}
+        onScroll={() => {
+          if (props.newComments === 0) return;
+          const pb = props.postBodyRef.current;
+          const lc = pb.lastElementChild;
+
+          if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+            props.resetNewComments();
+          }
+        }}
+      >
         <Article
           data={props.post}
           user={props.users[props.post.userId]}
@@ -63,6 +75,7 @@ function Post(props) {
             }}
           />
         ))}
+        {props.newComments > 0 && <div className="post__new-comments">{props.newComments}</div>}
       </div>
 
       <div className="post__footer">
@@ -85,10 +98,11 @@ function Post(props) {
         footer={
           <ModalButton
             onClick={() => {
-              socket.emit(
-                confirmDeletion === "post" ? "del_post" : "del_comment",
-                confirmDeletion === "post" ? props.postId : selectedComment
-              );
+              if (confirmDeletion === "post") {
+                socket.emit("del_post", props.postId);
+              } else {
+                socket.emit("del_comment", selectedComment);
+              }
               setConfirmDeletion(null);
             }}
           >

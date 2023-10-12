@@ -27,6 +27,20 @@
     overflow: auto;
   }
 
+  &__new-comments {
+    // footer height = 53px and scroll width = 12px
+    position: fixed;
+    right: calc(12px + 0.75rem);
+    bottom: calc(53px + 0.75rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: #0f766e;
+    border-radius: 50%;
+  }
+
   &__footer {
     display: flex;
     padding: 0 1rem;

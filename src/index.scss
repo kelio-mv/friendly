@@ -64,6 +64,7 @@ body {
   --bg-200: rgb(30, 30, 30);
   --bg-300: rgb(42, 42, 42);
   --bg-400: rgb(54, 54, 54);
+  --bg-500: rgb(66, 66, 66);
   --clr-100: rgb(236, 236, 236);
   --clr-200: rgb(212, 212, 212);
   --clr-300: rgb(188, 188, 188);
@@ -77,4 +78,22 @@ body {
 
 :is(input, textarea)::placeholder {
   color: var(--clr-500);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-400);
+  border: 2px solid var(--bg-200);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-500);
 }
