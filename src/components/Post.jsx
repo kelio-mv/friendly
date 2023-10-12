@@ -25,7 +25,7 @@ function Post(props) {
     }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendComment();
+      if (comment.trim()) sendComment();
     }
   }
 

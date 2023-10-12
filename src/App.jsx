@@ -67,10 +67,6 @@ class App extends React.Component {
     });
   }
 
-  componentDidUpdate() {
-    console.log(this.state.comments);
-  }
-
   requestUnfetchedUsers(articles) {
     const { users } = this.state;
     const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));

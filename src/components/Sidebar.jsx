@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ProfilePicture from "./ProfilePicture";
 import Icon from "./Icon";
 import "./Sidebar.scss";
@@ -8,18 +8,9 @@ function Sidebar(props) {
     return;
   }
 
-  useEffect(() => {
-    setStyles({});
-  }, []);
-
-  const [styles, setStyles] = useState({
-    sidebar: { background: "none" },
-    content: { transform: "translateX(-100%)" },
-  });
-
   return (
-    <div className="sidebar" style={styles.sidebar} onClick={props.close}>
-      <div className="sidebar__content" style={styles.content} onClick={(e) => e.stopPropagation()}>
+    <div className="sidebar" onClick={props.close}>
+      <div className="sidebar__content" onClick={(e) => e.stopPropagation()}>
         <header className="sidebar__header">
           <ProfilePicture src={props.user.profilePicture} />
           <p>@{props.user.username}</p>
