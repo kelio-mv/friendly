@@ -48,21 +48,19 @@ function Post(props) {
         <Article
           data={props.post}
           user={props.users[props.post.userId]}
-          delete={props.post.userId === storage.userId ? () => setConfirmDeletion("post") : null}
+          deletable={props.post.userId === storage.userId}
+          delete={() => setConfirmDeletion("post")}
         />
         {props.comments.map(([id, comment]) => (
           <Article
             key={id}
             data={comment}
             user={props.users[comment.userId]}
-            delete={
-              comment.userId === storage.userId
-                ? () => {
-                    setConfirmDeletion("comment");
-                    setSelectedComment(id);
-                  }
-                : null
-            }
+            deletable={comment.userId === storage.userId}
+            delete={() => {
+              setSelectedComment(id);
+              setConfirmDeletion("comment");
+            }}
           />
         ))}
       </div>

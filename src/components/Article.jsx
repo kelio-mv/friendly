@@ -16,7 +16,7 @@ function Article(props) {
             <p className="article__date">{parseDate(props.data.timestamp)}</p>
           </div>
           <div className="article__grow" />
-          {props.delete && <Icon name="delete" onClick={props.delete} />}
+          {props.deletable && <Icon name="delete" onClick={props.delete} />}
         </header>
 
         <p className="article__body" style={props.truncate ? truncate : {}}>
