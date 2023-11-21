@@ -30,11 +30,4 @@ function Feed(props) {
 
 export default Feed;
 
-/*
-A função sort está sendo executada sempre que o componente atualiza
-Possíveis causas do antigo bug dos 18px:
-- align-items stretch do flex-page
-- webkit-font-size-adjust
-- Estilos article__body
-- Elemento Article
-*/
+// A função sort está sendo executada sempre que o componente atualiza

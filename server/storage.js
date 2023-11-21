@@ -2,7 +2,7 @@ const Database = require("better-sqlite3");
 
 class Storage {
   constructor() {
-    this.db = new Database(".storage.db");
+    this.db = new Database(".data/storage.db");
     this.init();
     // Salvar statements pra otimizar queries
   }

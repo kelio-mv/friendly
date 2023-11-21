@@ -1,12 +1,9 @@
-import { useState } from "react";
 import ProfilePicture from "./ProfilePicture";
 import Icon from "./Icon";
 import "./Sidebar.scss";
 
 function Sidebar(props) {
-  if (!props.open) {
-    return;
-  }
+  if (!props.open) return;
 
   return (
     <div className="sidebar" onClick={props.close}>
@@ -52,3 +49,5 @@ function Sidebar(props) {
 }
 
 export default Sidebar;
+
+// Mesmo problema do Modal

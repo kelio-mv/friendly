@@ -2,7 +2,9 @@ function ModalButton(props) {
   return (
     <div
       className={`modal__btn ${props.disabled ? "modal__btn--disabled" : ""}`}
-      onClick={() => !props.disabled && props.onClick()}
+      onClick={() => {
+        if (!props.disabled) props.onClick();
+      }}
     >
       {props.children}
     </div>
@@ -10,3 +12,5 @@ function ModalButton(props) {
 }
 
 export default ModalButton;
+
+// Talvez esse componente não seja tão relevante

@@ -3,33 +3,33 @@ import Icon from "./Icon";
 import "./Article.scss";
 
 function Article(props) {
-  if (props.user) {
-    return (
-      <article
-        className={`article ${props.highlight ? "article--highlight" : ""}`}
-        onClick={props.onClick}
-      >
-        <header className="article__header">
-          <ProfilePicture src={props.user.profilePicture} small />
-          <div>
-            <p>@{props.user.username}</p>
-            <p className="article__date">{parseDate(props.data.timestamp)}</p>
-          </div>
-          <div className="article__grow" />
-          {props.deletable && <Icon name="delete" onClick={props.delete} dimmed />}
-        </header>
+  if (!props.user) return;
 
-        <p className="article__body" style={props.truncate ? truncate : {}}>
-          {props.data.content}
-        </p>
-      </article>
-    );
-  }
+  return (
+    <article
+      className={`article ${props.highlight ? "article--highlight" : ""}`}
+      onClick={props.onClick}
+    >
+      <header className="article__header">
+        <ProfilePicture src={props.user.profilePicture} small />
+        <div>
+          <p>@{props.user.username}</p>
+          <p className="article__date">{parseTime(props.data.timestamp)}</p>
+        </div>
+        <div className="article__grow" />
+        {props.deletable && <Icon name="delete" onClick={props.delete} dimmed />}
+      </header>
+
+      <p className="article__body" style={props.truncate ? truncate : {}}>
+        {props.data.content}
+      </p>
+    </article>
+  );
 }
 
-function parseDate(date) {
+function parseTime(time) {
   // This function is probably running too many times
-  const elapsed = new Date() / 1000 - date;
+  const elapsed = new Date() / 1000 - time;
 
   if (elapsed < 60) {
     return "agora mesmo";

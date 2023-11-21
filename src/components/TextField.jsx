@@ -3,30 +3,26 @@ import Icon from "./Icon";
 import "./TextField.scss";
 
 function TextField(props) {
-  const [showPassword, setShowPassword] = useState(false);
-  const maxLength = ["username", "password"].includes(props.type) ? 16 : null;
+  const [hideContent, setHideContent] = useState(props.type === "password");
 
   return (
     <div className="text-field">
       <input
-        type={props.type === "password" && !showPassword ? "password" : "text"}
+        type={hideContent ? "password" : "text"}
         className={`text-field__input ${props.modalChild ? "text-field__input--modal-child" : ""}`}
         placeholder={props.placeholder}
         value={props.value}
         onChange={(e) => {
-          let value = e.target.value;
-          if (props.type === "username") {
-            value = value.replace(/[^a-zA-Z0-9_]/g, "");
-          }
-          props.onChange(value);
+          const value = e.target.value;
+          props.onChange(props.type === "username" ? value.replace(/[^a-zA-Z0-9_]/g, "") : value);
         }}
-        maxLength={maxLength}
+        maxLength={["username", "password"].includes(props.type) ? 16 : null}
       />
       {props.type === "password" && (
         <div className="text-field__visibility">
           <Icon
-            name={`visibility${showPassword ? "_off" : ""}`}
-            onClick={() => setShowPassword(!showPassword)}
+            name={`visibility${hideContent ? "" : "_off"}`}
+            onClick={() => setHideContent(!hideContent)}
             dimmed
           />
         </div>

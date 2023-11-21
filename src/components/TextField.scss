@@ -14,13 +14,13 @@
     &:focus {
       border: 2px solid var(--bg-300);
     }
-  }
 
-  &__input--modal-child {
-    background: var(--bg-300);
+    &--modal-child {
+      background: var(--bg-300);
 
-    &:focus {
-      border: 2px solid var(--bg-400);
+      &:focus {
+        border: 2px solid var(--bg-400);
+      }
     }
   }
 

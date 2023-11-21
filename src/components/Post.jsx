@@ -8,8 +8,8 @@ import socket from "../socket";
 
 function Post(props) {
   const [comment, setComment] = useState("");
-  const [selectedComment, setSelectedComment] = useState(null);
-  const [confirmDeletion, setConfirmDeletion] = useState(null);
+  const [commentId, setCommentId] = useState(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const commentRef = useRef();
 
   useEffect(() => {
@@ -18,11 +18,20 @@ function Post(props) {
     comment.style.height = comment.scrollHeight + "px";
   }, [comment]);
 
-  function onKeyDown(e) {
-    // Send the comment when a desktop user presses Enter
-    if ("ontouchstart" in document.documentElement) {
-      return;
+  function onScroll() {
+    if (props.newComments === 0) return;
+    // Esta função está prejudicando o desempenho em dispositivos móveis
+    const pb = props.postBodyRef.current;
+    const lc = pb.lastElementChild;
+
+    if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+      props.resetNewComments();
     }
+  }
+
+  function onKeyDown(e) {
+    if ("ontouchstart" in document.documentElement) return;
+    // Send the comment when a desktop user presses Enter
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (comment.trim()) sendComment();
@@ -30,11 +39,18 @@ function Post(props) {
   }
 
   function sendComment() {
+    socket.emit("comment", props.postId, comment.trim(), props.onComment);
     setComment("");
-    socket.emit("comment", props.postId, comment.trim(), (id, comment) => {
-      props.onComment(id, comment);
-    });
     commentRef.current.focus();
+  }
+
+  function deleteArticle() {
+    if (deleteConfirmation === "post") {
+      socket.emit("del_post", props.postId);
+    } else {
+      socket.emit("del_comment", commentId);
+    }
+    setDeleteConfirmation(null);
   }
 
   return (
@@ -44,24 +60,12 @@ function Post(props) {
         <h1>Publicação</h1>
       </div>
 
-      <div
-        className="post__body"
-        ref={props.postBodyRef}
-        onScroll={() => {
-          if (props.newComments === 0) return;
-          const pb = props.postBodyRef.current;
-          const lc = pb.lastElementChild;
-
-          if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-            props.resetNewComments();
-          }
-        }}
-      >
+      <div className="post__body" ref={props.postBodyRef} onScroll={onScroll}>
         <Article
           data={props.post}
           user={props.users[props.post.userId]}
           deletable={props.post.userId === storage.userId}
-          delete={() => setConfirmDeletion("post")}
+          delete={() => setDeleteConfirmation("post")}
         />
         {props.comments.map(([id, comment]) => (
           <Article
@@ -70,8 +74,8 @@ function Post(props) {
             user={props.users[comment.userId]}
             deletable={comment.userId === storage.userId}
             delete={() => {
-              setSelectedComment(id);
-              setConfirmDeletion("comment");
+              setCommentId(id);
+              setDeleteConfirmation("comment");
             }}
           />
         ))}
@@ -93,26 +97,13 @@ function Post(props) {
       </div>
 
       <Modal
-        open={confirmDeletion !== null}
+        open={deleteConfirmation !== null}
         header="Confirmar exclusão"
-        footer={
-          <ModalButton
-            onClick={() => {
-              if (confirmDeletion === "post") {
-                socket.emit("del_post", props.postId);
-              } else {
-                socket.emit("del_comment", selectedComment);
-              }
-              setConfirmDeletion(null);
-            }}
-          >
-            Sim
-          </ModalButton>
-        }
-        close={() => setConfirmDeletion(null)}
+        footer={<ModalButton onClick={deleteArticle}>Sim</ModalButton>}
+        close={() => setDeleteConfirmation(null)}
       >
-        {`Você tem certeza que quer apagar este ${
-          confirmDeletion === "post" ? "post" : "comentário"
+        {`Você tem certeza que deseja apagar este ${
+          deleteConfirmation === "post" ? "post" : "comentário"
         }?`}
       </Modal>
     </div>

@@ -12,3 +12,5 @@ function ProfilePicture(props) {
 }
 
 export default ProfilePicture;
+
+// O filtro no Icon e ProfilePicture podem estar comprometendo o desempenho

@@ -67,15 +67,6 @@
   resize: none;
 }
 
-/*
-Possíveis causas do bug dos 18px:
-
-- align-items stretch do flex-page
-- webkit-font-size-adjust
-- Estilos article__body
-- Elemento Article
-*/
-
 .btn {
   min-width: 16rem;
   padding: 0.5rem 0.75rem;
@@ -108,3 +99,12 @@ Possíveis causas do bug dos 18px:
     }
   }
 }
+
+/*
+Possíveis causas do bug dos 18px:
+
+- align-items stretch do flex-page
+- webkit-font-size-adjust
+- Estilos article__body
+- Elemento Article
+*/
