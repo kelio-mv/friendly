@@ -10,12 +10,12 @@ import "./Settings.scss";
 
 function Settings(props) {
   const [display, setDisplay] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
   const [profilePicture, setProfilePicture] = useState(props.user.profilePicture);
   const [username, setUsername] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [saving, setSaving] = useState(false);
   const fileRef = useRef();
 
   function onFileLoad(file) {
@@ -41,6 +41,18 @@ function Settings(props) {
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  function reset(...variables) {
+    variables.forEach((v) => {
+      if (v === "display") setDisplay("");
+      else if (v === "profilePicture") setProfilePicture(props.user.profilePicture);
+      else if (v === "username") setUsername("");
+      else if (v === "password") setPassword("");
+      else if (v === "currentPassword") setCurrentPassword("");
+      else if (v === "errorMessage") setErrorMessage(null);
+      else if (v === "saving") setSaving(false);
+    });
   }
 
   return (
@@ -74,20 +86,15 @@ function Settings(props) {
             onClick={() => {
               setSaving(true);
               const data = { field: "profilePicture", value: profilePicture };
-              socket.emit("edit_user", data, () => {
-                setDisplay("");
-                setSaving(false);
-              });
+              const callback = () => reset("display", "saving");
+              socket.emit("edit_user", data, callback);
             }}
             disabled={profilePicture === props.user.profilePicture || saving}
           >
             Salvar
           </ModalButton>
         }
-        close={() => {
-          setDisplay("");
-          setProfilePicture(props.user.profilePicture);
-        }}
+        close={() => reset("display", "profilePicture")}
         center
       >
         <ProfilePicture src={profilePicture} />
@@ -127,11 +134,7 @@ function Settings(props) {
                   setSaving(false);
                 } else {
                   storage.saveCredentials(username, storage.password);
-                  setDisplay("");
-                  setSaving(false);
-                  setErrorMessage(null);
-                  setUsername("");
-                  setCurrentPassword("");
+                  reset("display", "saving", "errorMessage", "username", "currentPassword");
                 }
               };
               socket.emit("edit_user", data, callback);
@@ -141,12 +144,7 @@ function Settings(props) {
             Salvar
           </ModalButton>
         }
-        close={() => {
-          setDisplay("");
-          setErrorMessage("");
-          setUsername("");
-          setCurrentPassword("");
-        }}
+        close={() => reset("display", "errorMessage", "username", "currentPassword")}
         center
       >
         <TextField
@@ -182,11 +180,7 @@ function Settings(props) {
                   setSaving(false);
                 } else {
                   storage.saveCredentials(storage.username, password);
-                  setDisplay("");
-                  setSaving(false);
-                  setErrorMessage(null);
-                  setCurrentPassword("");
-                  setPassword("");
+                  reset("display", "saving", "errorMessage", "currentPassword", "password");
                 }
               };
               socket.emit("edit_user", data, callback);
@@ -196,12 +190,7 @@ function Settings(props) {
             Salvar
           </ModalButton>
         }
-        close={() => {
-          setDisplay("");
-          setErrorMessage("");
-          setCurrentPassword("");
-          setPassword("");
-        }}
+        close={() => reset("display", "errorMessage", "currentPassword", "password")}
         center
       >
         <TextField
