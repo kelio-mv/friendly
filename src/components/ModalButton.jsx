@@ -14,3 +14,4 @@ function ModalButton(props) {
 export default ModalButton;
 
 // Talvez esse componente não seja tão relevante
+// Observe o modal__btn no componente Home

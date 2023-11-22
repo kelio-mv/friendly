@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import TextField from "./TextField";
 import Icon from "./Icon";
@@ -6,107 +6,99 @@ import storage from "../storage";
 import socket from "../socket";
 import "./Home.scss";
 
-class Home extends React.Component {
-  state = {
-    username: storage.username,
-    password: storage.password,
-    signUp: false,
-    connecting: storage.credentials,
-    errorMessage: [],
-  };
+function Home(props) {
+  const [username, setUsername] = useState(storage.username);
+  const [password, setPassword] = useState(storage.password);
+  const [signUp, setSignUp] = useState(false);
+  const [connecting, setConnecting] = useState(storage.credentials);
+  const [errorMessage, setErrorMessage] = useState([]);
 
-  componentDidMount() {
-    socket.on("connect", this.auth);
+  useEffect(() => {
+    if (storage.credentials) socket.connect();
+  }, []);
 
-    if (storage.credentials) {
-      socket.connect();
-    }
-  }
+  useEffect(() => {
+    socket.on("connect", auth);
+    return () => socket.off("connect");
+  }, [username, password, signUp]);
 
-  auth = () => {
-    const { signUp, username, password } = this.state;
+  function auth() {
     const callback = (errorMessage) => {
       if (errorMessage) {
         socket.close();
-        this.props.onAuthError();
         storage.deleteCredentials();
-        this.setState({ connecting: false, errorMessage });
+        setConnecting(false);
+        setErrorMessage(errorMessage);
+        props.onAuthError();
       } else {
-        socket.off("connect");
-        socket.once("disconnect", this.auth);
         storage.saveCredentials(username, password);
-        this.props.onAuth();
+        socket.off("connect");
+        socket.once("disconnect", auth);
+        props.onAuth();
       }
     };
     socket.emit("auth", signUp, username, password, callback);
-  };
-
-  render() {
-    const { username, password, signUp, connecting, errorMessage } = this.state;
-
-    return (
-      <div className="home" style={connecting ? { pointerEvents: "none" } : {}}>
-        <img src="logo.png" className="home__logo" />
-
-        <h1 className="home__greeting">Bem-vindo ao Friendly</h1>
-
-        <p className="home__description">Um lugar para desabafar e fazer novos amigos</p>
-
-        <TextField
-          type="username"
-          placeholder="Nome de usuário"
-          value={username}
-          onChange={(v) => this.setState({ username: v })}
-        />
-
-        <TextField
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(v) => this.setState({ password: v })}
-        />
-
-        <button
-          className="home__btn btn btn--primary"
-          onClick={() => {
-            this.setState({ connecting: true });
-            socket.connect();
-          }}
-          disabled={connecting}
-        >
-          {signUp ? "Cadastrar-se" : "Entrar"}
-        </button>
-
-        <p className="home__switch-mode">
-          {signUp ? "Já tem uma conta? " : "Não tem uma conta? "}
-
-          <span
-            className="home__switch-mode-btn"
-            onClick={() => this.setState({ signUp: !signUp })}
-          >
-            {signUp ? "Faça login" : "Cadastre-se"}
-          </span>
-        </p>
-
-        <div className="home__ads">
-          <Icon name="favorite" dimmed />
-          <p>Não exibimos anúncios</p>
-        </div>
-
-        <Modal
-          open={errorMessage.length > 0}
-          header={errorMessage[0]}
-          footer={
-            <p className="modal__btn" onClick={() => this.setState({ errorMessage: [] })}>
-              OK
-            </p>
-          }
-        >
-          {errorMessage[1]}
-        </Modal>
-      </div>
-    );
   }
+
+  return (
+    <div className="home" style={connecting ? { pointerEvents: "none" } : {}}>
+      <img src="logo.png" className="home__logo" />
+
+      <h1 className="home__greeting">Bem-vindo ao Friendly</h1>
+
+      <p className="home__description">Um lugar para desabafar e fazer novos amigos</p>
+
+      <TextField
+        type="username"
+        placeholder="Nome de usuário"
+        value={username}
+        onChange={(v) => setUsername(v)}
+      />
+
+      <TextField
+        type="password"
+        placeholder="Senha"
+        value={password}
+        onChange={(v) => setPassword(v)}
+      />
+
+      <button
+        className="home__btn btn btn--primary"
+        onClick={() => {
+          setConnecting(true);
+          socket.connect();
+        }}
+        disabled={connecting}
+      >
+        {signUp ? "Cadastrar-se" : "Entrar"}
+      </button>
+
+      <p className="home__switch-mode">
+        {signUp ? "Já tem uma conta? " : "Não tem uma conta? "}
+
+        <span className="home__switch-mode-btn" onClick={() => setSignUp(!signUp)}>
+          {signUp ? "Faça login" : "Cadastre-se"}
+        </span>
+      </p>
+
+      <div className="home__ads">
+        <Icon name="favorite" dimmed />
+        <p>Não exibimos anúncios</p>
+      </div>
+
+      <Modal
+        open={errorMessage.length > 0}
+        header={errorMessage[0]}
+        footer={
+          <p className="modal__btn" onClick={() => setErrorMessage([])}>
+            OK
+          </p>
+        }
+      >
+        {errorMessage[1]}
+      </Modal>
+    </div>
+  );
 }
 
 export default Home;
