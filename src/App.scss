@@ -28,9 +28,9 @@
   }
 
   &__new-comments {
-    // footer height = 53px and scrollbar width = 12px
+    // footer height = 53px and scrollbar width = 10px
     position: fixed;
-    right: calc(12px + 0.75rem);
+    right: calc(10px + 0.75rem);
     bottom: calc(53px + 0.75rem);
     display: flex;
     justify-content: center;

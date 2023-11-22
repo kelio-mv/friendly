@@ -3,7 +3,8 @@ import Icon from "./Icon";
 import "./Article.scss";
 
 function Article(props) {
-  if (!props.user) return;
+  // This will ensure automatic scroll down works properly
+  const user = props.user || { username: "...", profilePicture: "loading_pfp.png" };
 
   return (
     <article
@@ -11,9 +12,9 @@ function Article(props) {
       onClick={props.onClick}
     >
       <header className="article__header">
-        <ProfilePicture src={props.user.profilePicture} small />
+        <ProfilePicture src={user.profilePicture} small />
         <div>
-          <p>@{props.user.username}</p>
+          <p>@{user.username}</p>
           <p className="article__date">{parseTime(props.data.timestamp)}</p>
         </div>
         <div className="article__grow" />

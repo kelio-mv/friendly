@@ -5,7 +5,7 @@ function ProfilePicture(props) {
       style={{
         width: props.small ? 48 : 72,
         borderRadius: "50%",
-        filter: props.src === "default_avatar.png" ? "invert(1)" : null,
+        filter: ["default_avatar.png", "loading_pfp.png"].includes(props.src) ? "invert(1)" : null,
       }}
     />
   );

@@ -57,6 +57,7 @@ function Settings(props) {
 
   return (
     <>
+      {/* Home */}
       <div className="flex-page">
         <div className="top-bar">
           <Icon name="arrow_back" onClick={props.close} />
@@ -78,6 +79,7 @@ function Settings(props) {
         </div>
       </div>
 
+      {/* Profile Picture */}
       <Modal
         open={display === "ProfilePicture"}
         header="Imagem de perfil"
@@ -120,6 +122,7 @@ function Settings(props) {
         </button>
       </Modal>
 
+      {/* Username */}
       <Modal
         open={display === "Username"}
         header="Nome de usuário"
@@ -166,6 +169,7 @@ function Settings(props) {
         {errorMessage && <p className="settings__error">{errorMessage}</p>}
       </Modal>
 
+      {/* Password */}
       <Modal
         open={display === "Password"}
         header="Senha"

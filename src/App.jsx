@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect, useRef } from "react";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
@@ -10,176 +10,188 @@ import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
 
-class App extends React.Component {
-  state = {
-    display: "Home",
-    modal: null,
-    users: {},
-    posts: {},
-    comments: {},
-    postId: null,
-    newComments: 0,
-  };
-  postBodyRef = React.createRef();
+function App() {
+  const [display, setDisplay] = useState("Home");
+  const [modal, setModal] = useState(null);
+  const [users, setUsers] = useState({});
+  const [posts, setPosts] = useState({});
+  const [comments, setComments] = useState({});
+  const [postId, setPostId] = useState(null);
+  const [newComments, setNewComments] = useState(0);
+  const postBodyRef = useRef();
 
-  componentDidMount() {
+  useEffect(() => {
     socket.on("add_users", (users) => {
-      this.setState({ users: { ...this.state.users, ...users } });
+      setUsers((prevUsers) => ({ ...prevUsers, ...users }));
     });
 
     socket.on("add_posts", (posts) => {
-      this.setState({ posts: { ...this.state.posts, ...posts } });
-      this.requestUnfetchedUsers(Object.values(posts));
+      setPosts((prevPosts) => ({ ...prevPosts, ...posts }));
+      requestUnfetchedUsers(Object.values(posts));
     });
 
     socket.on("add_comments", (comments) => {
       let callback;
 
-      if (this.state.postId === comments[Object.keys(comments)[0]].postId) {
-        const pb = this.postBodyRef.current;
+      if (postId === comments[Object.keys(comments)[0]].postId) {
+        const pb = postBodyRef.current;
         const lc = pb.lastElementChild;
-
         if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
           callback = () => pb.scrollTo(0, pb.scrollHeight);
         } else {
-          this.setState({ newComments: this.state.newComments + 1 });
+          setNewComments((prevNewComments) => prevNewComments + 1);
         }
       }
-
-      this.setState({ comments: { ...this.state.comments, ...comments } }, callback);
-      this.requestUnfetchedUsers(Object.values(comments));
+      setComments((prevComments) => ({ ...prevComments, ...comments }));
+      requestUnfetchedUsers(Object.values(comments));
+      if (callback) setTimeout(callback);
     });
 
-    socket.on("del_post", (postId) => {
-      if (this.state.postId === postId) {
-        this.setState({ display: "Feed", postId: null });
+    socket.on("del_post", (_postId) => {
+      if (postId === _postId) {
+        setDisplay("Feed");
+        setPostId(null);
       }
-      const posts = { ...this.state.posts };
-      const comments = { ...this.state.comments };
-      delete posts[postId];
-      for (const id in comments) {
-        if (comments[id].postId === postId) delete comments[id];
-      }
-      this.setState({ posts, comments });
+      setPosts((prevPosts) => {
+        const posts = { ...prevPosts };
+        delete posts[_postId];
+        return posts;
+      });
+      setComments((prevComments) => {
+        const comments = { ...prevComments };
+        for (const id in comments) {
+          if (comments[id].postId === _postId) delete comments[id];
+        }
+        return comments;
+      });
     });
 
     socket.on("del_comment", (commentId) => {
-      const comments = { ...this.state.comments };
-      delete comments[commentId];
-      this.setState({ comments });
+      setComments((prevComments) => {
+        const comments = { ...prevComments };
+        delete comments[commentId];
+        return comments;
+      });
     });
-  }
 
-  requestUnfetchedUsers(articles) {
-    const { users } = this.state;
+    // Make sure to remove all previous listeners on update
+    // Deps must only have variables that you need their current state
+    return () => {
+      socket.off("add_users");
+      socket.off("add_posts");
+      socket.off("add_comments");
+      socket.off("del_post");
+      socket.off("del_comment");
+    };
+  }, [users, postId]);
+
+  function requestUnfetchedUsers(articles) {
     const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
-    if (unfetched.size > 0) {
-      socket.emit("get_users", Array.from(unfetched));
-    }
+    if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
   }
 
-  render() {
-    const { display, modal, users, posts, comments, postId, newComments } = this.state;
-    const { postBodyRef } = this;
-
-    return (
-      <>
-        {display === "Home" && (
-          <Home
-            onAuth={() => {
-              // Get user data on the first connection
-              if (storage.userId === null) {
-                socket.emit("get_data", (userId, user) => {
-                  storage.userId = userId;
-                  this.setState({ display: "Feed", users: { [userId]: user } });
-                });
-              }
-              socket.emit("get_posts");
-            }}
-            onAuthError={() => {
-              // If the authentication fails on reconnect, return to Home
-              if (storage.userId !== null) {
-                this.setState({ display: "Home" });
-              }
-            }}
-          />
-        )}
-
-        {display === "Feed" && (
-          <Feed
-            {...{ users, posts }}
-            openSidebar={() => this.setState({ modal: "Sidebar" })}
-            openNewPost={() => this.setState({ display: "NewPost" })}
-            openPost={(postId) => {
-              const fetchedComments = Object.entries(comments)
-                .filter(([_, comment]) => comment.postId === postId)
-                .map(([id]) => parseInt(id));
-
-              socket.emit("get_comments", postId, fetchedComments);
-              this.setState({ display: "Post", postId });
-            }}
-          />
-        )}
-
-        {display === "Post" && (
-          <Post
-            {...{ users, postId, newComments, postBodyRef }}
-            post={posts[postId]}
-            comments={Object.entries(comments).filter(([_, comment]) => comment.postId === postId)}
-            onComment={(id, comment) => {
-              // will this break if the user receives the message after leaving the post?
-              const pb = postBodyRef.current;
-              const callback = () => pb.scrollTo(0, pb.scrollHeight);
-              this.setState({ comments: { ...comments, [id]: comment } }, callback);
-            }}
-            resetNewComments={() => this.setState({ newComments: 0 })}
-            close={() => this.setState({ display: "Feed", postId: null, newComments: 0 })}
-          />
-        )}
-
-        {display === "NewPost" && (
-          <NewPost
-            discard={() => this.setState({ display: "Feed" })}
-            onPost={(id, post) => {
-              this.setState({
-                display: "Post",
-                posts: { ...this.state.posts, [id]: post },
-                postId: id,
+  return (
+    <>
+      {display === "Home" && (
+        <Home
+          onAuth={() => {
+            // Get user data on first connection
+            if (storage.userId === null) {
+              socket.emit("get_data", (userId, user) => {
+                storage.userId = userId;
+                setDisplay("Feed");
+                setUsers({ [userId]: user });
               });
-            }}
-          />
-        )}
-
-        {display === "Settings" && (
-          <Settings user={users[storage.userId]} close={() => this.setState({ display: "Feed" })} />
-        )}
-
-        <Sidebar
-          open={modal === "Sidebar"}
-          close={() => this.setState({ modal: null })}
-          user={users[storage.userId]}
-          openInstall={() => this.setState({ modal: "Install" })}
-          share={() => {
-            navigator.share({
-              title: "Friendly",
-              text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
-              url: "https://kelio-mv.github.io/friendly/",
-            });
+            }
+            socket.emit("get_posts");
           }}
-          contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
-          openSettings={() => this.setState({ display: "Settings", modal: null })}
-          logout={() => {
-            socket.off("disconnect");
-            socket.close();
-            storage.deleteCredentials();
-            this.setState({ display: "Home", modal: null });
+          onAuthError={() => {
+            // Return to Home if auth fails on reconnect
+            if (storage.userId !== null) setDisplay("Home");
           }}
         />
+      )}
 
-        <Install open={modal === "Install"} close={() => this.setState({ modal: null })} />
-      </>
-    );
-  }
+      {display === "Feed" && (
+        <Feed
+          {...{ users, posts }}
+          openSidebar={() => setModal("Sidebar")}
+          openNewPost={() => setDisplay("NewPost")}
+          openPost={(postId) => {
+            const fetchedComments = Object.entries(comments)
+              .filter(([_, comment]) => comment.postId === postId)
+              .map(([id]) => parseInt(id));
+
+            socket.emit("get_comments", postId, fetchedComments);
+            setDisplay("Post");
+            setPostId(postId);
+          }}
+        />
+      )}
+
+      {display === "Post" && (
+        <Post
+          {...{ users, postId, newComments, postBodyRef }}
+          post={posts[postId]}
+          comments={Object.entries(comments).filter(([_, comment]) => comment.postId === postId)}
+          onComment={(id, comment) => {
+            setComments((prevComments) => ({ ...prevComments, [id]: comment }));
+            const pb = postBodyRef.current;
+            if (pb) setTimeout(() => pb.scrollTo(0, pb.scrollHeight));
+          }}
+          resetNewComments={() => setNewComments(0)}
+          close={() => {
+            setDisplay("Feed");
+            setPostId(null);
+            setNewComments(0);
+          }}
+        />
+      )}
+
+      {display === "NewPost" && (
+        <NewPost
+          discard={() => setDisplay("Feed")}
+          onPost={(id, post) => {
+            setDisplay("Post");
+            setPosts((prevPosts) => ({ ...prevPosts, [id]: post }));
+            setPostId(id);
+          }}
+        />
+      )}
+
+      {display === "Settings" && (
+        <Settings user={users[storage.userId]} close={() => setDisplay("Feed")} />
+      )}
+
+      <Sidebar
+        open={modal === "Sidebar"}
+        close={() => setModal(null)}
+        user={users[storage.userId]}
+        openInstall={() => setModal("Install")}
+        share={() => {
+          navigator.share({
+            title: "Friendly",
+            text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
+            url: "https://kelio-mv.github.io/friendly/",
+          });
+        }}
+        contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
+        openSettings={() => {
+          setDisplay("Settings");
+          setModal(null);
+        }}
+        logout={() => {
+          socket.off("disconnect");
+          socket.close();
+          storage.deleteCredentials();
+          setDisplay("Home");
+          setModal(null);
+        }}
+      />
+
+      <Install open={modal === "Install"} close={() => setModal(null)} />
+    </>
+  );
 }
 
 export default App;
