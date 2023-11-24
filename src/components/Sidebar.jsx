@@ -3,8 +3,6 @@ import Icon from "./Icon";
 import "./Sidebar.scss";
 
 function Sidebar(props) {
-  if (!props.open) return;
-
   return (
     <div className="sidebar" onClick={props.close}>
       <div className="sidebar__content" onClick={(e) => e.stopPropagation()}>

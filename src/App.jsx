@@ -21,61 +21,12 @@ function App() {
   const postBodyRef = useRef();
 
   useEffect(() => {
-    socket.on("add_users", (users) => {
-      setUsers((prevUsers) => ({ ...prevUsers, ...users }));
-    });
+    socket.on("add_users", addUsers);
+    socket.on("add_posts", addPosts);
+    socket.on("add_comments", addComments);
+    socket.on("del_post", delPost);
+    socket.on("del_comment", delComment);
 
-    socket.on("add_posts", (posts) => {
-      setPosts((prevPosts) => ({ ...prevPosts, ...posts }));
-      requestUnfetchedUsers(Object.values(posts));
-    });
-
-    socket.on("add_comments", (comments) => {
-      let callback;
-
-      if (postId === comments[Object.keys(comments)[0]].postId) {
-        const pb = postBodyRef.current;
-        const lc = pb.lastElementChild;
-        if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-          callback = () => pb.scrollTo(0, pb.scrollHeight);
-        } else {
-          setNewComments((prevNewComments) => prevNewComments + 1);
-        }
-      }
-      setComments((prevComments) => ({ ...prevComments, ...comments }));
-      requestUnfetchedUsers(Object.values(comments));
-      if (callback) setTimeout(callback);
-    });
-
-    socket.on("del_post", (_postId) => {
-      if (postId === _postId) {
-        setDisplay("Feed");
-        setPostId(null);
-      }
-      setPosts((prevPosts) => {
-        const posts = { ...prevPosts };
-        delete posts[_postId];
-        return posts;
-      });
-      setComments((prevComments) => {
-        const comments = { ...prevComments };
-        for (const id in comments) {
-          if (comments[id].postId === _postId) delete comments[id];
-        }
-        return comments;
-      });
-    });
-
-    socket.on("del_comment", (commentId) => {
-      setComments((prevComments) => {
-        const comments = { ...prevComments };
-        delete comments[commentId];
-        return comments;
-      });
-    });
-
-    // Make sure to remove all previous listeners on update
-    // Deps must only have variables that you need their current state
     return () => {
       socket.off("add_users");
       socket.off("add_posts");
@@ -84,6 +35,58 @@ function App() {
       socket.off("del_comment");
     };
   }, [users, postId]);
+
+  function addUsers(users) {
+    setUsers((prevUsers) => ({ ...prevUsers, ...users }));
+  }
+
+  function addPosts(posts) {
+    setPosts((prevPosts) => ({ ...prevPosts, ...posts }));
+    requestUnfetchedUsers(Object.values(posts));
+  }
+
+  function addComments(comments) {
+    let callback;
+    if (postId === comments[Object.keys(comments)[0]].postId) {
+      const pb = postBodyRef.current;
+      const lc = pb.lastElementChild;
+      if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+        callback = () => pb.scrollTo(0, pb.scrollHeight);
+      } else {
+        setNewComments((prevNewComments) => prevNewComments + 1);
+      }
+    }
+    setComments((prevComments) => ({ ...prevComments, ...comments }));
+    requestUnfetchedUsers(Object.values(comments));
+    if (callback) setTimeout(callback);
+  }
+
+  function delPost(_postId) {
+    if (postId === _postId) {
+      setDisplay("Feed");
+      setPostId(null);
+    }
+    setPosts((prevPosts) => {
+      const posts = { ...prevPosts };
+      delete posts[_postId];
+      return posts;
+    });
+    setComments((prevComments) => {
+      const comments = { ...prevComments };
+      for (const id in comments) {
+        if (comments[id].postId === _postId) delete comments[id];
+      }
+      return comments;
+    });
+  }
+
+  function delComment(commentId) {
+    setComments((prevComments) => {
+      const comments = { ...prevComments };
+      delete comments[commentId];
+      return comments;
+    });
+  }
 
   function requestUnfetchedUsers(articles) {
     const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
@@ -163,33 +166,34 @@ function App() {
         <Settings user={users[storage.userId]} close={() => setDisplay("Feed")} />
       )}
 
-      <Sidebar
-        open={modal === "Sidebar"}
-        close={() => setModal(null)}
-        user={users[storage.userId]}
-        openInstall={() => setModal("Install")}
-        share={() => {
-          navigator.share({
-            title: "Friendly",
-            text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
-            url: "https://kelio-mv.github.io/friendly/",
-          });
-        }}
-        contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
-        openSettings={() => {
-          setDisplay("Settings");
-          setModal(null);
-        }}
-        logout={() => {
-          socket.off("disconnect");
-          socket.close();
-          storage.deleteCredentials();
-          setDisplay("Home");
-          setModal(null);
-        }}
-      />
+      {modal === "Sidebar" && (
+        <Sidebar
+          close={() => setModal(null)}
+          user={users[storage.userId]}
+          openInstall={() => setModal("Install")}
+          share={() => {
+            navigator.share({
+              title: "Friendly",
+              text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
+              url: "https://kelio-mv.github.io/friendly/",
+            });
+          }}
+          contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
+          openSettings={() => {
+            setDisplay("Settings");
+            setModal(null);
+          }}
+          logout={() => {
+            socket.off("disconnect");
+            socket.close();
+            storage.deleteCredentials();
+            setDisplay("Home");
+            setModal(null);
+          }}
+        />
+      )}
 
-      <Install open={modal === "Install"} close={() => setModal(null)} />
+      {modal === "Install" && <Install close={() => setModal(null)} />}
     </>
   );
 }

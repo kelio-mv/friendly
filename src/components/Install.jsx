@@ -2,8 +2,6 @@ import { useState } from "react";
 import Modal from "./Modal";
 
 function Install(props) {
-  if (!props.open) return;
-
   const [isIPhone, setIsIPhone] = useState(null);
 
   return (

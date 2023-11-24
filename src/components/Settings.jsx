@@ -44,15 +44,16 @@ function Settings(props) {
   }
 
   function reset(...variables) {
-    variables.forEach((v) => {
-      if (v === "display") setDisplay("");
-      else if (v === "profilePicture") setProfilePicture(props.user.profilePicture);
-      else if (v === "username") setUsername("");
-      else if (v === "password") setPassword("");
-      else if (v === "currentPassword") setCurrentPassword("");
-      else if (v === "errorMessage") setErrorMessage(null);
-      else if (v === "saving") setSaving(false);
-    });
+    const functions = {
+      display: () => setDisplay(""),
+      profilePicture: () => setProfilePicture(props.user.profilePicture),
+      username: () => setUsername(""),
+      password: () => setPassword(""),
+      currentPassword: () => setCurrentPassword(""),
+      errorMessage: () => setErrorMessage(null),
+      saving: () => setSaving(false),
+    };
+    variables.forEach((v) => functions[v]());
   }
 
   return (
