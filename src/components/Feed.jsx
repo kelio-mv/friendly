@@ -1,8 +1,12 @@
+import { useMemo } from "react";
 import Article from "./Article";
 import Icon from "./Icon";
 
 function Feed(props) {
-  const posts = Object.entries(props.posts).sort((a, b) => b[0] - a[0]);
+  const posts = useMemo(
+    () => Object.entries(props.posts).sort((a, b) => b[0] - a[0]),
+    [props.posts]
+  );
 
   return (
     <div className="flex-page">
@@ -29,5 +33,3 @@ function Feed(props) {
 }
 
 export default Feed;
-
-// A função sort está sendo executada sempre que o componente atualiza

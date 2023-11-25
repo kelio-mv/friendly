@@ -4,8 +4,8 @@ import "./Sidebar.scss";
 
 function Sidebar(props) {
   return (
-    <div className="sidebar" onClick={props.close}>
-      <div className="sidebar__content" onClick={(e) => e.stopPropagation()}>
+    <div className="sidebar" onMouseDown={props.close}>
+      <div className="sidebar__content" onMouseDown={(e) => e.stopPropagation()}>
         <header className="sidebar__header">
           <ProfilePicture src={props.user.profilePicture} />
           <p>@{props.user.username}</p>
@@ -47,5 +47,3 @@ function Sidebar(props) {
 }
 
 export default Sidebar;
-
-// Mesmo problema do Modal

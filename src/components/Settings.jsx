@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import Modal from "./Modal";
-import ModalButton from "./ModalButton";
 import ProfilePicture from "./ProfilePicture";
 import TextField from "./TextField";
 import Icon from "./Icon";
@@ -85,7 +84,8 @@ function Settings(props) {
         open={display === "ProfilePicture"}
         header="Imagem de perfil"
         footer={
-          <ModalButton
+          <button
+            className="modal__btn"
             onClick={() => {
               setSaving(true);
               const data = { field: "profilePicture", value: profilePicture };
@@ -95,7 +95,7 @@ function Settings(props) {
             disabled={profilePicture === props.user.profilePicture || saving}
           >
             Salvar
-          </ModalButton>
+          </button>
         }
         close={() => reset("display", "profilePicture")}
         center
@@ -128,7 +128,8 @@ function Settings(props) {
         open={display === "Username"}
         header="Nome de usuário"
         footer={
-          <ModalButton
+          <button
+            className="modal__btn"
             onClick={() => {
               setSaving(true);
               const data = { field: "username", value: username, currentPassword };
@@ -146,7 +147,7 @@ function Settings(props) {
             disabled={!username || !currentPassword || saving}
           >
             Salvar
-          </ModalButton>
+          </button>
         }
         close={() => reset("display", "errorMessage", "username", "currentPassword")}
         center
@@ -175,7 +176,8 @@ function Settings(props) {
         open={display === "Password"}
         header="Senha"
         footer={
-          <ModalButton
+          <button
+            className="modal__btn"
             onClick={() => {
               setSaving(true);
               const data = { field: "password", value: password, currentPassword };
@@ -193,7 +195,7 @@ function Settings(props) {
             disabled={!currentPassword || !password || saving}
           >
             Salvar
-          </ModalButton>
+          </button>
         }
         close={() => reset("display", "errorMessage", "currentPassword", "password")}
         center

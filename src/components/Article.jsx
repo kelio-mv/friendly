@@ -3,7 +3,12 @@ import Icon from "./Icon";
 import "./Article.scss";
 
 function Article(props) {
-  // This will ensure automatic scroll down works properly
+  /*
+    Why set a fallback value for user?
+    - Articles can be displayed while user data is loading
+    - Automatic scroll down works properly
+    - It's easier to identify bugs related to missing user data
+  */
   const user = props.user || { username: "...", profilePicture: "loading_pfp.png" };
 
   return (
@@ -29,32 +34,19 @@ function Article(props) {
 }
 
 function parseTime(time) {
-  // This function is probably running too many times
   const elapsed = new Date() / 1000 - time;
-
-  if (elapsed < 60) {
-    return "agora mesmo";
-  }
-  if (elapsed < 120) {
-    return "há 1 minuto";
-  }
-  if (elapsed < 3600) {
-    return `há ${Math.floor(elapsed / 60)} minutos`;
-  }
-  if (elapsed < 7200) {
-    return "há 1 hora";
-  }
-  if (elapsed < 86400) {
-    return `há ${Math.floor(elapsed / 3600)} horas`;
-  }
-  if (elapsed < 172800) {
-    return "há 1 dia";
-  }
+  // This function is running too many times. Is this ok?
+  if (elapsed < 60) return "agora mesmo";
+  if (elapsed < 120) return "há 1 minuto";
+  if (elapsed < 3600) return `há ${Math.floor(elapsed / 60)} minutos`;
+  if (elapsed < 7200) return "há 1 hora";
+  if (elapsed < 86400) return `há ${Math.floor(elapsed / 3600)} horas`;
+  if (elapsed < 172800) return "há 1 dia";
   return `há ${Math.floor(elapsed / 86400)} dias`;
 }
 
 const truncate = {
-  /* Limit content to 3 lines but still render all the text (slow) */
+  // Limit content to 3 lines but still render all the text (slow)
   display: "-webkit-box",
   overflow: "hidden",
   WebkitBoxOrient: "vertical",

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Article from "./Article";
 import Icon from "./Icon";
 import Modal from "./Modal";
-import ModalButton from "./ModalButton";
 import storage from "../storage";
 import socket from "../socket";
 
@@ -66,6 +65,7 @@ function Post(props) {
           user={props.users[props.post.userId]}
           deletable={props.post.userId === storage.userId}
           delete={() => setDeleteConfirmation("post")}
+          highlight
         />
         {props.comments.map(([id, comment]) => (
           <Article
@@ -99,7 +99,11 @@ function Post(props) {
       <Modal
         open={deleteConfirmation !== null}
         header="Confirmar exclusão"
-        footer={<ModalButton onClick={deleteArticle}>Sim</ModalButton>}
+        footer={
+          <button className="modal__btn" onClick={deleteArticle}>
+            Sim
+          </button>
+        }
         close={() => setDeleteConfirmation(null)}
       >
         {`Você tem certeza que deseja apagar este ${
