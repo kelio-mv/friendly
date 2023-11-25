@@ -46,7 +46,7 @@ function parseTime(time) {
 }
 
 const truncate = {
-  // Limit content to 3 lines but still render all the text (slow)
+  // This limits the content to 3 lines but still renders all the text (slow)
   display: "-webkit-box",
   overflow: "hidden",
   WebkitBoxOrient: "vertical",

@@ -18,13 +18,12 @@ function Post(props) {
   }, [comment]);
 
   function onScroll() {
-    if (props.newComments === 0) return;
-    // Esta função está prejudicando o desempenho em dispositivos móveis
-    const pb = props.postBodyRef.current;
-    const lc = pb.lastElementChild;
-
-    if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-      props.resetNewComments();
+    if (props.newComments > 0) {
+      const pb = props.postBodyRef.current;
+      const lc = pb.lastElementChild;
+      if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
+        props.resetNewComments();
+      }
     }
   }
 
@@ -79,7 +78,6 @@ function Post(props) {
             }}
           />
         ))}
-        {props.newComments > 0 && <div className="post__new-comments">{props.newComments}</div>}
       </div>
 
       <div className="post__footer">
@@ -95,6 +93,8 @@ function Post(props) {
         />
         <Icon name="send" onClick={sendComment} disabled={!comment.trim()} />
       </div>
+
+      {props.newComments > 0 && <div className="post__new-comments">{props.newComments}</div>}
 
       <Modal
         open={deleteConfirmation !== null}

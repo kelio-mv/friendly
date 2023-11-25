@@ -13,4 +13,7 @@ function ProfilePicture(props) {
 
 export default ProfilePicture;
 
-// O filtro no Icon e ProfilePicture podem estar comprometendo o desempenho
+/*
+The invert filter in Icon and ProfilePicture might be slowing down the rendering
+Once people vote whether to implement light mode or not, i'll decide what to do
+*/
