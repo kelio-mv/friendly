@@ -17,7 +17,7 @@ function App() {
   const [posts, setPosts] = useState({});
   const [comments, setComments] = useState({});
   const [postId, setPostId] = useState(null);
-  const [newComments, setNewComments] = useState(0);
+  const [unseenComments, setUnseenComments] = useState(0);
   const postBodyRef = useRef();
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function App() {
       if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
         callback = () => pb.scrollTo(0, pb.scrollHeight);
       } else {
-        setNewComments((prevNewComments) => prevNewComments + 1);
+        setUnseenComments((prevUnseenComments) => prevUnseenComments + 1);
       }
     }
     setComments((prevComments) => ({ ...prevComments, ...comments }));
@@ -131,7 +131,7 @@ function App() {
 
       {display === "Post" && (
         <Post
-          {...{ users, postId, newComments, postBodyRef }}
+          {...{ users, postId, unseenComments, postBodyRef }}
           post={posts[postId]}
           comments={Object.entries(comments).filter(([_, comment]) => comment.postId === postId)}
           onComment={(id, comment) => {
@@ -139,11 +139,11 @@ function App() {
             const pb = postBodyRef.current;
             if (pb) setTimeout(() => pb.scrollTo(0, pb.scrollHeight));
           }}
-          resetNewComments={() => setNewComments(0)}
+          onSeeLastComment={() => setUnseenComments(0)}
           close={() => {
             setDisplay("Feed");
             setPostId(null);
-            setNewComments(0);
+            setUnseenComments(0);
           }}
         />
       )}
@@ -152,9 +152,9 @@ function App() {
         <NewPost
           discard={() => setDisplay("Feed")}
           onPost={(id, post) => {
-            setDisplay("Post");
             setPosts((prevPosts) => ({ ...prevPosts, [id]: post }));
             setPostId(id);
+            setDisplay("Post");
           }}
         />
       )}

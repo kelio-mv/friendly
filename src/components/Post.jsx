@@ -22,7 +22,7 @@ function Post(props) {
       const pb = props.postBodyRef.current;
       const lc = pb.lastElementChild;
       if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-        props.resetNewComments();
+        props.onSeeLastComment();
       }
     }
   }
