@@ -10,34 +10,47 @@ function Home(props) {
   const [username, setUsername] = useState(storage.username);
   const [password, setPassword] = useState(storage.password);
   const [signUp, setSignUp] = useState(false);
-  const [connecting, setConnecting] = useState(storage.credentials);
+  const [connecting, setConnecting] = useState(false);
   const [errorMessage, setErrorMessage] = useState([]);
 
   useEffect(() => {
-    if (storage.credentials) socket.connect();
+    if (storage.credentials) auth(false);
   }, []);
 
-  useEffect(() => {
-    socket.on("connect", auth);
-    return () => socket.off("connect");
-  }, [username, password, signUp]);
-
-  function auth() {
-    const callback = (errorMessage) => {
+  function auth(requestedByUser) {
+    setConnecting(true);
+    socket.connect();
+    socket.emit("auth", signUp, username, password, (errorMessage) => {
       if (errorMessage) {
+        if (!requestedByUser) storage.deleteCredentials();
         socket.close();
-        storage.deleteCredentials();
         setConnecting(false);
         setErrorMessage(errorMessage);
-        props.onAuthError();
       } else {
-        storage.saveCredentials(username, password);
-        socket.off("connect");
-        socket.once("disconnect", auth);
+        if (requestedByUser) storage.saveCredentials(username, password);
+        socket.on("disconnect", reauth);
         props.onAuth();
       }
-    };
-    socket.emit("auth", signUp, username, password, callback);
+    });
+  }
+
+  function reauth() {
+    /*
+      This function re-authenticates the user once the connection is reestablished so that the
+      buffered messages can be sent safely. But apparently, messages sent before triggering the
+      disconnect event are ignored as socket.io thinks they were sent.
+      Stored credentials are used because the user might have changed their credentials in Settings.
+    */
+    socket.emit("auth", false, storage.username, storage.password, (errorMessage) => {
+      if (errorMessage) {
+        storage.deleteCredentials();
+        socket.off("disconnect");
+        socket.close();
+        props.onReauthError();
+      } else {
+        props.onReauth();
+      }
+    });
   }
 
   return (
@@ -64,10 +77,7 @@ function Home(props) {
 
       <button
         className="home__btn btn btn--primary"
-        onClick={() => {
-          setConnecting(true);
-          socket.connect();
-        }}
+        onClick={() => auth(true)}
         disabled={connecting}
       >
         {signUp ? "Cadastrar-se" : "Entrar"}

@@ -1,5 +1,5 @@
 class Storage {
-  credentials = localStorage.friendly ? JSON.parse(localStorage.friendly) : null;
+  credentials = JSON.parse(localStorage.getItem("friendly") || "null");
   username = this.credentials ? this.credentials.username : "";
   password = this.credentials ? this.credentials.password : "";
   userId = null;
@@ -7,13 +7,13 @@ class Storage {
   saveCredentials(username, password) {
     this.username = username;
     this.password = password;
-    localStorage.friendly = JSON.stringify({ username, password });
+    localStorage.setItem("friendly", JSON.stringify({ username, password }));
   }
 
   deleteCredentials() {
     this.credentials = null;
     this.userId = null;
-    localStorage.removeItem("friendly");
+    localStorage.setItem("friendly", "");
   }
 }
 

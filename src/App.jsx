@@ -98,19 +98,16 @@ function App() {
       {display === "Home" && (
         <Home
           onAuth={() => {
-            // Get user data on first connection
-            if (storage.userId === null) {
-              socket.emit("get_data", (userId, user) => {
-                storage.userId = userId;
-                setDisplay("Feed");
-                setUsers({ [userId]: user });
-              });
-            }
-            socket.emit("get_posts");
+            socket.emit("get_data", (userId, user) => {
+              storage.userId = userId;
+              setUsers({ [userId]: user });
+              setDisplay("Feed");
+            });
           }}
-          onAuthError={() => {
-            // Return to Home if auth fails on reconnect
-            if (storage.userId !== null) setDisplay("Home");
+          onReauth={() => socket.emit("get_posts")}
+          onReauthError={() => {
+            setModal(null);
+            setDisplay("Home");
           }}
         />
       )}
@@ -184,11 +181,11 @@ function App() {
             setModal(null);
           }}
           logout={() => {
+            storage.deleteCredentials();
             socket.off("disconnect");
             socket.close();
-            storage.deleteCredentials();
-            setDisplay("Home");
             setModal(null);
+            setDisplay("Home");
           }}
         />
       )}

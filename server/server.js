@@ -78,6 +78,7 @@ io.on("connection", (socket) => {
   socket.on("get_data", (callback) => {
     const { username, profilePicture } = storage.getUser("id", socket.userId);
     callback(socket.userId, { username, profilePicture });
+    socket.emit("add_posts", getPosts());
   });
 
   socket.on("get_posts", () => {
