@@ -1,7 +1,7 @@
 function Icon(props) {
   return (
     <img
-      src={`${props.name}.svg`}
+      src={`/${props.name}.svg`}
       onClick={props.onClick}
       style={{
         filter: "invert(1)",

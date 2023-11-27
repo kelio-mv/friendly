@@ -27,7 +27,7 @@
     overflow: auto;
   }
 
-  &__new-comments {
+  &__unseen-comments {
     // footer height = 53px and scrollbar width = 10px
     position: fixed;
     right: calc(10px + 0.75rem);

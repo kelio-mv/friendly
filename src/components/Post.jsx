@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Article from "./Article";
 import Icon from "./Icon";
 import Modal from "./Modal";
@@ -6,10 +7,31 @@ import storage from "../storage";
 import socket from "../socket";
 
 function Post(props) {
+  const postId = parseInt(useParams().id);
+  const post = props.posts[postId];
+  const comments = useMemo(getComments, [props.comments]);
   const [comment, setComment] = useState("");
+  const [unseenComments, setUnseenComments] = useState(0);
   const [commentId, setCommentId] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const commentsLength = useRef(comments.length);
   const commentRef = useRef();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!post) navigate(-1);
+  }, [post]);
+
+  useEffect(() => {
+    if (comments.length > commentsLength.current) {
+      const pb = props.postBodyRef.current;
+      const lc = pb.lastElementChild;
+      if (pb.clientHeight + pb.scrollTop <= pb.scrollHeight - lc.offsetHeight) {
+        setUnseenComments((prevUnseenComments) => prevUnseenComments + 1);
+      }
+    }
+    commentsLength.current = comments.length;
+  }, [comments]);
 
   useEffect(() => {
     const comment = commentRef.current;
@@ -17,12 +39,16 @@ function Post(props) {
     comment.style.height = comment.scrollHeight + "px";
   }, [comment]);
 
+  function getComments() {
+    return Object.entries(props.comments).filter(([_, comment]) => comment.postId === postId);
+  }
+
   function onScroll() {
-    if (props.newComments > 0) {
+    if (unseenComments > 0) {
       const pb = props.postBodyRef.current;
       const lc = pb.lastElementChild;
       if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-        props.onSeeLastComment();
+        setUnseenComments(0);
       }
     }
   }
@@ -37,14 +63,14 @@ function Post(props) {
   }
 
   function sendComment() {
-    socket.emit("comment", props.postId, comment.trim(), props.onComment);
+    socket.emit("comment", postId, comment.trim(), props.onComment);
     setComment("");
     commentRef.current.focus();
   }
 
   function deleteArticle() {
     if (deleteConfirmation === "post") {
-      socket.emit("del_post", props.postId);
+      socket.emit("del_post", postId);
     } else {
       socket.emit("del_comment", commentId);
     }
@@ -54,19 +80,21 @@ function Post(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <Icon name="arrow_back" onClick={props.close} />
+        <Icon name="arrow_back" onClick={() => navigate(-1)} />
         <h1>Publicação</h1>
       </div>
 
       <div className="post__body" ref={props.postBodyRef} onScroll={onScroll}>
-        <Article
-          data={props.post}
-          user={props.users[props.post.userId]}
-          deletable={props.post.userId === storage.userId}
-          delete={() => setDeleteConfirmation("post")}
-          highlight
-        />
-        {props.comments.map(([id, comment]) => (
+        {post && (
+          <Article
+            data={post}
+            user={props.users[post.userId]}
+            deletable={post.userId === storage.userId}
+            delete={() => setDeleteConfirmation("post")}
+            highlight
+          />
+        )}
+        {comments.map(([id, comment]) => (
           <Article
             key={id}
             data={comment}
@@ -94,7 +122,7 @@ function Post(props) {
         <Icon name="send" onClick={sendComment} disabled={!comment.trim()} />
       </div>
 
-      {props.newComments > 0 && <div className="post__new-comments">{props.newComments}</div>}
+      {unseenComments > 0 && <div className="post__unseen-comments">{unseenComments}</div>}
 
       <Modal
         open={deleteConfirmation !== null}

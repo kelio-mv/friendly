@@ -1,11 +1,13 @@
 function ProfilePicture(props) {
+  const isDefault = ["default_avatar.png", "loading_pfp.png"].includes(props.src);
+
   return (
     <img
-      src={props.src}
+      src={isDefault ? `/${props.src}` : props.src}
       style={{
         width: props.small ? 48 : 72,
         borderRadius: "50%",
-        filter: ["default_avatar.png", "loading_pfp.png"].includes(props.src) ? "invert(1)" : null,
+        filter: isDefault ? "invert(1)" : null,
       }}
     />
   );
