@@ -9,7 +9,7 @@ import socket from "../socket";
 function Post(props) {
   const postId = parseInt(useParams().id);
   const post = props.posts[postId];
-  const comments = useMemo(getComments, [props.comments]);
+  const comments = useMemo(getPostComments, [props.comments]);
   const [comment, setComment] = useState("");
   const [unseenComments, setUnseenComments] = useState(0);
   const [scrollDown, setScrollDown] = useState(false);
@@ -21,7 +21,12 @@ function Post(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!post) navigate(-1);
+    if (post) {
+      const fetchedComments = getPostComments().map(([id]) => parseInt(id));
+      socket.emit("get_comments", postId, fetchedComments);
+    } else {
+      navigate(-1);
+    }
   }, [post]);
 
   useEffect(() => {
@@ -48,12 +53,12 @@ function Post(props) {
     textarea.style.height = textarea.scrollHeight + "px";
   }, [comment]);
 
-  function getComments() {
+  function getPostComments() {
     return Object.entries(props.comments).filter(([_, comment]) => comment.postId === postId);
   }
 
   function onScroll() {
-    // To do: Dynamically decrease the value as comments are seen
+    // Optional improvement: Dynamically decrease the value as comments are seen
     if (unseenComments > 0) {
       const pb = postBodyRef.current;
       const lc = pb.lastElementChild;

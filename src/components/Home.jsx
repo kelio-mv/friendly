@@ -36,7 +36,7 @@ function Home(props) {
 
   function reauth() {
     /*
-      This function re-authenticates the user once the connection is reestablished so that the
+      This function re-authenticates the user when the connection is reestablished so that the
       buffered messages can be sent safely. But apparently, messages sent before triggering the
       disconnect event are ignored as socket.io thinks they were sent.
       Stored credentials are used because the user might have changed their credentials in Settings.

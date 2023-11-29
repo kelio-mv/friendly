@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
@@ -12,6 +12,7 @@ import socket from "./socket";
 import "./App.scss";
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState({});
@@ -76,8 +77,16 @@ function App() {
     if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
   }
 
-  return (
-    <>
+  function resetState() {
+    setUsers({});
+    setPosts({});
+    setComments({});
+    setModal(null);
+    setAuthenticated(false);
+  }
+
+  if (!authenticated) {
+    return (
       <Routes>
         <Route
           path="/"
@@ -87,33 +96,30 @@ function App() {
                 socket.emit("get_data", (userId, user) => {
                   storage.userId = userId;
                   setUsers({ [userId]: user });
-                  navigate("feed");
+                  setAuthenticated(true);
                 });
               }}
               onReauth={() => socket.emit("get_posts")}
-              onReauthError={() => {
-                setModal(null);
-                navigate("/");
-              }}
+              onReauthError={resetState}
             />
           }
         />
+        <Route path="*" element={<Navigate to="/ " />} />
+      </Routes>
+    );
+  }
 
+  return (
+    <>
+      <Routes>
         <Route
-          path="feed"
+          path="/"
           element={
             <Feed
               {...{ users, posts }}
               openSidebar={() => setModal("Sidebar")}
               openNewPost={() => navigate("new-post")}
-              openPost={(postId) => {
-                const fetchedComments = Object.entries(comments)
-                  .filter(([_, comment]) => comment.postId === postId)
-                  .map(([id]) => parseInt(id));
-
-                socket.emit("get_comments", postId, fetchedComments);
-                navigate(`post/${postId}`);
-              }}
+              openPost={(id) => navigate(`post/${id}`)}
             />
           }
         />
@@ -170,8 +176,7 @@ function App() {
             storage.deleteCredentials();
             socket.off("disconnect");
             socket.close();
-            setModal(null);
-            navigate("/");
+            resetState();
           }}
         />
       )}
