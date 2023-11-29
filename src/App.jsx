@@ -16,7 +16,6 @@ function App() {
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState({});
   const [comments, setComments] = useState({});
-  const postBodyRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -123,12 +122,9 @@ function App() {
           path="post/:id"
           element={
             <Post
-              {...{ users, posts, comments, postBodyRef }}
-              onComment={(id, comment) => {
-                // i think this can be implemented in the own component
+              {...{ users, posts, comments }}
+              addComment={(id, comment) => {
                 setComments((prevComments) => ({ ...prevComments, [id]: comment }));
-                const pb = postBodyRef.current;
-                if (pb) setTimeout(() => pb.scrollTo(0, pb.scrollHeight));
               }}
             />
           }

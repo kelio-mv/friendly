@@ -12,10 +12,12 @@ function Post(props) {
   const comments = useMemo(getComments, [props.comments]);
   const [comment, setComment] = useState("");
   const [unseenComments, setUnseenComments] = useState(0);
+  const [scrollDown, setScrollDown] = useState(false);
   const [commentId, setCommentId] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const postBodyRef = useRef();
   const commentsLength = useRef(comments.length);
-  const commentRef = useRef();
+  const textareaRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,20 +25,27 @@ function Post(props) {
   }, [post]);
 
   useEffect(() => {
-    if (comments.length > commentsLength.current) {
-      const pb = props.postBodyRef.current;
-      const lc = pb.lastElementChild;
-      if (pb.clientHeight + pb.scrollTop <= pb.scrollHeight - lc.offsetHeight) {
-        setUnseenComments((prevUnseenComments) => prevUnseenComments + 1);
+    const difference = comments.length - commentsLength.current;
+
+    if (difference > 0) {
+      const pb = postBodyRef.current;
+
+      if (scrollDown) {
+        pb.scrollTo(0, pb.scrollHeight);
+        setScrollDown(false);
+      } else {
+        if (pb.clientHeight < pb.scrollHeight) {
+          setUnseenComments((puc) => puc + difference);
+        }
       }
     }
     commentsLength.current = comments.length;
   }, [comments]);
 
   useEffect(() => {
-    const comment = commentRef.current;
-    comment.style.height = "auto";
-    comment.style.height = comment.scrollHeight + "px";
+    const textarea = textareaRef.current;
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
   }, [comment]);
 
   function getComments() {
@@ -44,8 +53,9 @@ function Post(props) {
   }
 
   function onScroll() {
+    // To do: Dynamically decrease the value as comments are seen
     if (unseenComments > 0) {
-      const pb = props.postBodyRef.current;
+      const pb = postBodyRef.current;
       const lc = pb.lastElementChild;
       if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
         setUnseenComments(0);
@@ -63,9 +73,12 @@ function Post(props) {
   }
 
   function sendComment() {
-    socket.emit("comment", postId, comment.trim(), props.onComment);
+    socket.emit("comment", postId, comment.trim(), (id, comment) => {
+      props.addComment(id, comment);
+      setScrollDown(true);
+    });
     setComment("");
-    commentRef.current.focus();
+    textareaRef.current.focus();
   }
 
   function deleteArticle() {
@@ -84,7 +97,7 @@ function Post(props) {
         <h1>Publicação</h1>
       </div>
 
-      <div className="post__body" ref={props.postBodyRef} onScroll={onScroll}>
+      <div className="post__body" ref={postBodyRef} onScroll={onScroll}>
         {post && (
           <Article
             data={post}
@@ -111,7 +124,7 @@ function Post(props) {
       <div className="post__footer">
         <textarea
           className="post__textarea"
-          ref={commentRef}
+          ref={textareaRef}
           placeholder="Comente algo..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
