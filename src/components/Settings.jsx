@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import ProfilePicture from "./ProfilePicture";
 import TextField from "./TextField";
@@ -16,6 +17,7 @@ function Settings(props) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef();
+  const navigate = useNavigate();
 
   function onFileLoad(file) {
     if (!file) return;
@@ -60,7 +62,7 @@ function Settings(props) {
       {/* Home */}
       <div className="flex-page">
         <div className="top-bar">
-          <Icon name="arrow_back" onClick={props.close} />
+          <Icon name="arrow_back" onClick={() => navigate(-1)} />
           <h1>Configurações</h1>
         </div>
         <div className="settings__body">

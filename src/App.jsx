@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
@@ -17,7 +17,6 @@ function App() {
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState({});
   const [comments, setComments] = useState({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on("add_users", addUsers);
@@ -104,7 +103,7 @@ function App() {
             />
           }
         />
-        <Route path="*" element={<Navigate to="/ " />} />
+        <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>
     );
   }
@@ -114,14 +113,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={
-            <Feed
-              {...{ users, posts }}
-              openSidebar={() => setModal("Sidebar")}
-              openNewPost={() => navigate("new-post")}
-              openPost={(id) => navigate(`post/${id}`)}
-            />
-          }
+          element={<Feed {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
         />
 
         <Route
@@ -140,19 +132,12 @@ function App() {
           path="new-post"
           element={
             <NewPost
-              discard={() => navigate(-1)}
-              onPost={(id, post) => {
-                setPosts((prevPosts) => ({ ...prevPosts, [id]: post }));
-                navigate(`post/${id}`, { replace: true });
-              }}
+              addPost={(id, post) => setPosts((prevPosts) => ({ ...prevPosts, [id]: post }))}
             />
           }
         />
 
-        <Route
-          path="settings"
-          element={<Settings user={users[storage.userId]} close={() => navigate(-1)} />}
-        />
+        <Route path="settings" element={<Settings user={users[storage.userId]} />} />
       </Routes>
 
       {modal === "Sidebar" && (
@@ -160,24 +145,7 @@ function App() {
           close={() => setModal(null)}
           user={users[storage.userId]}
           openInstall={() => setModal("Install")}
-          share={() => {
-            navigator.share({
-              title: "Friendly",
-              text: "Conheça o Friendly, um lugar para desabafar e fazer amigos!",
-              url: "https://kelio-mv.github.io/friendly/",
-            });
-          }}
-          contact={() => window.open("https://www.instagram.com/kelio_mv/", "_blank")}
-          openSettings={() => {
-            setModal(null);
-            navigate("settings");
-          }}
-          logout={() => {
-            storage.deleteCredentials();
-            socket.off("disconnect");
-            socket.close();
-            resetState();
-          }}
+          onLogout={resetState}
         />
       )}
 
