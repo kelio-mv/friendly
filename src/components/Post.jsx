@@ -22,7 +22,7 @@ function Post(props) {
 
   useEffect(() => {
     if (post) {
-      const fetchedComments = getPostComments().map(([id]) => parseInt(id));
+      const fetchedComments = comments.map(([id]) => parseInt(id));
       socket.emit("get_comments", postId, fetchedComments);
     } else {
       navigate(-1);

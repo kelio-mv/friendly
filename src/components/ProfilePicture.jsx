@@ -3,7 +3,7 @@ function ProfilePicture(props) {
 
   return (
     <img
-      src={isDefault ? `/${props.src}` : props.src}
+      src={isDefault ? `/friendly/${props.src}` : props.src}
       style={{
         width: props.small ? 48 : 72,
         borderRadius: "50%",

@@ -1,7 +1,7 @@
 function Icon(props) {
   return (
     <img
-      src={`/${props.name}.svg`}
+      src={`/friendly/${props.name}.svg`}
       onClick={props.onClick}
       style={{
         filter: "invert(1)",
@@ -16,3 +16,8 @@ function Icon(props) {
 }
 
 export default Icon;
+
+/*
+  Fix the prop "src" here and in ProfilePicture when possible
+  https://stackoverflow.com/questions/74168824/vite-not-prepending-base-path-to-anything-in-public-directory
+*/
