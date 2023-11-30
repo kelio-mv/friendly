@@ -4,6 +4,7 @@ function ProfilePicture(props) {
   return (
     <img
       src={isDefault ? `/friendly/${props.src}` : props.src}
+      onClick={props.onClick}
       style={{
         width: props.small ? 48 : 72,
         borderRadius: "50%",

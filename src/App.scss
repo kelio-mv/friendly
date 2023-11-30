@@ -1,5 +1,5 @@
 .flex-page {
-  // Used in Feed, Post, NewPost and Settings
+  // Used in Feed, Post, NewPost, Profile and Settings
   display: flex;
   flex-direction: column;
 }
@@ -67,6 +67,16 @@
   resize: none;
 }
 
+.profile__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  font-size: 1.125rem;
+  border-bottom: 1px solid #0f766e;
+}
+
 .btn {
   min-width: 16rem;
   padding: 0.5rem 0.75rem;
@@ -101,10 +111,10 @@
 }
 
 /*
-Possíveis causas do bug dos 18px:
+Possíveis causas do antigo bug dos 18px:
 
-- align-items stretch do flex-page
-- webkit-font-size-adjust
-- Estilos article__body
-- Elemento Article
+- Flex-page possui align-items: stretch
+- Ausência de webkit-font-size-adjust
+- Estilos do article__body
+- Elemento article modifica a exibição da fonte
 */

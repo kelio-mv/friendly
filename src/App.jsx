@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
-import Sidebar from "./components/Sidebar";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
-import Install from "./components/Install";
+import Profile from "./components/Profile";
 import Settings from "./components/Settings";
+import Sidebar from "./components/Sidebar";
+import Install from "./components/Install";
 import storage from "./storage";
 import socket from "./socket";
 import "./App.scss";
@@ -136,6 +137,8 @@ function App() {
             />
           }
         />
+
+        <Route path="profile/:id" element={<Profile {...{ users, posts }} />} />
 
         <Route path="settings" element={<Settings user={users[storage.userId]} />} />
       </Routes>

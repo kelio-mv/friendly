@@ -112,6 +112,7 @@ function Post(props) {
             user={props.users[post.userId]}
             deletable={post.userId === storage.userId}
             delete={() => setDeleteConfirmation("post")}
+            onProfileClick={() => navigate(`/profile/${post.userId}`)}
             highlight
           />
         )}
@@ -125,6 +126,7 @@ function Post(props) {
               setCommentId(id);
               setDeleteConfirmation("comment");
             }}
+            onProfileClick={() => navigate(`/profile/${comment.userId}`)}
           />
         ))}
       </div>

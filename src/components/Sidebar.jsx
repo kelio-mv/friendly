@@ -8,6 +8,11 @@ import "./Sidebar.scss";
 function Sidebar(props) {
   const navigate = useNavigate();
 
+  function openProfile() {
+    props.close();
+    navigate(`profile/${storage.userId}`);
+  }
+
   function share() {
     navigator.share({
       title: "Friendly",
@@ -35,7 +40,7 @@ function Sidebar(props) {
   return (
     <div className="sidebar" onMouseDown={props.close}>
       <div className="sidebar__content" onMouseDown={(e) => e.stopPropagation()}>
-        <header className="sidebar__header">
+        <header className="sidebar__header" onClick={openProfile}>
           <ProfilePicture src={props.user.profilePicture} />
           <p>@{props.user.username}</p>
         </header>

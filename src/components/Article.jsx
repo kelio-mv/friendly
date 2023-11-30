@@ -29,9 +29,9 @@ function Article(props) {
       onClick={props.onClick}
     >
       <header className="article__header">
-        <ProfilePicture src={user.profilePicture} small />
+        <ProfilePicture src={user.profilePicture} onClick={props.onProfileClick} small />
         <div>
-          <p>@{user.username}</p>
+          <p onClick={props.onProfileClick}>@{user.username}</p>
           <p className="article__date">{parseTime(props.data.timestamp)}</p>
         </div>
         <div className="article__grow" />
