@@ -5,20 +5,34 @@ const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://localhost:5173" : "https://kelio-mv.github.io" },
 });
 
+function getPosts() {
+  const posts = {};
+  storage.getPosts().forEach((post) => {
+    const { id } = post;
+    delete post.id;
+    posts[id] = post;
+  });
+  return posts;
+}
+
+function getComments(postId, except) {
+  const comments = {};
+  storage
+    .getComments(postId)
+    .filter((c) => !except.includes(c.id))
+    .forEach((comment) => {
+      const { id } = comment;
+      delete comment.id;
+      comments[id] = comment;
+    });
+  return comments;
+}
+
 function createPost(userId, content) {
   const post = storage.createPost(userId, content);
   const { id } = post;
   delete post.id;
   return [id, post];
-}
-
-function getPosts() {
-  const posts = {};
-  storage.getPosts().forEach((post) => {
-    posts[post.id] = post;
-    delete posts[post.id].id;
-  });
-  return posts;
 }
 
 function createComment(userId, postId, content) {
@@ -28,20 +42,19 @@ function createComment(userId, postId, content) {
   return [id, comment];
 }
 
-function getComments(postId, except) {
-  const comments = {};
-  storage
-    .getComments(postId)
-    .filter((c) => !except.includes(c.id))
-    .forEach((comment) => {
-      comments[comment.id] = comment;
-      delete comments[comment.id].id;
-    });
-  return comments;
-}
-
 io.on("connection", (socket) => {
-  socket.on("auth", (signUp, username, password, callback) => {
+  socket.on("auth", handleAuth);
+  socket.on("get_data", handleGetData);
+  socket.on("get_posts", handleGetPosts);
+  socket.on("get_comments", handleGetComments);
+  socket.on("get_users", handleGetUsers);
+  socket.on("post", handlePost);
+  socket.on("comment", handleComment);
+  socket.on("del_post", handleDelPost);
+  socket.on("del_comment", handleDelComment);
+  socket.on("edit_user", handleEditUser);
+
+  function handleAuth(signUp, username, password, callback) {
     const user = storage.getUser("username", username);
     let errorMessage;
 
@@ -73,59 +86,59 @@ io.on("connection", (socket) => {
       }
     }
     callback(errorMessage);
-  });
+  }
 
-  socket.on("get_data", (callback) => {
+  function handleGetData(callback) {
     const { username, profilePicture } = storage.getUser("id", socket.userId);
     callback(socket.userId, { username, profilePicture });
     socket.emit("add_posts", getPosts());
-  });
+  }
 
-  socket.on("get_posts", () => {
+  function handleGetPosts() {
     socket.emit("add_posts", getPosts());
-  });
+  }
 
-  socket.on("get_users", (userIds) => {
+  function handleGetComments(postId, except) {
+    const comments = getComments(postId, except);
+    if (Object.keys(comments).length > 0) {
+      socket.emit("add_comments", comments);
+    }
+  }
+
+  function handleGetUsers(userIds) {
     const users = {};
     userIds.forEach((userId) => {
       const { username, profilePicture } = storage.getUser("id", userId);
       users[userId] = { username, profilePicture };
     });
     socket.emit("add_users", users);
-  });
+  }
 
-  socket.on("get_comments", (postId, except) => {
-    const comments = getComments(postId, except);
-    if (Object.keys(comments).length > 0) {
-      socket.emit("add_comments", comments);
-    }
-  });
-
-  socket.on("post", (content, callback) => {
+  function handlePost(content, callback) {
     const [id, post] = createPost(socket.userId, content);
     callback(id, post);
     socket.broadcast.emit("add_posts", { [id]: post });
-  });
+  }
 
-  socket.on("comment", (postId, content, callback) => {
+  function handleComment(postId, content, callback) {
     const [id, comment] = createComment(socket.userId, postId, content);
     callback(id, comment);
     socket.broadcast.emit("add_comments", { [id]: comment });
-  });
+  }
 
-  socket.on("del_post", (postId) => {
+  function handleDelPost(postId) {
     storage.deletePost(postId);
     socket.emit("del_post", postId);
     socket.broadcast.emit("del_post", postId);
-  });
+  }
 
-  socket.on("del_comment", (commentId) => {
+  function handleDelComment(commentId) {
     storage.deleteComment(commentId);
     socket.emit("del_comment", commentId);
     socket.broadcast.emit("del_comment", commentId);
-  });
+  }
 
-  socket.on("edit_user", ({ field, value, currentPassword }, callback) => {
+  function handleEditUser({ field, value, currentPassword }, callback) {
     const user = storage.getUser("id", socket.userId);
     let errorMessage;
 
@@ -152,24 +165,23 @@ io.on("connection", (socket) => {
     if (!errorMessage) {
       storage.editUser(socket.userId, field, value);
       if (["profilePicture", "username"].includes(field)) {
-        const { username, profilePicture } = storage.getUser("id", socket.userId);
-        socket.emit("add_users", { [socket.userId]: { username, profilePicture } });
-        socket.broadcast.emit("add_users", { [socket.userId]: { username, profilePicture } });
+        socket.emit("update_user", socket.userId);
+        socket.broadcast.emit("update_user", socket.userId);
       }
     }
 
     callback(errorMessage);
-  });
+  }
 });
 
 console.log("Server is running");
 
 /*
-function isUserConnected(userId) {
-  for (const [id, socket] of io.of("/").sockets) {
-    if (socket.userId === userId) {
-      return true;
+  function isUserConnected(userId) {
+    for (const [id, socket] of io.of("/").sockets) {
+      if (socket.userId === userId) {
+        return true;
+      }
     }
   }
-}
 */

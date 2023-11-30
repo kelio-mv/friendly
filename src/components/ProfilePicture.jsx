@@ -9,6 +9,7 @@ function ProfilePicture(props) {
         width: props.small ? 48 : 72,
         borderRadius: "50%",
         filter: isDefault ? "invert(1)" : null,
+        cursor: props.onClick ? "pointer" : null,
       }}
     />
   );

@@ -25,6 +25,7 @@ function App() {
     socket.on("add_comments", addComments);
     socket.on("del_post", delPost);
     socket.on("del_comment", delComment);
+    socket.on("update_user", updateUser);
 
     return () => {
       socket.off("add_users");
@@ -32,6 +33,7 @@ function App() {
       socket.off("add_comments");
       socket.off("del_post");
       socket.off("del_comment");
+      socket.off("update_user");
     };
   }, [users]);
 
@@ -70,6 +72,10 @@ function App() {
       delete comments[commentId];
       return comments;
     });
+  }
+
+  function updateUser(userId) {
+    if (userId in users) socket.emit("get_users", [userId]);
   }
 
   function requestUnfetchedUsers(articles) {
