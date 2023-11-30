@@ -3,10 +3,6 @@
   border-bottom: 1px solid var(--bg-300);
   animation: article 0.5s ease;
 
-  &:hover {
-    background: var(--bg-200);
-  }
-
   &--highlight {
     border-bottom: 1px solid #0f766e;
   }

@@ -70,6 +70,7 @@ body {
   --clr-300: rgb(188, 188, 188);
   --clr-400: rgb(164, 164, 164);
   --clr-500: rgb(140, 140, 140);
+  --scrollbar-width: 10px;
 }
 
 #root > * {
@@ -81,7 +82,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: var(--scrollbar-width);
 }
 
 ::-webkit-scrollbar-track {
@@ -91,7 +92,6 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--bg-400);
   border: 2px solid var(--bg-200);
-  // border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

@@ -18,6 +18,7 @@ function Post(props) {
   const postBodyRef = useRef();
   const commentsLength = useRef(comments.length);
   const textareaRef = useRef();
+  const unseenElementRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,8 +50,10 @@ function Post(props) {
 
   useEffect(() => {
     const textarea = textareaRef.current;
+    const unseen = unseenElementRef.current;
     textarea.style.height = "auto";
     textarea.style.height = textarea.scrollHeight + "px";
+    unseen.style.transform = `translateY(-${textarea.style.height})`;
   }, [comment]);
 
   function getPostComments() {
@@ -140,7 +143,13 @@ function Post(props) {
         <Icon name="send" onClick={sendComment} disabled={!comment.trim()} />
       </div>
 
-      {unseenComments > 0 && <div className="post__unseen-comments">{unseenComments}</div>}
+      <div
+        className="post__unseen-comments"
+        ref={unseenElementRef}
+        style={unseenComments === 0 ? { display: "none" } : {}}
+      >
+        {unseenComments}
+      </div>
 
       <Modal
         open={deleteConfirmation !== null}

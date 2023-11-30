@@ -28,10 +28,10 @@
   }
 
   &__unseen-comments {
-    // footer height = 53px and scrollbar width = 10px
+    /* As the footer height is dynamic, the vertical offset is applied with Javascript. */
     position: fixed;
-    right: calc(10px + 0.75rem);
-    bottom: calc(53px + 0.75rem);
+    right: calc(0.75rem + var(--scrollbar-width));
+    bottom: 0.75rem;
     display: flex;
     justify-content: center;
     align-items: center;
