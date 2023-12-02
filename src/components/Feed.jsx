@@ -16,6 +16,7 @@ function Feed(props) {
         <Icon name="menu" onClick={props.openSidebar} />
         <h1>Recentes</h1>
         <div className="top-bar__grow" />
+        <Icon name="chat" onClick={() => navigate("chats")} />
         <Icon name="add_circle" onClick={() => navigate("new-post")} />
       </div>
 

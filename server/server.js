@@ -47,11 +47,13 @@ io.on("connection", (socket) => {
   socket.on("get_data", handleGetData);
   socket.on("get_posts", handleGetPosts);
   socket.on("get_comments", handleGetComments);
+  socket.on("get_chats", handleGetChats);
   socket.on("get_users", handleGetUsers);
   socket.on("post", handlePost);
   socket.on("comment", handleComment);
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
+
   socket.on("edit_user", handleEditUser);
 
   function handleAuth(signUp, username, password, callback) {
@@ -103,6 +105,10 @@ io.on("connection", (socket) => {
     if (Object.keys(comments).length > 0) {
       socket.emit("add_comments", comments);
     }
+  }
+
+  function handleGetChats() {
+    console.log(storage.getChats(socket.userId));
   }
 
   function handleGetUsers(userIds) {

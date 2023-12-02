@@ -21,6 +21,8 @@ function Profile(props) {
       <div className="top-bar">
         <Icon name="arrow_back" onClick={() => navigate(-1)} />
         <h1>Perfil</h1>
+        <div className="top-bar__grow" />
+        <Icon name="send" />
       </div>
 
       <div className="profile__header">

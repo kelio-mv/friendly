@@ -12,14 +12,15 @@ class Storage {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username VARCHAR(16) NOT NULL,
       password VARCHAR(16) NOT NULL,
-      profilePicture TEXT NOT NULL DEFAULT 'default_avatar.png'
+      profilePicture TEXT NOT NULL DEFAULT 'default_avatar.png',
+      lastLoginAt INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )`);
     this.db.exec(`CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       userId INTEGER NOT NULL,
       timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       content TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES users (id)
+      FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
     )`);
     this.db.exec(`CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,8 +28,26 @@ class Storage {
       postId INTEGER NOT NULL,
       timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       content TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES users (id),
-      FOREIGN KEY (postId) REFERENCES posts (id)
+      FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (postId) REFERENCES posts (id) ON DELETE CASCADE
+    )`);
+    this.db.exec(`CREATE TABLE IF NOT EXISTS chats (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user1Id INTEGER NOT NULL,
+      user2Id INTEGER NOT NULL,
+      lastViewedMessageId INTEGER,
+      FOREIGN KEY (user1Id) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (user2Id) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (lastViewedMessageId) REFERENCES messages (id)
+    )`);
+    this.db.exec(`CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      chatId INTEGER NOT NULL,
+      userId INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      content TEXT NOT NULL,
+      FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE,
+      FOREIGN KEY (userId) REFERENCES users (id)
     )`);
   }
 
@@ -59,7 +78,6 @@ class Storage {
   }
 
   deletePost(postId) {
-    this.db.prepare("DELETE FROM comments WHERE postId = ?").run(postId);
     this.db.prepare("DELETE FROM posts WHERE id = ?").run(postId);
   }
 
@@ -78,6 +96,32 @@ class Storage {
 
   deleteComment(commentId) {
     this.db.prepare("DELETE FROM comments WHERE id = ?").run(commentId);
+  }
+
+  createChat(user1Id, user2Id) {
+    const stmt = this.db.prepare("INSERT INTO chats (user1Id, user2Id) VALUES (?, ?)");
+    return this.getChat(stmt.run(user1Id, user2Id).lastInsertRowid);
+  }
+
+  getChat(chatId) {
+    return this.db.prepare("SELECT * FROM chats WHERE id = ?").get(chatId);
+  }
+
+  getChats(userId) {
+    const stmt = this.db.prepare("SELECT * FROM chats WHERE user1Id = ? OR user2Id = ?");
+    return stmt.all(userId, userId);
+  }
+
+  createMessage(chatId, userId, content) {
+    const stmt = this.db.prepare("INSERT INTO messages (chatId, userId, content) VALUES (?, ?, ?)");
+    stmt.run(chatId, userId, content);
+  }
+
+  getLastMessage(chatId) {
+    const stmt = this.db.prepare(
+      "SELECT * FROM messages WHERE chatId = ? ORDER BY id DESC LIMIT 1"
+    );
+    return stmt.get(chatId);
   }
 }
 

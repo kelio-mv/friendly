@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Post from "./components/Post";
+import Chats from "./components/Chats";
 import NewPost from "./components/NewPost";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
@@ -18,6 +19,7 @@ function App() {
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState({});
   const [comments, setComments] = useState({});
+  const [chats, setChats] = useState({});
 
   useEffect(() => {
     socket.on("add_users", addUsers);
@@ -87,6 +89,7 @@ function App() {
     setUsers({});
     setPosts({});
     setComments({});
+    setChats({});
     setModal(null);
     setAuthenticated(false);
   }
@@ -134,6 +137,8 @@ function App() {
             />
           }
         />
+
+        <Route path="chats" element={<Chats />} />
 
         <Route
           path="new-post"
