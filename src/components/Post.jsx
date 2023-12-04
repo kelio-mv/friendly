@@ -28,6 +28,7 @@ function Post(props) {
     } else {
       navigate(-1);
     }
+    return () => socket.emit("leave_room", postId);
   }, [post]);
 
   useEffect(() => {

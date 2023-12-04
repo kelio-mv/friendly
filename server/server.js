@@ -5,41 +5,26 @@ const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://localhost:5173" : "https://kelio-mv.github.io" },
 });
 
-function getPosts() {
+function getPosts(before) {
   const posts = {};
-  storage.getPosts().forEach((post) => {
-    const { id } = post;
-    delete post.id;
-    posts[id] = post;
+  storage.getPosts(15, before).forEach((post) => {
+    const { id, ...rest } = post;
+    posts[id] = rest;
   });
   return posts;
 }
 
-function getComments(postId, except) {
-  const comments = {};
-  storage
-    .getComments(postId)
-    .filter((c) => !except.includes(c.id))
-    .forEach((comment) => {
-      const { id } = comment;
-      delete comment.id;
-      comments[id] = comment;
-    });
-  return comments;
-}
-
-function createPost(userId, content) {
-  const post = storage.createPost(userId, content);
-  const { id } = post;
-  delete post.id;
-  return [id, post];
-}
-
-function createComment(userId, postId, content) {
-  const comment = storage.createComment(userId, postId, content);
-  const { id } = comment;
-  delete comment.id;
-  return [id, comment];
+function getComments(postId, fetched) {
+  const all = storage.getComments(postId);
+  const allIds = all.map(({ id }) => id);
+  const _unfetched = all.filter((c) => !fetched.includes(c.id));
+  const deleted = fetched.filter((id) => !allIds.includes(id));
+  const unfetched = {};
+  _unfetched.forEach((comment) => {
+    const { id, ...rest } = comment;
+    unfetched[id] = rest;
+  });
+  return [unfetched, deleted];
 }
 
 io.on("connection", (socket) => {
@@ -49,11 +34,11 @@ io.on("connection", (socket) => {
   socket.on("get_comments", handleGetComments);
   socket.on("get_chats", handleGetChats);
   socket.on("get_users", handleGetUsers);
+  socket.on("leave_room", handleLeaveRoom);
   socket.on("post", handlePost);
   socket.on("comment", handleComment);
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
-
   socket.on("edit_user", handleEditUser);
 
   function handleAuth(signUp, username, password, callback) {
@@ -96,15 +81,16 @@ io.on("connection", (socket) => {
     socket.emit("add_posts", getPosts());
   }
 
-  function handleGetPosts() {
-    socket.emit("add_posts", getPosts());
+  function handleGetPosts(before, callback) {
+    socket.emit("add_posts", getPosts(before));
+    callback();
   }
 
-  function handleGetComments(postId, except) {
-    const comments = getComments(postId, except);
-    if (Object.keys(comments).length > 0) {
-      socket.emit("add_comments", comments);
-    }
+  function handleGetComments(postId, fetched) {
+    const [unfetched, deleted] = getComments(postId, fetched);
+    if (Object.keys(unfetched).length > 0) socket.emit("add_comments", unfetched);
+    if (deleted.length > 0) socket.emit("del_comments", deleted);
+    socket.join(postId);
   }
 
   function handleGetChats() {
@@ -120,16 +106,20 @@ io.on("connection", (socket) => {
     socket.emit("add_users", users);
   }
 
+  function handleLeaveRoom(postId) {
+    socket.leave(postId);
+  }
+
   function handlePost(content, callback) {
-    const [id, post] = createPost(socket.userId, content);
-    callback(id, post);
-    socket.broadcast.emit("add_posts", { [id]: post });
+    const { id, ...rest } = storage.createPost(socket.userId, content);
+    callback(id, rest);
+    socket.broadcast.emit("add_posts", { [id]: rest });
   }
 
   function handleComment(postId, content, callback) {
-    const [id, comment] = createComment(socket.userId, postId, content);
-    callback(id, comment);
-    socket.broadcast.emit("add_comments", { [id]: comment });
+    const { id, ...rest } = storage.createComment(socket.userId, postId, content);
+    callback(id, rest);
+    io.to(rest.postId).emit("add_comments", { [id]: rest });
   }
 
   function handleDelPost(postId) {
@@ -139,9 +129,9 @@ io.on("connection", (socket) => {
   }
 
   function handleDelComment(commentId) {
-    storage.deleteComment(commentId);
-    socket.emit("del_comment", commentId);
-    socket.broadcast.emit("del_comment", commentId);
+    const { postId } = storage.deleteComment(commentId);
+    socket.emit("del_comments", [commentId]);
+    io.to(postId).emit("del_comments", [commentId]);
   }
 
   function handleEditUser({ field, value, currentPassword }, callback) {

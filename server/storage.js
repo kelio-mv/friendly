@@ -73,8 +73,9 @@ class Storage {
     return this.db.prepare("SELECT * FROM posts WHERE id = ?").get(id);
   }
 
-  getPosts() {
-    return this.db.prepare("SELECT * FROM posts").all();
+  getPosts(limit, before) {
+    const where = before ? `WHERE id < ${before}` : "";
+    return this.db.prepare(`SELECT * FROM posts ${where} ORDER BY id DESC LIMIT ?`).all(limit);
   }
 
   deletePost(postId) {
@@ -95,7 +96,9 @@ class Storage {
   }
 
   deleteComment(commentId) {
+    const comment = this.getComment(commentId);
     this.db.prepare("DELETE FROM comments WHERE id = ?").run(commentId);
+    return comment;
   }
 
   createChat(user1Id, user2Id) {

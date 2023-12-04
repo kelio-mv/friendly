@@ -26,7 +26,7 @@ function App() {
     socket.on("add_posts", addPosts);
     socket.on("add_comments", addComments);
     socket.on("del_post", delPost);
-    socket.on("del_comment", delComment);
+    socket.on("del_comments", delComments);
     socket.on("update_user", updateUser);
 
     return () => {
@@ -68,10 +68,10 @@ function App() {
     });
   }
 
-  function delComment(commentId) {
+  function delComments(commentIds) {
     setComments((prevComments) => {
       const comments = { ...prevComments };
-      delete comments[commentId];
+      commentIds.forEach((commentId) => delete comments[commentId]);
       return comments;
     });
   }
@@ -108,7 +108,9 @@ function App() {
                   setAuthenticated(true);
                 });
               }}
-              onReauth={() => socket.emit("get_posts")}
+              onReauth={() => {
+                /* dynamic post loading */
+              }}
               onReauthError={resetState}
             />
           }
