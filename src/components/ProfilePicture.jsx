@@ -6,7 +6,7 @@ function ProfilePicture(props) {
       src={isDefault ? `/friendly/${props.src}` : props.src}
       onClick={props.onClick}
       style={{
-        width: props.small ? 48 : 72,
+        width: props.size ? props.size : 72,
         borderRadius: "50%",
         filter: isDefault ? "invert(1)" : null,
         cursor: props.onClick ? "pointer" : null,

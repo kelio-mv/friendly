@@ -1,0 +1,22 @@
+.chat {
+  &__body {
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  &__footer {
+    display: flex;
+    padding: 0 1rem;
+    background: var(--bg-200);
+    border-top: 1px solid var(--bg-300);
+  }
+
+  &__textarea {
+    flex-grow: 1;
+    padding: 1rem 0;
+    background: none;
+    color: inherit;
+    border: none;
+    resize: none;
+  }
+}

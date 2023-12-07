@@ -29,7 +29,7 @@ function Article(props) {
       onClick={props.onClick}
     >
       <header className="article__header">
-        <ProfilePicture src={user.profilePicture} onClick={props.onProfileClick} small />
+        <ProfilePicture src={user.profilePicture} onClick={props.onProfileClick} size={48} />
         <div>
           <p
             onClick={props.onProfileClick}

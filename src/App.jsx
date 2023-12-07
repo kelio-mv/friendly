@@ -3,8 +3,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Feed from "./components/Feed";
 import Post from "./components/Post";
-import Chats from "./components/Chats";
 import NewPost from "./components/NewPost";
+import Chats from "./components/Chats";
+import Chat from "./components/Chat";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
 import Sidebar from "./components/Sidebar";
@@ -20,6 +21,7 @@ function App() {
   const [posts, setPosts] = useState({});
   const [comments, setComments] = useState({});
   const [chats, setChats] = useState({});
+  const [messages, setMessages] = useState({});
 
   useEffect(() => {
     socket.on("add_users", addUsers);
@@ -90,6 +92,7 @@ function App() {
     setPosts({});
     setComments({});
     setChats({});
+    setMessages({});
     setModal(null);
     setAuthenticated(false);
   }
@@ -140,8 +143,6 @@ function App() {
           }
         />
 
-        <Route path="chats" element={<Chats />} />
-
         <Route
           path="new-post"
           element={
@@ -151,7 +152,11 @@ function App() {
           }
         />
 
-        <Route path="profile/:id" element={<Profile {...{ users, posts }} />} />
+        <Route path="chats" element={<Chats />} />
+
+        <Route path="chat/:id" element={<Chat {...{ users }} />} />
+
+        <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 
         <Route path="settings" element={<Settings user={users[storage.userId]} />} />
       </Routes>
