@@ -5,12 +5,13 @@ import Icon from "./Icon";
 import socket from "../socket";
 
 function Feed(props) {
-  const posts = useMemo(
-    () => Object.entries(props.posts).sort((a, b) => b[0] - a[0]),
-    [props.posts]
-  );
+  const posts = useMemo(getPosts, [props.posts]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  function getPosts() {
+    return Object.entries(props.posts).sort((a, b) => b[0] - a[0]);
+  }
 
   function onScroll(e) {
     if (loading) return;

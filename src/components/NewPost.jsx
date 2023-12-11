@@ -18,7 +18,7 @@ function NewPost(props) {
           name="send"
           onClick={() => {
             setSending(true);
-            socket.emit("post", content.trim(), (id, post) => {
+            socket.emit("create_post", content.trim(), (id, post) => {
               props.addPost(id, post);
               navigate(`/post/${id}`, { replace: true });
             });

@@ -27,6 +27,8 @@ function App() {
     socket.on("add_users", addUsers);
     socket.on("add_posts", addPosts);
     socket.on("add_comments", addComments);
+    socket.on("add_chats", addChats);
+    socket.on("add_messages", addMessages);
     socket.on("del_post", delPost);
     socket.on("del_comments", delComments);
     socket.on("update_user", updateUser);
@@ -35,6 +37,8 @@ function App() {
       socket.off("add_users");
       socket.off("add_posts");
       socket.off("add_comments");
+      socket.off("add_chats");
+      socket.off("add_messages");
       socket.off("del_post");
       socket.off("del_comment");
       socket.off("update_user");
@@ -53,6 +57,14 @@ function App() {
   function addComments(comments) {
     setComments((prevComments) => ({ ...prevComments, ...comments }));
     requestUnfetchedUsers(Object.values(comments));
+  }
+
+  function addChats(chats) {
+    setChats((prevChats) => ({ ...prevChats, ...chats }));
+  }
+
+  function addMessages(messages) {
+    setMessages((prevMessages) => ({ ...prevMessages, ...messages }));
   }
 
   function delPost(postId) {
@@ -154,7 +166,15 @@ function App() {
 
         <Route path="chats" element={<Chats />} />
 
-        <Route path="chat/:id" element={<Chat {...{ users }} />} />
+        <Route
+          path="chat/:id"
+          element={
+            <Chat
+              {...{ users, chats, messages }}
+              addChat={(id, chat) => setChats((prevChats) => ({ ...prevChats, [id]: chat }))}
+            />
+          }
+        />
 
         <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 

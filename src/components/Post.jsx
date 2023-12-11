@@ -82,7 +82,7 @@ function Post(props) {
   }
 
   function sendComment() {
-    socket.emit("comment", postId, comment.trim(), (id, comment) => {
+    socket.emit("create_comment", postId, comment.trim(), (id, comment) => {
       props.addComment(id, comment);
       setScrollDown(true);
     });

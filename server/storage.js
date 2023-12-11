@@ -117,7 +117,15 @@ class Storage {
 
   createMessage(chatId, userId, content) {
     const stmt = this.db.prepare("INSERT INTO messages (chatId, userId, content) VALUES (?, ?, ?)");
-    stmt.run(chatId, userId, content);
+    return this.getMessage(stmt.run(chatId, userId, content).lastInsertRowid);
+  }
+
+  getMessage(messageId) {
+    return this.db.prepare("SELECT * FROM messages WHERE id = ?").get(messageId);
+  }
+
+  getMessages(chatId) {
+    return this.db.prepare("SELECT * FROM messages WHERE chatId = ?").all(chatId);
   }
 
   getLastMessage(chatId) {

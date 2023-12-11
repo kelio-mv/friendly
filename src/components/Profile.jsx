@@ -19,13 +19,15 @@ function Profile(props) {
   }
 
   function openChat() {
+    let chatId;
     for (const [id, chat] of Object.entries(props.chats)) {
       if (chat.user1Id === userId || chat.user2Id === userId) {
-        navigate(`/chat/${id}`);
-        return;
+        chatId = id;
+        break;
       }
     }
-    socket.emit("create_chat", userId);
+    if (chatId) navigate(`/chat/${chatId}`);
+    else navigate(`/chat/u${userId}`);
   }
 
   return (

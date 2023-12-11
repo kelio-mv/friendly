@@ -2,7 +2,7 @@ const { Server } = require("socket.io");
 const storage = require("./storage");
 const developmentEnv = true;
 const io = new Server(3000, {
-  cors: { origin: developmentEnv ? "http://localhost:5173" : "https://kelio-mv.github.io" },
+  cors: { origin: developmentEnv ? "http://192.168.1.5:5173" : "https://kelio-mv.github.io" },
 });
 
 function getPosts(before) {
@@ -27,16 +27,44 @@ function getComments(postId, fetched) {
   return [unfetched, deleted];
 }
 
+function getChats(userId) {
+  const chats = {};
+  storage.getChats(userId).forEach((chat) => {
+    const { id, ...rest } = chat;
+    chats[id] = rest;
+  });
+  return chats;
+}
+
+function getMessages(chatId) {
+  const messages = {};
+  storage.getMessages(chatId).forEach((message) => {
+    const { id, ...rest } = message;
+    messages[id] = rest;
+  });
+  return messages;
+}
+
+function getSocket(userId) {
+  for (const [_, socket] of io.of("/").sockets) {
+    if (socket.userId === userId) {
+      return socket;
+    }
+  }
+}
+
 io.on("connection", (socket) => {
   socket.on("auth", handleAuth);
   socket.on("get_data", handleGetData);
   socket.on("get_posts", handleGetPosts);
   socket.on("get_comments", handleGetComments);
-  socket.on("get_chats", handleGetChats);
+  socket.on("get_messages", handleGetMessages);
   socket.on("get_users", handleGetUsers);
   socket.on("leave_room", handleLeaveRoom);
-  socket.on("post", handlePost);
-  socket.on("comment", handleComment);
+  socket.on("create_post", handleCreatePost);
+  socket.on("create_comment", handleCreateComment);
+  socket.on("create_chat", handleCreateChat);
+  socket.on("create_message", handleCreateMessage);
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
   socket.on("edit_user", handleEditUser);
@@ -79,22 +107,29 @@ io.on("connection", (socket) => {
     const { username, profilePicture } = storage.getUser("id", socket.userId);
     callback(socket.userId, { username, profilePicture });
     socket.emit("add_posts", getPosts());
+    socket.emit("add_chats", getChats(socket.userId));
   }
 
   function handleGetPosts(before, callback) {
-    socket.emit("add_posts", getPosts(before));
+    const posts = getPosts(before);
+    if (Object.keys(posts).length > 0) socket.emit("add_posts", posts);
     callback();
   }
 
   function handleGetComments(postId, fetched) {
+    if (!storage.getPost(postId)) {
+      socket.emit("del_post", postId);
+      return;
+    }
     const [unfetched, deleted] = getComments(postId, fetched);
     if (Object.keys(unfetched).length > 0) socket.emit("add_comments", unfetched);
     if (deleted.length > 0) socket.emit("del_comments", deleted);
     socket.join(postId);
   }
 
-  function handleGetChats() {
-    console.log(storage.getChats(socket.userId));
+  function handleGetMessages(chatId) {
+    const messages = getMessages(chatId);
+    if (Object.keys(messages).length > 0) socket.emit("add_messages", messages);
   }
 
   function handleGetUsers(userIds) {
@@ -110,22 +145,33 @@ io.on("connection", (socket) => {
     socket.leave(postId);
   }
 
-  function handlePost(content, callback) {
+  function handleCreatePost(content, callback) {
     const { id, ...rest } = storage.createPost(socket.userId, content);
     callback(id, rest);
     socket.broadcast.emit("add_posts", { [id]: rest });
   }
 
-  function handleComment(postId, content, callback) {
+  function handleCreateComment(postId, content, callback) {
     const { id, ...rest } = storage.createComment(socket.userId, postId, content);
     callback(id, rest);
     io.to(rest.postId).emit("add_comments", { [id]: rest });
   }
 
+  function handleCreateChat(userId, callback) {
+    const { id, ...rest } = storage.createChat(socket.userId, userId);
+    callback(id, rest);
+  }
+
+  function handleCreateMessage(chatId, content, userId) {
+    const { id, ...rest } = storage.createMessage(chatId, socket.userId, content);
+    socket.emit("add_messages", { [id]: rest });
+    getSocket(userId).emit("add_messages", { [id]: rest });
+  }
+
   function handleDelPost(postId) {
     storage.deletePost(postId);
     socket.emit("del_post", postId);
-    socket.broadcast.emit("del_post", postId);
+    io.to(postId).emit("del_post", postId);
   }
 
   function handleDelComment(commentId) {
@@ -171,13 +217,3 @@ io.on("connection", (socket) => {
 });
 
 console.log("Server is running");
-
-/*
-  function isUserConnected(userId) {
-    for (const [id, socket] of io.of("/").sockets) {
-      if (socket.userId === userId) {
-        return true;
-      }
-    }
-  }
-*/
