@@ -35,9 +35,9 @@ function App() {
   }, []);
 
   function onAuth() {
-    socket.emit("get_data", (userId, user) => {
-      storage.userId = userId;
-      setUsers({ [userId]: user });
+    socket.emit("get_data", (id, rest) => {
+      storage.userId = id;
+      setUsers({ [id]: rest });
       setAuthenticated(true);
     });
   }
@@ -48,16 +48,21 @@ function App() {
 
   function addPosts(posts) {
     setPosts((prevPosts) => ({ ...prevPosts, ...posts }));
-    requestUnfetchedUsers(Object.values(posts));
+    requestUnfetchedUsers(Object.values(posts).map(({ userId }) => userId));
   }
 
   function addComments(comments) {
     setComments((prevComments) => ({ ...prevComments, ...comments }));
-    requestUnfetchedUsers(Object.values(comments));
+    requestUnfetchedUsers(Object.values(comments).map(({ userId }) => userId));
   }
 
   function addChats(chats) {
     setChats((prevChats) => ({ ...prevChats, ...chats }));
+    requestUnfetchedUsers(
+      Object.values(chats).map(({ user1Id, user2Id }) =>
+        user1Id === storage.userId ? user2Id : user1Id
+      )
+    );
   }
 
   function addMessages(messages) {
@@ -91,11 +96,11 @@ function App() {
     if (userId in users) socket.emit("get_users", [userId]);
   }
 
-  function requestUnfetchedUsers(articles) {
-    setUsers((users) => {
-      const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
+  function requestUnfetchedUsers(users) {
+    setUsers((prevUsers) => {
+      const unfetched = new Set(users.filter((id) => !(id in prevUsers)));
       if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
-      return users;
+      return prevUsers;
     });
   }
 
@@ -133,7 +138,7 @@ function App() {
 
         <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
 
-        <Route path="chats" element={<Chats />} />
+        <Route path="chats" element={<Chats {...{ users, chats, messages }} />} />
 
         <Route path="chat/:id" element={<Chat {...{ users, chats, messages, addChats }} />} />
 

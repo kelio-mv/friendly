@@ -1,15 +1,14 @@
+import { useMemo } from "react";
 import storage from "../storage";
+import "./Message.scss";
 
 function Message(props) {
   const fromMe = props.userId === storage.userId;
-  const time = getTime();
-
-  function getTime() {
-    // useMemo?
+  const time = useMemo(() => {
     const date = new Date(props.timestamp * 1000);
     const [hours, minutes] = [date.getHours(), date.getMinutes()].map((v) => ("0" + v).slice(-2));
     return hours + ":" + minutes;
-  }
+  }, []);
 
   return (
     <div className={`message ${fromMe ? "message--from-me" : ""}`}>
@@ -20,3 +19,5 @@ function Message(props) {
 }
 
 export default Message;
+
+// Alinhar hora à direita

@@ -133,6 +133,8 @@ io.on("connection", (socket) => {
   function handleCreateChat(userId, callback) {
     const { id, ...rest } = storage.createChat(socket.userId, userId);
     callback(id, rest);
+    const interlocutor = getSocket(userId);
+    if (interlocutor) interlocutor.emit("add_chats", { [id]: rest });
   }
 
   function handleCreateMessage(chatId, content, userId) {

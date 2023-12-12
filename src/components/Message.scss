@@ -1,0 +1,26 @@
+.message {
+  width: fit-content;
+  padding: 0.5rem 0.75rem;
+  background: #0f766e;
+  border-radius: 0.5rem;
+
+  &:not(:last-child) {
+    margin-bottom: 0.25rem;
+  }
+
+  &--from-me {
+    margin-left: auto;
+    background: var(--bg-200);
+  }
+
+  &__content {
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  &__time {
+    margin-left: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--clr-300);
+  }
+}
