@@ -5,44 +5,13 @@ const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://192.168.1.5:5173" : "https://kelio-mv.github.io" },
 });
 
-function getPosts(before) {
-  const posts = {};
-  storage.getPosts(15, before).forEach((post) => {
-    const { id, ...rest } = post;
-    posts[id] = rest;
+function transform(array) {
+  const object = {};
+  array.forEach((value) => {
+    const { id, ...rest } = value;
+    object[id] = rest;
   });
-  return posts;
-}
-
-function getComments(postId, fetched) {
-  const all = storage.getComments(postId);
-  const allIds = all.map(({ id }) => id);
-  const _unfetched = all.filter((c) => !fetched.includes(c.id));
-  const deleted = fetched.filter((id) => !allIds.includes(id));
-  const unfetched = {};
-  _unfetched.forEach((comment) => {
-    const { id, ...rest } = comment;
-    unfetched[id] = rest;
-  });
-  return [unfetched, deleted];
-}
-
-function getChats(userId) {
-  const chats = {};
-  storage.getChats(userId).forEach((chat) => {
-    const { id, ...rest } = chat;
-    chats[id] = rest;
-  });
-  return chats;
-}
-
-function getMessages(chatId) {
-  const messages = {};
-  storage.getMessages(chatId).forEach((message) => {
-    const { id, ...rest } = message;
-    messages[id] = rest;
-  });
-  return messages;
+  return object;
 }
 
 function getSocket(userId) {
@@ -106,13 +75,13 @@ io.on("connection", (socket) => {
   function handleGetData(callback) {
     const { username, profilePicture } = storage.getUser("id", socket.userId);
     callback(socket.userId, { username, profilePicture });
-    socket.emit("add_posts", getPosts());
-    socket.emit("add_chats", getChats(socket.userId));
+    socket.emit("add_posts", transform(storage.getPosts(15)));
+    socket.emit("add_chats", transform(storage.getChats(socket.userId)));
   }
 
   function handleGetPosts(before, callback) {
-    const posts = getPosts(before);
-    if (Object.keys(posts).length > 0) socket.emit("add_posts", posts);
+    const posts = storage.getPosts(15, before);
+    if (posts.length > 0) socket.emit("add_posts", transform(posts));
     callback();
   }
 
@@ -121,15 +90,19 @@ io.on("connection", (socket) => {
       socket.emit("del_post", postId);
       return;
     }
-    const [unfetched, deleted] = getComments(postId, fetched);
-    if (Object.keys(unfetched).length > 0) socket.emit("add_comments", unfetched);
+    const all = storage.getComments(postId);
+    const allIds = all.map(({ id }) => id);
+    const unfetched = all.filter((c) => !fetched.includes(c.id));
+    const deleted = fetched.filter((id) => !allIds.includes(id));
+
+    if (unfetched.length > 0) socket.emit("add_comments", transform(unfetched));
     if (deleted.length > 0) socket.emit("del_comments", deleted);
     socket.join(postId);
   }
 
   function handleGetMessages(chatId) {
-    const messages = getMessages(chatId);
-    if (Object.keys(messages).length > 0) socket.emit("add_messages", messages);
+    const messages = storage.getMessages(chatId);
+    if (messages.length > 0) socket.emit("add_messages", transform(messages));
   }
 
   function handleGetUsers(userIds) {
@@ -159,6 +132,7 @@ io.on("connection", (socket) => {
 
   function handleCreateChat(userId, callback) {
     const { id, ...rest } = storage.createChat(socket.userId, userId);
+
     callback(id, rest);
   }
 

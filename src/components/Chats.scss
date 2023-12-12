@@ -1,0 +1,31 @@
+.chats {
+  &__chat {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--bg-300);
+    animation: chats__chat 0.5s ease;
+  }
+
+  &__chat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__date {
+    color: var(--clr-300);
+  }
+
+  &__chat-grow {
+    flex-grow: 1;
+  }
+}
+
+@keyframes chats__chat {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
