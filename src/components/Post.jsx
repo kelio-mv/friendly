@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Article from "./Article";
 import Icon from "./Icon";
@@ -8,8 +8,11 @@ import socket from "../socket";
 
 function Post(props) {
   const postId = parseInt(useParams().id);
-  const post = props.posts[postId];
-  const comments = useMemo(getPostComments, [props.comments]);
+  const post = props.posts.find((post) => post.id === postId);
+  const comments = useMemo(
+    () => props.comments.filter((comment) => comment.postId === postId),
+    [props.comments]
+  );
   const [comment, setComment] = useState("");
   const [unseenComments, setUnseenComments] = useState(0);
   const [scrollDown, setScrollDown] = useState(false);
@@ -23,7 +26,7 @@ function Post(props) {
 
   useEffect(() => {
     if (post) {
-      const fetchedComments = comments.map(([id]) => parseInt(id));
+      const fetchedComments = comments.map((comment) => comment.id);
       socket.emit("get_comments", postId, fetchedComments);
     } else {
       navigate(-1);
@@ -57,10 +60,6 @@ function Post(props) {
     unseen.style.transform = `translateY(-${textarea.style.height})`;
   }, [comment]);
 
-  function getPostComments() {
-    return Object.entries(props.comments).filter(([_, comment]) => comment.postId === postId);
-  }
-
   function onScroll() {
     // Optional improvement: Dynamically decrease the value as comments are seen
     if (unseenComments > 0) {
@@ -83,7 +82,7 @@ function Post(props) {
 
   function sendComment() {
     socket.emit("create_comment", postId, comment.trim(), (comment) => {
-      props.addComments(comment);
+      props.addComments([comment]);
       setScrollDown(true);
     });
     setComment("");
@@ -117,14 +116,14 @@ function Post(props) {
             highlight
           />
         )}
-        {comments.map(([id, comment]) => (
+        {comments.map((comment) => (
           <Article
-            key={id}
+            key={comment.id}
             data={comment}
             user={props.users[comment.userId]}
             deletable={comment.userId === storage.userId}
             delete={() => {
-              setCommentId(id);
+              setCommentId(comment.id);
               setDeleteConfirmation("comment");
             }}
             onProfileClick={() => navigate(`/profile/${comment.userId}`)}

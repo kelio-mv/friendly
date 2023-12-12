@@ -18,10 +18,10 @@ function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState({});
-  const [posts, setPosts] = useState({});
-  const [comments, setComments] = useState({});
-  const [chats, setChats] = useState({});
-  const [messages, setMessages] = useState({});
+  const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     socket.on("add_users", addUsers);
@@ -35,73 +35,60 @@ function App() {
   }, []);
 
   function onAuth() {
-    socket.emit("get_data", (id, rest) => {
-      storage.userId = id;
-      setUsers({ [id]: rest });
+    socket.emit("get_data", (user) => {
+      storage.userId = user.id;
+      setUsers({ [user.id]: user });
       setAuthenticated(true);
     });
   }
 
   function addUsers(users) {
-    setUsers((prevUsers) => ({ ...prevUsers, ...users }));
+    setUsers((prevUsers) => ({
+      ...prevUsers,
+      ...Object.fromEntries(users.map((user) => [user.id, user])),
+    }));
   }
 
   function addPosts(posts) {
-    setPosts((prevPosts) => ({ ...prevPosts, ...posts }));
-    requestUnfetchedUsers(Object.values(posts).map(({ userId }) => userId));
+    setPosts((prevPosts) => [...prevPosts, ...posts]);
+    requestUnfetchedUsers(posts.map((post) => post.userId));
   }
 
   function addComments(comments) {
-    setComments((prevComments) => ({ ...prevComments, ...comments }));
-    requestUnfetchedUsers(Object.values(comments).map(({ userId }) => userId));
+    setComments((prevComments) => [...prevComments, ...comments]);
+    requestUnfetchedUsers(comments.map((comment) => comment.userId));
   }
 
   function addChats(chats) {
-    setChats((prevChats) => ({ ...prevChats, ...chats }));
+    setChats((prevChats) => [...prevChats, ...chats]);
     requestUnfetchedUsers(
-      Object.values(chats).map(({ user1Id, user2Id }) =>
-        user1Id === storage.userId ? user2Id : user1Id
-      )
+      chats.map(({ user1Id, user2Id }) => (user1Id === storage.userId ? user2Id : user1Id))
     );
   }
 
   function addMessages(messages) {
-    setMessages((prevMessages) => ({ ...prevMessages, ...messages }));
+    setMessages((prevMessages) => [...prevMessages, ...messages]);
   }
 
-  function delPost(postId) {
-    setPosts((prevPosts) => {
-      const posts = { ...prevPosts };
-      delete posts[postId];
-      return posts;
-    });
-    setComments((prevComments) => {
-      const comments = { ...prevComments };
-      for (const id in comments) {
-        if (comments[id].postId === postId) delete comments[id];
-      }
-      return comments;
-    });
+  function delPost(id) {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
-  function delComments(commentIds) {
-    setComments((prevComments) => {
-      const comments = { ...prevComments };
-      commentIds.forEach((commentId) => delete comments[commentId]);
-      return comments;
-    });
+  function delComments(ids) {
+    setComments((prevComments) => prevComments.filter((comment) => !ids.includes(comment.id)));
   }
 
-  function updateUser(userId) {
+  function updateUser(id) {
     setUsers((users) => {
-      if (userId in users) socket.emit("get_users", [userId]);
+      if (id in users) socket.emit("get_users", [id]);
       return users;
     });
   }
 
-  function requestUnfetchedUsers(userIds) {
+  function requestUnfetchedUsers(ids) {
     setUsers((users) => {
-      const unfetched = new Set(userIds.filter((id) => !(id in users)));
+      const unfetched = new Set(ids.filter((id) => !(id in users)));
       if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
       return users;
     });
@@ -109,10 +96,10 @@ function App() {
 
   function resetState() {
     setUsers({});
-    setPosts({});
-    setComments({});
-    setChats({});
-    setMessages({});
+    setPosts([]);
+    setComments([]);
+    setChats([]);
+    setMessages([]);
     setModal(null);
     setAuthenticated(false);
   }
@@ -165,3 +152,5 @@ function App() {
 }
 
 export default App;
+
+// ordenar feed, terminar migração pra array a partir do chats

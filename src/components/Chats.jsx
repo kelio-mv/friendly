@@ -6,16 +6,15 @@ import "./Chats.scss";
 
 function Chats(props) {
   const navigate = useNavigate();
-  const chats = Object.entries(props.chats);
 
   function getUser(chat) {
     const { user1Id, user2Id } = chat;
     const userId = user1Id === storage.userId ? user2Id : user1Id;
-    return props.users[userId];
+    return props.users.find((user) => user.id === userId);
   }
 
   function getLastMessage(chatId) {
-    const messages = Object.values(props.messages).filter((message) => message.chatId === chatId);
+    const messages = props.messages.filter((message) => message.chatId === chatId);
     return messages[messages.length - 1];
   }
 
@@ -26,12 +25,12 @@ function Chats(props) {
         <h1>Conversas</h1>
       </div>
       <div className="chats__body">
-        {chats.map(([id, rest]) => (
+        {props.chats.map((chat) => (
           <Chat
-            key={id}
-            user={getUser(rest)}
-            lastMessage={getLastMessage(parseInt(id))}
-            onClick={() => navigate(`/chat/${id}`)}
+            key={chat.id}
+            user={getUser(chat)}
+            lastMessage={getLastMessage(chat.id)}
+            onClick={() => navigate(`/chat/${chat.id}`)}
           />
         ))}
       </div>

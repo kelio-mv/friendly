@@ -60,6 +60,10 @@ class Storage {
     return this.db.prepare(`SELECT * FROM users WHERE ${field} = ?`).get(value);
   }
 
+  getUserData(id) {
+    return this.db.prepare(`SELECT id, username, profilePicture FROM users WHERE id = ?`).get(id);
+  }
+
   editUser(id, field, value) {
     this.db.prepare(`UPDATE users SET ${field} = ? WHERE id = ?`).run(value, id);
   }

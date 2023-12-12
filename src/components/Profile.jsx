@@ -4,25 +4,18 @@ import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Article from "./Article";
 import storage from "../storage";
-import socket from "../socket";
 
 function Profile(props) {
   const userId = parseInt(useParams().id);
-  const user = props.users[userId];
-  const posts = useMemo(getUserPosts, [props.posts]);
+  const user = props.users.find((user) => user.id === userId);
+  const posts = useMemo(() => props.posts.filter((post) => post.userId === userId), [props.posts]);
   const navigate = useNavigate();
-
-  function getUserPosts() {
-    return Object.entries(props.posts)
-      .filter(([_, post]) => post.userId === userId)
-      .sort((a, b) => b[0] - a[0]);
-  }
 
   function openChat() {
     let chatId;
-    for (const [id, chat] of Object.entries(props.chats)) {
+    for (const chat of props.chats) {
       if (chat.user1Id === userId || chat.user2Id === userId) {
-        chatId = id;
+        chatId = chat.id;
         break;
       }
     }
@@ -44,12 +37,12 @@ function Profile(props) {
         <p>@{user.username}</p>
       </div>
 
-      {posts.map(([id, post]) => (
+      {posts.map((post) => (
         <Article
-          key={id}
+          key={post.id}
           data={post}
-          user={user}
-          onClick={() => navigate(`/post/${id}`)}
+          users={props.users}
+          onClick={() => navigate(`/post/${post.id}`)}
           truncate
         />
       ))}

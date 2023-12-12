@@ -18,9 +18,9 @@ function NewPost(props) {
           name="send"
           onClick={() => {
             setSending(true);
-            socket.emit("create_post", content.trim(), (id, rest) => {
-              props.addPosts({ [id]: rest });
-              navigate(`/post/${id}`, { replace: true });
+            socket.emit("create_post", content.trim(), (post) => {
+              props.addPosts([post]);
+              navigate(`/post/${post.id}`, { replace: true });
             });
           }}
           disabled={!content.trim() || sending}
