@@ -38,7 +38,7 @@ function Chat(props) {
       const { user1Id, user2Id } = props.chats[chatId];
       return user1Id === storage.userId ? user2Id : user1Id;
     } else {
-      return param.substring(1); // bug?
+      return parseInt(param.substring(1));
     }
   }
 

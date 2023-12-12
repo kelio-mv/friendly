@@ -93,14 +93,17 @@ function App() {
   }
 
   function updateUser(userId) {
-    if (userId in users) socket.emit("get_users", [userId]);
+    setUsers((users) => {
+      if (userId in users) socket.emit("get_users", [userId]);
+      return users;
+    });
   }
 
-  function requestUnfetchedUsers(users) {
-    setUsers((prevUsers) => {
-      const unfetched = new Set(users.filter((id) => !(id in prevUsers)));
+  function requestUnfetchedUsers(userIds) {
+    setUsers((users) => {
+      const unfetched = new Set(userIds.filter((id) => !(id in users)));
       if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
-      return prevUsers;
+      return users;
     });
   }
 
