@@ -126,26 +126,26 @@ io.on("connection", (socket) => {
 
   function handleCreateComment(postId, content, callback) {
     const { id, ...rest } = storage.createComment(socket.userId, postId, content);
-    callback(id, rest);
-    io.to(rest.postId).emit("add_comments", { [id]: rest });
+    callback({ [id]: rest });
+    socket.broadcast.to(rest.postId).emit("add_comments", { [id]: rest });
   }
 
   function handleCreateChat(userId, callback) {
     const { id, ...rest } = storage.createChat(socket.userId, userId);
-
     callback(id, rest);
   }
 
   function handleCreateMessage(chatId, content, userId) {
     const { id, ...rest } = storage.createMessage(chatId, socket.userId, content);
     socket.emit("add_messages", { [id]: rest });
-    getSocket(userId).emit("add_messages", { [id]: rest });
+    const interlocutor = getSocket(userId);
+    if (interlocutor) interlocutor.emit("add_messages", { [id]: rest });
   }
 
   function handleDelPost(postId) {
     storage.deletePost(postId);
     socket.emit("del_post", postId);
-    io.to(postId).emit("del_post", postId);
+    socket.broadcast.to(postId).emit("del_post", postId);
   }
 
   function handleDelComment(commentId) {

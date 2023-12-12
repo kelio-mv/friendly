@@ -34,6 +34,14 @@ function App() {
     socket.on("update_user", updateUser);
   }, []);
 
+  function onAuth() {
+    socket.emit("get_data", (userId, user) => {
+      storage.userId = userId;
+      setUsers({ [userId]: user });
+      setAuthenticated(true);
+    });
+  }
+
   function addUsers(users) {
     setUsers((prevUsers) => ({ ...prevUsers, ...users }));
   }
@@ -106,21 +114,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={
-            <Home
-              onAuth={() => {
-                socket.emit("get_data", (userId, user) => {
-                  storage.userId = userId;
-                  setUsers({ [userId]: user });
-                  setAuthenticated(true);
-                });
-              }}
-              onReauth={() => {
-                /* dynamic post loading */
-              }}
-              onReauthError={resetState}
-            />
-          }
+          element={<Home onAuth={onAuth} onReauth={() => {}} onReauthError={resetState} />}
         />
         <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>
@@ -135,38 +129,13 @@ function App() {
           element={<Feed {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
         />
 
-        <Route
-          path="post/:id"
-          element={
-            <Post
-              {...{ users, posts, comments }}
-              addComment={(id, comment) => {
-                setComments((prevComments) => ({ ...prevComments, [id]: comment }));
-              }}
-            />
-          }
-        />
+        <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
 
-        <Route
-          path="new-post"
-          element={
-            <NewPost
-              addPost={(id, post) => setPosts((prevPosts) => ({ ...prevPosts, [id]: post }))}
-            />
-          }
-        />
+        <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
 
         <Route path="chats" element={<Chats />} />
 
-        <Route
-          path="chat/:id"
-          element={
-            <Chat
-              {...{ users, chats, messages }}
-              addChat={(id, chat) => setChats((prevChats) => ({ ...prevChats, [id]: chat }))}
-            />
-          }
-        />
+        <Route path="chat/:id" element={<Chat {...{ users, chats, messages, addChats }} />} />
 
         <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 

@@ -59,8 +59,8 @@ function Chat(props) {
     if (chatId) {
       socket.emit("create_message", chatId, message.trim(), userId);
     } else {
-      socket.emit("create_chat", userId, (id, chat) => {
-        props.addChat(id, chat);
+      socket.emit("create_chat", userId, (id, rest) => {
+        props.addChats({ [id]: rest });
         navigate(`/chat/${id}`, { replace: true });
         socket.emit("create_message", id, message.trim(), userId);
       });
