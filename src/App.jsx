@@ -32,18 +32,7 @@ function App() {
     socket.on("del_post", delPost);
     socket.on("del_comments", delComments);
     socket.on("update_user", updateUser);
-
-    return () => {
-      socket.off("add_users");
-      socket.off("add_posts");
-      socket.off("add_comments");
-      socket.off("add_chats");
-      socket.off("add_messages");
-      socket.off("del_post");
-      socket.off("del_comment");
-      socket.off("update_user");
-    };
-  }, [users]);
+  }, []);
 
   function addUsers(users) {
     setUsers((prevUsers) => ({ ...prevUsers, ...users }));
@@ -95,8 +84,11 @@ function App() {
   }
 
   function requestUnfetchedUsers(articles) {
-    const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
-    if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
+    setUsers((users) => {
+      const unfetched = new Set(articles.map((a) => a.userId).filter((id) => !(id in users)));
+      if (unfetched.size > 0) socket.emit("get_users", Array.from(unfetched));
+      return users;
+    });
   }
 
   function resetState() {
