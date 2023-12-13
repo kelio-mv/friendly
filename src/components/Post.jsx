@@ -8,7 +8,7 @@ import socket from "../socket";
 
 function Post(props) {
   const postId = parseInt(useParams().id);
-  const post = props.posts.find((post) => post.id === postId);
+  const post = useMemo(() => props.posts.find((post) => post.id === postId), [props.posts]);
   const comments = useMemo(
     () => props.comments.filter((comment) => comment.postId === postId),
     [props.comments]
@@ -61,7 +61,6 @@ function Post(props) {
   }, [comment]);
 
   function onScroll() {
-    // Optional improvement: Dynamically decrease the value as comments are seen
     if (unseenComments > 0) {
       const pb = postBodyRef.current;
       const lc = pb.lastElementChild;

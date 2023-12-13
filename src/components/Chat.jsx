@@ -10,16 +10,21 @@ import "./Chat.scss";
 function Chat(props) {
   const param = useParams().id;
   const chatId = param.startsWith("u") ? null : parseInt(param);
-  const userId = getUserId();
+  const userId = useMemo(getUserId, []);
   const user = props.users[userId];
-  const messages = useMemo(getMessages, [props.messages]);
+  const messages = useMemo(() =>
+    props.messages.filter((message) => message.chatId === chatId, [props.messages])
+  );
   const [message, setMessage] = useState("");
   const chatBodyRef = useRef();
   const textareaRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (chatId) socket.emit("get_messages", chatId);
+    if (chatId) {
+      const fetchedMessages = messages.map((message) => message.id);
+      socket.emit("get_messages", chatId, fetchedMessages);
+    }
   }, []);
 
   useEffect(() => {
@@ -35,15 +40,11 @@ function Chat(props) {
 
   function getUserId() {
     if (chatId) {
-      const { user1Id, user2Id } = props.chats[chatId];
+      const { user1Id, user2Id } = props.chats.find((chat) => chat.id === chatId);
       return user1Id === storage.userId ? user2Id : user1Id;
     } else {
       return parseInt(param.substring(1));
     }
-  }
-
-  function getMessages() {
-    return Object.entries(props.messages).filter(([_, message]) => message.chatId === chatId);
   }
 
   function onKeyDown(e) {
@@ -59,10 +60,10 @@ function Chat(props) {
     if (chatId) {
       socket.emit("create_message", chatId, message.trim(), userId);
     } else {
-      socket.emit("create_chat", userId, (id, rest) => {
-        props.addChats({ [id]: rest });
-        navigate(`/chat/${id}`, { replace: true });
-        socket.emit("create_message", id, message.trim(), userId);
+      socket.emit("create_chat", userId, (chat) => {
+        props.addChats([chat]);
+        navigate(`/chat/${chat.id}`, { replace: true });
+        socket.emit("create_message", chat.id, message.trim(), userId);
       });
     }
     setMessage("");
@@ -77,8 +78,8 @@ function Chat(props) {
         <p className="chat__username">@{user.username}</p>
       </div>
       <div className="chat__body" ref={chatBodyRef}>
-        {messages.map(([id, message]) => (
-          <Message key={id} {...message} />
+        {messages.map((message) => (
+          <Message key={message.id} {...message} />
         ))}
       </div>
       <div className="chat__footer">

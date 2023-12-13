@@ -65,9 +65,13 @@ io.on("connection", (socket) => {
 
   function handleGetData(callback) {
     const user = storage.getUserData(socket.userId);
+    const posts = storage.getPosts(15);
+    const chats = storage.getChats(socket.userId);
+    const lastMessages = chats.map((chat) => storage.getLastMessage(chat.id));
     callback(user);
-    socket.emit("add_posts", storage.getPosts(15));
-    socket.emit("add_chats", storage.getChats(socket.userId));
+    socket.emit("add_posts", posts);
+    socket.emit("add_chats", chats);
+    socket.emit("add_messages", lastMessages);
   }
 
   function handleGetPosts(before, callback) {
@@ -91,9 +95,10 @@ io.on("connection", (socket) => {
     socket.join(postId);
   }
 
-  function handleGetMessages(chatId) {
-    const messages = storage.getMessages(chatId);
-    if (messages.length > 0) socket.emit("add_messages", messages);
+  function handleGetMessages(chatId, fetched) {
+    const all = storage.getMessages(chatId);
+    const unfetched = all.filter(({ id }) => !fetched.includes(id));
+    if (unfetched.length > 0) socket.emit("add_messages", unfetched);
   }
 
   function handleGetUsers(ids) {
@@ -118,17 +123,17 @@ io.on("connection", (socket) => {
   }
 
   function handleCreateChat(userId, callback) {
-    const { id, ...rest } = storage.createChat(socket.userId, userId);
-    callback(id, rest);
+    const chat = storage.createChat(socket.userId, userId);
+    callback(chat);
     const interlocutor = getSocket(userId);
-    if (interlocutor) interlocutor.emit("add_chats", { [id]: rest });
+    if (interlocutor) interlocutor.emit("add_chats", [chat]);
   }
 
   function handleCreateMessage(chatId, content, userId) {
-    const { id, ...rest } = storage.createMessage(chatId, socket.userId, content);
-    socket.emit("add_messages", { [id]: rest });
+    const message = storage.createMessage(chatId, socket.userId, content);
+    socket.emit("add_messages", [message]);
     const interlocutor = getSocket(userId);
-    if (interlocutor) interlocutor.emit("add_messages", { [id]: rest });
+    if (interlocutor) interlocutor.emit("add_messages", [message]);
   }
 
   function handleDelPost(postId) {

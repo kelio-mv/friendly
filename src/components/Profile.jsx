@@ -7,7 +7,7 @@ import storage from "../storage";
 
 function Profile(props) {
   const userId = parseInt(useParams().id);
-  const user = props.users.find((user) => user.id === userId);
+  const user = props.users[userId];
   const posts = useMemo(() => props.posts.filter((post) => post.userId === userId), [props.posts]);
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ function Profile(props) {
         <Article
           key={post.id}
           data={post}
-          users={props.users}
+          user={user}
           onClick={() => navigate(`/post/${post.id}`)}
           truncate
         />

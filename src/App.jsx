@@ -50,7 +50,7 @@ function App() {
   }
 
   function addPosts(posts) {
-    setPosts((prevPosts) => [...prevPosts, ...posts]);
+    setPosts((prevPosts) => [...prevPosts, ...posts].sort((a, b) => b.id - a.id));
     requestUnfetchedUsers(posts.map((post) => post.userId));
   }
 
@@ -67,7 +67,7 @@ function App() {
   }
 
   function addMessages(messages) {
-    setMessages((prevMessages) => [...prevMessages, ...messages]);
+    setMessages((prevMessages) => [...prevMessages, ...messages].sort((a, b) => a.id - b.id));
   }
 
   function delPost(id) {
@@ -152,5 +152,3 @@ function App() {
 }
 
 export default App;
-
-// ordenar feed, terminar migração pra array a partir do chats

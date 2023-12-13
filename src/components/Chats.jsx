@@ -10,7 +10,7 @@ function Chats(props) {
   function getUser(chat) {
     const { user1Id, user2Id } = chat;
     const userId = user1Id === storage.userId ? user2Id : user1Id;
-    return props.users.find((user) => user.id === userId);
+    return props.users[userId];
   }
 
   function getLastMessage(chatId) {
