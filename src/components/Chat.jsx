@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Message from "./Message";
+import Modal from "./Modal";
 import socket from "../socket";
 import "./Chat.scss";
 
@@ -12,6 +13,7 @@ function Chat(props) {
   const chat = useMemo(getChat, [props.chats]);
   const messages = useMemo(getMessages, [props.messages]);
   const [message, setMessage] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
   const textareaRef = useRef();
   const navigate = useNavigate();
@@ -21,6 +23,11 @@ function Chat(props) {
       const fetchedMessages = messages.map((message) => message.id);
       socket.emit("get_messages", interlocutorId, fetchedMessages);
     }
+    const handleDelChat = (_interlocutorId) => {
+      if (_interlocutorId === interlocutorId) navigate(-1);
+    };
+    socket.on("del_chat", handleDelChat);
+    return () => socket.off("del_chat", handleDelChat);
   }, []);
 
   useEffect(() => {
@@ -60,12 +67,19 @@ function Chat(props) {
     textareaRef.current.focus();
   }
 
+  function deleteChat() {
+    socket.emit("del_chat", interlocutorId);
+    setDeleteConfirmation(false);
+  }
+
   return (
     <div className="flex-page">
       <div className="top-bar" style={{ padding: "5px 0.875rem" }}>
         <Icon name="arrow_back" onClick={() => navigate(-1)} />
         <ProfilePicture src={interlocutor.profilePicture} size={48} />
         <p className="chat__username">@{interlocutor.username}</p>
+        <div className="top-bar__grow"></div>
+        <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
       <div className="chat__body" ref={chatBodyRef}>
         {messages.map((message) => (
@@ -85,6 +99,19 @@ function Chat(props) {
         />
         <Icon name="send" onClick={sendMessage} disabled={!message.trim()} />
       </div>
+
+      <Modal
+        open={deleteConfirmation}
+        header="Confirmar exclusão"
+        footer={
+          <button className="modal__btn" onClick={deleteChat}>
+            Sim
+          </button>
+        }
+        close={() => setDeleteConfirmation(null)}
+      >
+        Você tem certeza que deseja apagar esta conversa?
+      </Modal>
     </div>
   );
 }
@@ -92,3 +119,7 @@ function Chat(props) {
 export default Chat;
 
 // Create component for post__footer and chat__footer
+// Opção de deletar mensagem
+// Exibir datas no chat e na parte superior
+// Quando eu mandar mensagem, fz scroll
+// Quando receber mensagem, fz scroll se estiver vendo a ultima mensagem, e se não, mostrar unviewed messages

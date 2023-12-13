@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
   socket.on("create_message", handleCreateMessage);
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
+  socket.on("del_chat", handleDelChat);
   socket.on("edit_user", handleEditUser);
 
   function handleAuth(signUp, username, password, callback) {
@@ -149,6 +150,15 @@ io.on("connection", (socket) => {
     const { postId } = storage.deleteComment(id);
     socket.emit("del_comments", [id]);
     socket.broadcast.to(postId).emit("del_comments", [id]);
+  }
+
+  function handleDelChat(interlocutorId) {
+    storage.deleteChat(socket.userId, interlocutorId);
+    storage.deleteChat(interlocutorId, socket.userId);
+    storage.deleteMessages(socket.userId, interlocutorId);
+    socket.emit("del_chat", interlocutorId);
+    const interlocutor = getSocket(interlocutorId);
+    if (interlocutor) interlocutor.emit("del_chat", socket.userId);
   }
 
   function handleEditUser({ field, value, currentPassword }, callback) {

@@ -31,6 +31,7 @@ function App() {
     socket.on("add_messages", addMessages);
     socket.on("del_post", delPost);
     socket.on("del_comments", delComments);
+    socket.on("del_chat", delChat);
     socket.on("update_user", updateUser);
   }, []);
 
@@ -75,6 +76,15 @@ function App() {
 
   function delComments(ids) {
     setComments((prevComments) => prevComments.filter((comment) => !ids.includes(comment.id)));
+  }
+
+  function delChat(interlocutorId) {
+    setChats((prevChats) => prevChats.filter((chat) => chat.interlocutorId !== interlocutorId));
+    setMessages((prevMessages) =>
+      prevMessages.filter(
+        (message) => !(message.senderId === interlocutorId || message.receiverId === interlocutorId)
+      )
+    );
   }
 
   function updateUser(id) {

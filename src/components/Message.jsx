@@ -4,11 +4,7 @@ import "./Message.scss";
 
 function Message(props) {
   const fromMe = props.senderId === storage.userId;
-  const time = useMemo(() => {
-    const date = new Date(props.timestamp * 1000);
-    const [hours, minutes] = [date.getHours(), date.getMinutes()].map((v) => ("0" + v).slice(-2));
-    return hours + ":" + minutes;
-  }, []);
+  const time = useMemo(() => new Date(props.timestamp * 1000).toTimeString().substring(0, 5), []);
 
   return (
     <div className={`message ${fromMe ? "message--from-me" : ""}`}>
