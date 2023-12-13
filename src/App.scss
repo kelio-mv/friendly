@@ -10,7 +10,7 @@
     overflow: auto;
   }
 
-  &__unseen-comments {
+  &__unviewed-comments {
     /* As the footer height is dynamic, the vertical offset is applied with Javascript. */
     position: fixed;
     right: calc(0.75rem + var(--scrollbar-width));
@@ -23,18 +23,6 @@
     background: #0f766e;
     border-radius: 50%;
   }
-
-  &__footer {
-    display: flex;
-    padding: 0 1rem;
-    background: var(--bg-200);
-    border-top: 1px solid var(--bg-300);
-  }
-
-  &__textarea {
-    flex-grow: 1;
-    padding: 1rem 0;
-  }
 }
 
 .new-post__textarea {
@@ -44,7 +32,7 @@
 }
 
 .chats {
-  &__chat {
+  &__item {
     display: flex;
     align-items: center;
     padding: 0.75rem;
@@ -58,6 +46,18 @@
 
   &__date {
     color: var(--clr-300);
+  }
+}
+
+.chat {
+  &__username {
+    font-size: 1.125rem;
+  }
+
+  &__body {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 0.75rem;
   }
 }
 

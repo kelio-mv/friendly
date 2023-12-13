@@ -53,7 +53,7 @@ function Chat({ user, lastMessage, onClick }) {
   }
 
   return (
-    <div className="chats__chat" onClick={onClick}>
+    <div className="chats__item" onClick={onClick}>
       <ProfilePicture src={user.profilePicture} size={48} />
       <div style={{ marginLeft: "0.75rem", marginRight: "auto" }}>
         <p>@{user.username}</p>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Article from "./Article";
 import Icon from "./Icon";
 import Modal from "./Modal";
+import TextArea from "./TextArea";
 import storage from "../storage";
 import socket from "../socket";
 
@@ -13,15 +14,13 @@ function Post(props) {
     () => props.comments.filter((comment) => comment.postId === postId),
     [props.comments]
   );
-  const [comment, setComment] = useState("");
-  const [unseenComments, setUnseenComments] = useState(0);
+  const [unviewedComments, setUnviewedComments] = useState(0);
   const [scrollDown, setScrollDown] = useState(false);
   const [commentId, setCommentId] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const postBodyRef = useRef();
   const commentsLength = useRef(comments.length);
-  const textareaRef = useRef();
-  const unseenElementRef = useRef();
+  const unviewedElemRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,47 +44,28 @@ function Post(props) {
         setScrollDown(false);
       } else {
         if (pb.clientHeight < pb.scrollHeight) {
-          setUnseenComments((puc) => puc + difference);
+          setUnviewedComments((puc) => puc + difference);
         }
       }
     }
     commentsLength.current = comments.length;
   }, [comments]);
 
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    const unseen = unseenElementRef.current;
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
-    unseen.style.transform = `translateY(-${textarea.style.height})`;
-  }, [comment]);
-
   function onScroll() {
-    if (unseenComments > 0) {
+    if (unviewedComments > 0) {
       const pb = postBodyRef.current;
       const lc = pb.lastElementChild;
       if (pb.clientHeight + pb.scrollTop > pb.scrollHeight - lc.offsetHeight) {
-        setUnseenComments(0);
+        setUnviewedComments(0);
       }
     }
   }
 
-  function onKeyDown(e) {
-    if ("ontouchstart" in document.documentElement) return;
-    // Send the comment when a desktop user presses Enter
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (comment.trim()) sendComment();
-    }
-  }
-
-  function sendComment() {
-    socket.emit("create_comment", postId, comment.trim(), (comment) => {
+  function sendComment(content) {
+    socket.emit("create_comment", postId, content, (comment) => {
       props.addComments([comment]);
       setScrollDown(true);
     });
-    setComment("");
-    textareaRef.current.focus();
   }
 
   function deleteArticle() {
@@ -130,26 +110,21 @@ function Post(props) {
         ))}
       </div>
 
-      <div className="post__footer">
-        <textarea
-          className="post__textarea"
-          ref={textareaRef}
-          placeholder="Comente algo..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows="1"
-          maxLength="500"
-          onKeyDown={onKeyDown}
-        />
-        <Icon name="send" onClick={sendComment} disabled={!comment.trim()} />
-      </div>
+      <TextArea
+        placeholder="Comente algo..."
+        maxLength="500"
+        onHeightChange={(height) => {
+          unviewedElemRef.current.style.transform = `translateY(-${height})`;
+        }}
+        send={sendComment}
+      />
 
       <div
-        className="post__unseen-comments"
-        ref={unseenElementRef}
-        style={unseenComments === 0 ? { display: "none" } : {}}
+        className="post__unviewed-comments"
+        ref={unviewedElemRef}
+        style={unviewedComments === 0 ? { display: "none" } : {}}
       >
-        {unseenComments}
+        {unviewedComments}
       </div>
 
       <Modal

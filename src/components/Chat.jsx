@@ -4,18 +4,16 @@ import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Message from "./Message";
 import Modal from "./Modal";
+import TextArea from "./TextArea";
 import socket from "../socket";
-import "./Chat.scss";
 
 function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
   const interlocutor = props.users[interlocutorId];
   const chat = useMemo(getChat, [props.chats]);
   const messages = useMemo(getMessages, [props.messages]);
-  const [message, setMessage] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
-  const textareaRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,12 +33,6 @@ function Chat(props) {
     cb.scrollTo(0, cb.scrollHeight);
   }, [messages]);
 
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
-  }, [message]);
-
   function getChat() {
     return props.chats.find((chat) => chat.interlocutorId === interlocutorId);
   }
@@ -51,20 +43,9 @@ function Chat(props) {
     );
   }
 
-  function onKeyDown(e) {
-    if ("ontouchstart" in document.documentElement) return;
-    // Send the message when a desktop user presses Enter
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (message.trim()) sendMessage();
-    }
-  }
-
-  function sendMessage() {
-    socket.emit("create_message", interlocutorId, message.trim());
+  function sendMessage(content) {
+    socket.emit("create_message", interlocutorId, content);
     if (!chat) socket.emit("create_chat", interlocutorId);
-    setMessage("");
-    textareaRef.current.focus();
   }
 
   function deleteChat() {
@@ -86,19 +67,13 @@ function Chat(props) {
           <Message key={message.id} {...message} />
         ))}
       </div>
-      <div className="chat__footer">
-        <textarea
-          className="chat__textarea"
-          ref={textareaRef}
-          placeholder="Mensagem..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          rows="1"
-          maxLength="500"
-          onKeyDown={onKeyDown}
-        />
-        <Icon name="send" onClick={sendMessage} disabled={!message.trim()} />
-      </div>
+
+      <TextArea
+        placeholder="Mensagem..."
+        maxLength="500"
+        onHeightChange={() => {}}
+        send={sendMessage}
+      />
 
       <Modal
         open={deleteConfirmation}
@@ -118,7 +93,6 @@ function Chat(props) {
 
 export default Chat;
 
-// Create component for post__footer and chat__footer
 // Opção de deletar mensagem
 // Exibir datas no chat e na parte superior
 // Quando eu mandar mensagem, fz scroll
