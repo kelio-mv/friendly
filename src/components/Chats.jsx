@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
-import "./Chats.scss";
 
 function Chats(props) {
   const navigate = useNavigate();
