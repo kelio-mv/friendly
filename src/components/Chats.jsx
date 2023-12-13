@@ -34,16 +34,23 @@ function Chats(props) {
 }
 
 function Chat({ user, lastMessage, onClick }) {
-  function parseTime(time) {
-    const elapsed = new Date() / 1000 - time;
+  // Not tested yet
+  function parseTimestamp(timestamp) {
+    const now = new Date();
+    const date = new Date(timestamp * 1000);
 
-    if (elapsed < 60) return "há poucos segundos";
-    if (elapsed < 120) return "há 1 minuto";
-    if (elapsed < 3600) return `há ${Math.floor(elapsed / 60)} minutos`;
-    if (elapsed < 7200) return "há 1 hora";
-    if (elapsed < 86400) return `há ${Math.floor(elapsed / 3600)} horas`;
-    if (elapsed < 172800) return "há 1 dia";
-    return `há ${Math.floor(elapsed / 86400)} dias`;
+    if (now.toDateString() === date.toDateString()) {
+      return date.toTimeString().substring(0, 5);
+    }
+
+    now.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
+
+    if (now - date === 86400000) {
+      return "Ontem";
+    }
+
+    return date.toLocaleDateString();
   }
 
   return (
@@ -53,11 +60,9 @@ function Chat({ user, lastMessage, onClick }) {
         <p>@{user.username}</p>
         <p className="chats__last-message">{lastMessage.content}</p>
       </div>
-      <p className="chats__date">{parseTime(lastMessage.timestamp)}</p>
+      <p className="chats__date">{parseTimestamp(lastMessage.timestamp)}</p>
     </div>
   );
 }
 
 export default Chats;
-
-// The function parseTime is the same used in Article
