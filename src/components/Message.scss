@@ -1,11 +1,16 @@
 .message {
+  --padding-x: 10px;
+  --padding-y: 6px;
+  --time-width: 36px;
+  position: relative;
   width: fit-content;
-  padding: 0.5rem 0.75rem;
+  max-width: 90%;
+  padding: var(--padding-y) var(--padding-x);
   background: #0f766e;
   border-radius: 0.5rem;
 
   &:not(:last-child) {
-    margin-bottom: 0.25rem;
+    margin-bottom: 6px;
   }
 
   &--from-me {
@@ -16,11 +21,14 @@
   &__content {
     word-break: break-word;
     white-space: pre-wrap;
+    margin-right: calc(var(--time-width) + var(--padding-x));
   }
 
   &__time {
-    margin-left: 0.75rem;
-    font-size: 0.75rem;
+    position: absolute;
+    right: var(--padding-x);
+    bottom: var(--padding-y);
+    font: 0.75rem "Source Code Pro", monospace;
     color: var(--clr-300);
   }
 }

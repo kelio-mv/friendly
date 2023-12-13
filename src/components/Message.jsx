@@ -16,4 +16,4 @@ function Message(props) {
 
 export default Message;
 
-// Alinhar hora à direita
+// Alinhar hora à direita com pseudo-element
