@@ -4,26 +4,22 @@ import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Message from "./Message";
 import socket from "../socket";
-import storage from "../storage";
 import "./Chat.scss";
 
 function Chat(props) {
-  const param = useParams().id;
-  const chatId = param.startsWith("u") ? null : parseInt(param);
-  const userId = useMemo(getUserId, []);
-  const user = props.users[userId];
-  const messages = useMemo(() =>
-    props.messages.filter((message) => message.chatId === chatId, [props.messages])
-  );
+  const interlocutorId = parseInt(useParams().id);
+  const interlocutor = props.users[interlocutorId];
+  const chat = useMemo(getChat, [props.chats]);
+  const messages = useMemo(getMessages, [props.messages]);
   const [message, setMessage] = useState("");
   const chatBodyRef = useRef();
   const textareaRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (chatId) {
+    if (chat) {
       const fetchedMessages = messages.map((message) => message.id);
-      socket.emit("get_messages", chatId, fetchedMessages);
+      socket.emit("get_messages", interlocutorId, fetchedMessages);
     }
   }, []);
 
@@ -38,13 +34,14 @@ function Chat(props) {
     textarea.style.height = textarea.scrollHeight + "px";
   }, [message]);
 
-  function getUserId() {
-    if (chatId) {
-      const { user1Id, user2Id } = props.chats.find((chat) => chat.id === chatId);
-      return user1Id === storage.userId ? user2Id : user1Id;
-    } else {
-      return parseInt(param.substring(1));
-    }
+  function getChat() {
+    return props.chats.find((chat) => chat.interlocutorId === interlocutorId);
+  }
+
+  function getMessages() {
+    return props.messages.filter(
+      (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
+    );
   }
 
   function onKeyDown(e) {
@@ -57,15 +54,8 @@ function Chat(props) {
   }
 
   function sendMessage() {
-    if (chatId) {
-      socket.emit("create_message", chatId, message.trim(), userId);
-    } else {
-      socket.emit("create_chat", userId, (chat) => {
-        props.addChats([chat]);
-        navigate(`/chat/${chat.id}`, { replace: true });
-        socket.emit("create_message", chat.id, message.trim(), userId);
-      });
-    }
+    socket.emit("create_message", interlocutorId, message.trim());
+    if (!chat) socket.emit("create_chat", interlocutorId);
     setMessage("");
     textareaRef.current.focus();
   }
@@ -74,8 +64,8 @@ function Chat(props) {
     <div className="flex-page">
       <div className="top-bar" style={{ padding: "5px 0.875rem" }}>
         <Icon name="arrow_back" onClick={() => navigate(-1)} />
-        <ProfilePicture src={user.profilePicture} size={48} />
-        <p className="chat__username">@{user.username}</p>
+        <ProfilePicture src={interlocutor.profilePicture} size={48} />
+        <p className="chat__username">@{interlocutor.username}</p>
       </div>
       <div className="chat__body" ref={chatBodyRef}>
         {messages.map((message) => (

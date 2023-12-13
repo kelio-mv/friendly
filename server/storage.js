@@ -32,22 +32,22 @@ class Storage {
       FOREIGN KEY (postId) REFERENCES posts (id) ON DELETE CASCADE
     )`);
     this.db.exec(`CREATE TABLE IF NOT EXISTS chats (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user1Id INTEGER NOT NULL,
-      user2Id INTEGER NOT NULL,
+      userId INTEGER NOT NULL,
+      interlocutorId INTEGER NOT NULL,
       lastViewedMessageId INTEGER,
-      FOREIGN KEY (user1Id) REFERENCES users (id) ON DELETE CASCADE,
-      FOREIGN KEY (user2Id) REFERENCES users (id) ON DELETE CASCADE,
+      PRIMARY KEY (userId, interlocutorId),
+      FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (interlocutorId) REFERENCES users (id) ON DELETE CASCADE,
       FOREIGN KEY (lastViewedMessageId) REFERENCES messages (id)
     )`);
     this.db.exec(`CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      chatId INTEGER NOT NULL,
-      userId INTEGER NOT NULL,
+      senderId INTEGER NOT NULL,
+      receiverId INTEGER NOT NULL,
       timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       content TEXT NOT NULL,
-      FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE,
-      FOREIGN KEY (userId) REFERENCES users (id)
+      FOREIGN KEY (senderId) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (receiverId) REFERENCES users (id) ON DELETE CASCADE
     )`);
   }
 
@@ -82,8 +82,8 @@ class Storage {
     return this.db.prepare(`SELECT * FROM posts ${where} ORDER BY id DESC LIMIT ?`).all(limit);
   }
 
-  deletePost(postId) {
-    this.db.prepare("DELETE FROM posts WHERE id = ?").run(postId);
+  deletePost(id) {
+    this.db.prepare("DELETE FROM posts WHERE id = ?").run(id);
   }
 
   createComment(userId, postId, content) {
@@ -99,44 +99,53 @@ class Storage {
     return this.db.prepare("SELECT * FROM comments WHERE postId = ?").all(postId);
   }
 
-  deleteComment(commentId) {
-    const comment = this.getComment(commentId);
-    this.db.prepare("DELETE FROM comments WHERE id = ?").run(commentId);
+  deleteComment(id) {
+    const comment = this.getComment(id);
+    this.db.prepare("DELETE FROM comments WHERE id = ?").run(id);
     return comment;
   }
 
-  createChat(user1Id, user2Id) {
-    const stmt = this.db.prepare("INSERT INTO chats (user1Id, user2Id) VALUES (?, ?)");
-    return this.getChat(stmt.run(user1Id, user2Id).lastInsertRowid);
+  createChat(userId, interlocutorId) {
+    const stmt = this.db.prepare("INSERT INTO chats (userId, interlocutorId) VALUES (?, ?)");
+    stmt.run(userId, interlocutorId);
+    return this.getChat(userId, interlocutorId);
   }
 
-  getChat(chatId) {
-    return this.db.prepare("SELECT * FROM chats WHERE id = ?").get(chatId);
+  getChat(userId, interlocutorId) {
+    const stmt = this.db.prepare("SELECT * FROM chats WHERE userId = ? AND interlocutorId = ?");
+    return stmt.get(userId, interlocutorId);
   }
 
   getChats(userId) {
-    const stmt = this.db.prepare("SELECT * FROM chats WHERE user1Id = ? OR user2Id = ?");
-    return stmt.all(userId, userId);
+    return this.db.prepare("SELECT * FROM chats WHERE userId = ?").all(userId);
   }
 
-  createMessage(chatId, userId, content) {
-    const stmt = this.db.prepare("INSERT INTO messages (chatId, userId, content) VALUES (?, ?, ?)");
-    return this.getMessage(stmt.run(chatId, userId, content).lastInsertRowid);
+  createMessage(senderId, receiverId, content) {
+    const stmt = this.db.prepare(
+      "INSERT INTO messages (senderId, receiverId, content) VALUES (?, ?, ?)"
+    );
+    return this.getMessage(stmt.run(senderId, receiverId, content).lastInsertRowid);
   }
 
   getMessage(messageId) {
     return this.db.prepare("SELECT * FROM messages WHERE id = ?").get(messageId);
   }
 
-  getMessages(chatId) {
-    return this.db.prepare("SELECT * FROM messages WHERE chatId = ?").all(chatId);
+  getMessages(userId, interlocutorId) {
+    const stmt = this.db.prepare(`
+      SELECT * FROM messages
+      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
+    `);
+    return stmt.all(userId, interlocutorId, interlocutorId, userId);
   }
 
-  getLastMessage(chatId) {
-    const stmt = this.db.prepare(
-      "SELECT * FROM messages WHERE chatId = ? ORDER BY id DESC LIMIT 1"
-    );
-    return stmt.get(chatId);
+  getLastMessage(userId, interlocutorId) {
+    const stmt = this.db.prepare(`
+      SELECT * FROM messages
+      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
+      ORDER BY id DESC LIMIT 1
+    `);
+    return stmt.get(userId, interlocutorId, interlocutorId, userId);
   }
 }
 

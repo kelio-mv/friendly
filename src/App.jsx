@@ -61,9 +61,7 @@ function App() {
 
   function addChats(chats) {
     setChats((prevChats) => [...prevChats, ...chats]);
-    requestUnfetchedUsers(
-      chats.map(({ user1Id, user2Id }) => (user1Id === storage.userId ? user2Id : user1Id))
-    );
+    requestUnfetchedUsers(chats.map((chat) => chat.interlocutorId));
   }
 
   function addMessages(messages) {
@@ -130,7 +128,7 @@ function App() {
 
         <Route path="chats" element={<Chats {...{ users, chats, messages }} />} />
 
-        <Route path="chat/:id" element={<Chat {...{ users, chats, messages, addChats }} />} />
+        <Route path="chat/:id" element={<Chat {...{ users, chats, messages }} />} />
 
         <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 

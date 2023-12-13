@@ -67,7 +67,9 @@ io.on("connection", (socket) => {
     const user = storage.getUserData(socket.userId);
     const posts = storage.getPosts(15);
     const chats = storage.getChats(socket.userId);
-    const lastMessages = chats.map((chat) => storage.getLastMessage(chat.id));
+    const lastMessages = chats.map((chat) =>
+      storage.getLastMessage(chat.userId, chat.interlocutorId)
+    );
     callback(user);
     socket.emit("add_posts", posts);
     socket.emit("add_chats", chats);
@@ -95,8 +97,8 @@ io.on("connection", (socket) => {
     socket.join(postId);
   }
 
-  function handleGetMessages(chatId, fetched) {
-    const all = storage.getMessages(chatId);
+  function handleGetMessages(interlocutorId, fetched) {
+    const all = storage.getMessages(socket.userId, interlocutorId);
     const unfetched = all.filter(({ id }) => !fetched.includes(id));
     if (unfetched.length > 0) socket.emit("add_messages", unfetched);
   }
@@ -122,18 +124,19 @@ io.on("connection", (socket) => {
     socket.broadcast.to(comment.postId).emit("add_comments", [comment]);
   }
 
-  function handleCreateChat(userId, callback) {
-    const chat = storage.createChat(socket.userId, userId);
-    callback(chat);
-    const interlocutor = getSocket(userId);
-    if (interlocutor) interlocutor.emit("add_chats", [chat]);
+  function handleCreateChat(interlocutorId) {
+    const userChat = storage.createChat(socket.userId, interlocutorId);
+    const interlocutorChat = storage.createChat(interlocutorId, socket.userId);
+    const interlocutor = getSocket(interlocutorId);
+    socket.emit("add_chats", [userChat]);
+    if (interlocutor) interlocutor.emit("add_chats", [interlocutorChat]);
   }
 
-  function handleCreateMessage(chatId, content, userId) {
-    const message = storage.createMessage(chatId, socket.userId, content);
+  function handleCreateMessage(receiverId, content) {
+    const message = storage.createMessage(socket.userId, receiverId, content);
+    const receiver = getSocket(receiverId);
     socket.emit("add_messages", [message]);
-    const interlocutor = getSocket(userId);
-    if (interlocutor) interlocutor.emit("add_messages", [message]);
+    if (receiver) receiver.emit("add_messages", [message]);
   }
 
   function handleDelPost(postId) {

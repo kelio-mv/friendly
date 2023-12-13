@@ -11,25 +11,15 @@ function Profile(props) {
   const posts = useMemo(() => props.posts.filter((post) => post.userId === userId), [props.posts]);
   const navigate = useNavigate();
 
-  function openChat() {
-    let chatId;
-    for (const chat of props.chats) {
-      if (chat.user1Id === userId || chat.user2Id === userId) {
-        chatId = chat.id;
-        break;
-      }
-    }
-    if (chatId) navigate(`/chat/${chatId}`);
-    else navigate(`/chat/u${userId}`);
-  }
-
   return (
     <div className="flex-page">
       <div className="top-bar">
         <Icon name="arrow_back" onClick={() => navigate(-1)} />
         <h1>Perfil</h1>
         <div className="top-bar__grow" />
-        {userId !== storage.userId && <Icon name="send" onClick={openChat} />}
+        {userId !== storage.userId && (
+          <Icon name="send" onClick={() => navigate(`/chat/${userId}`)} />
+        )}
       </div>
 
       <div className="profile__header">
