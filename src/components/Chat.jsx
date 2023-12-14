@@ -141,14 +141,13 @@ function Message(props) {
 
   return (
     <div className={`message ${fromMe ? "message--from-me" : ""}`}>
-      <span className="message__content">{props.content}</span>
-      <span className="message__time">{time}</span>
+      <p className="message__content">{props.content}</p>
+      <p className="message__time">{time}</p>
     </div>
   );
 }
 
 export default Chat;
 
-// Alinhar hora com pseudo element
 // Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
 // Exibir datas no chat e na parte superior da tela
