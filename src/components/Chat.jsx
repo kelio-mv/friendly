@@ -2,10 +2,11 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
-import Message from "./Message";
 import Modal from "./Modal";
 import TextArea from "./TextArea";
+import storage from "../storage";
 import socket from "../socket";
+import "./Chat.scss";
 
 function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
@@ -91,9 +92,23 @@ function Chat(props) {
   );
 }
 
+function Message(props) {
+  const fromMe = props.senderId === storage.userId;
+  const time = useMemo(() => new Date(props.timestamp * 1000).toTimeString().substring(0, 5), []);
+
+  return (
+    <div className={`message ${fromMe ? "message--from-me" : ""}`}>
+      <span className="message__content">{props.content}</span>
+      <span className="message__time">{time}</span>
+    </div>
+  );
+}
+
 export default Chat;
 
 // Opção de deletar mensagem
 // Exibir datas no chat e na parte superior
 // Quando eu mandar mensagem, fz scroll
 // Quando receber mensagem, fz scroll se estiver vendo a ultima mensagem, e se não, mostrar unviewed messages
+// Alinhar hora com pseudo element
+// Criar componente para unviewed messages e botão scroll down
