@@ -12,7 +12,7 @@ function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
   const interlocutor = props.users[interlocutorId];
   const chat = props.chats.find((chat) => chat.interlocutorId === interlocutorId);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(getMessages());
   const [unviewedMessages, setUnviewedMessages] = useState(0);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
@@ -22,7 +22,7 @@ function Chat(props) {
 
   useEffect(() => {
     if (chat) {
-      const fetchedMessages = getMessages().map((message) => message.id);
+      const fetchedMessages = messages.map((message) => message.id);
       socket.emit("get_messages", interlocutorId, fetchedMessages);
     }
     const handleDelChat = (_interlocutorId) => {
