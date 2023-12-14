@@ -138,7 +138,7 @@ function App() {
 
         <Route path="chats" element={<Chats {...{ users, chats, messages }} />} />
 
-        <Route path="chat/:id" element={<Chat {...{ users, chats, messages }} />} />
+        <Route path="chat/:id" element={<Chat {...{ users, chats, messages, addMessages }} />} />
 
         <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 

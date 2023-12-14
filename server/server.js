@@ -133,10 +133,10 @@ io.on("connection", (socket) => {
     if (interlocutor) interlocutor.emit("add_chats", [interlocutorChat]);
   }
 
-  function handleCreateMessage(receiverId, content) {
+  function handleCreateMessage(receiverId, content, callback) {
     const message = storage.createMessage(socket.userId, receiverId, content);
     const receiver = getSocket(receiverId);
-    socket.emit("add_messages", [message]);
+    callback(message);
     if (receiver) receiver.emit("add_messages", [message]);
   }
 

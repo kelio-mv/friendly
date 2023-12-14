@@ -4,25 +4,9 @@
   overflow: "auto";
 }
 
-.post {
-  &__body {
-    flex-grow: 1;
-    overflow: auto;
-  }
-
-  &__unviewed-comments {
-    /* As the footer height is dynamic, the vertical offset is applied with Javascript. */
-    position: fixed;
-    right: calc(0.75rem + var(--scrollbar-width));
-    bottom: 0.75rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    background: #0f766e;
-    border-radius: 50%;
-  }
+.post__body {
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .new-post__textarea {
@@ -112,6 +96,20 @@
       border: 1px solid #b91c1c;
     }
   }
+}
+
+.unviewed {
+  /* As the footer height is dynamic, the vertical offset is applied with Javascript. */
+  position: fixed;
+  right: calc(0.75rem + var(--scrollbar-width));
+  bottom: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: #0f766e;
+  border-radius: 50%;
 }
 
 @keyframes fade-in {

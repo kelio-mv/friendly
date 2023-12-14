@@ -12,10 +12,10 @@ function Post(props) {
   const post = props.posts.find((post) => post.id === postId);
   const comments = props.comments.filter((comment) => comment.postId === postId);
   const [unviewedComments, setUnviewedComments] = useState(0);
-  const [scrollDown, setScrollDown] = useState(false);
   const [commentId, setCommentId] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const postBodyRef = useRef();
+  const scrollDown = useRef(false);
   const commentsLength = useRef(comments.length);
   const unviewedElemRef = useRef();
   const navigate = useNavigate();
@@ -32,21 +32,18 @@ function Post(props) {
 
   useEffect(() => {
     const difference = comments.length - commentsLength.current;
+    const pb = postBodyRef.current;
+    commentsLength.current = comments.length;
 
     if (difference > 0) {
-      const pb = postBodyRef.current;
-
-      if (scrollDown) {
+      if (scrollDown.current) {
         pb.scrollTo(0, pb.scrollHeight);
-        setScrollDown(false);
-      } else {
-        if (pb.clientHeight < pb.scrollHeight) {
-          setUnviewedComments((puc) => puc + difference);
-        }
+        scrollDown.current = false;
+      } else if (pb.clientHeight < pb.scrollHeight) {
+        setUnviewedComments((puc) => puc + difference);
       }
     }
-    commentsLength.current = comments.length;
-  }, [comments]);
+  }, [props.comments]);
 
   function onScroll() {
     if (unviewedComments > 0) {
@@ -61,7 +58,7 @@ function Post(props) {
   function sendComment(content) {
     socket.emit("create_comment", postId, content, (comment) => {
       props.addComments([comment]);
-      setScrollDown(true);
+      scrollDown.current = true;
     });
   }
 
@@ -117,7 +114,7 @@ function Post(props) {
       />
 
       <div
-        className="post__unviewed-comments"
+        className="unviewed"
         ref={unviewedElemRef}
         style={unviewedComments === 0 ? { display: "none" } : {}}
       >

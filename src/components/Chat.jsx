@@ -15,8 +15,12 @@ function Chat(props) {
   const messages = props.messages.filter(
     (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
   );
+  const [unviewedMessages, setUnviewedMessages] = useState(0);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
+  const scrollDown = useRef(true);
+  const messagesLength = useRef(messages.length);
+  const unviewedElemRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,12 +36,42 @@ function Chat(props) {
   }, []);
 
   useEffect(() => {
+    // We need the previous sibling because this is run after the update.
+    // Maybe i should have comments as a state that is only updated after running this
+    const difference = messages.length - messagesLength.current;
     const cb = chatBodyRef.current;
-    cb.scrollTo(0, cb.scrollHeight);
-  }, [messages]);
+    const lc = cb.lastElementChild;
+    const ps = lc.previousElementSibling;
+    messagesLength.current = messages.length;
+
+    if (difference > 0) {
+      if (scrollDown.current) {
+        cb.scrollTo(0, cb.scrollHeight);
+        scrollDown.current = false;
+      } else if (
+        cb.clientHeight + cb.scrollTop >
+        cb.scrollHeight - lc.offsetHeight - ps.offsetHeight
+      ) {
+        cb.scrollTo(0, cb.scrollHeight);
+      } else {
+        setUnviewedMessages((pum) => pum + difference);
+      }
+    }
+  }, [props.messages]);
+
+  function onScroll() {
+    const cb = chatBodyRef.current;
+    const lc = cb.lastElementChild;
+    if (cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight) {
+      setUnviewedMessages(0);
+    }
+  }
 
   function sendMessage(content) {
-    socket.emit("create_message", interlocutorId, content);
+    socket.emit("create_message", interlocutorId, content, (message) => {
+      props.addMessages([message]);
+      scrollDown.current = true;
+    });
     if (!chat) socket.emit("create_chat", interlocutorId);
   }
 
@@ -55,7 +89,7 @@ function Chat(props) {
         <div className="top-bar__grow"></div>
         <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
-      <div className="chat__body" ref={chatBodyRef}>
+      <div className="chat__body" ref={chatBodyRef} onScroll={onScroll}>
         {messages.map((message) => (
           <Message key={message.id} {...message} />
         ))}
@@ -64,9 +98,19 @@ function Chat(props) {
       <TextArea
         placeholder="Mensagem..."
         maxLength="500"
-        onHeightChange={() => {}}
+        onHeightChange={(height) => {
+          unviewedElemRef.current.style.transform = `translateY(-${height})`;
+        }}
         send={sendMessage}
       />
+
+      <div
+        className="unviewed"
+        ref={unviewedElemRef}
+        style={unviewedMessages === 0 ? { display: "none" } : {}}
+      >
+        {unviewedMessages}
+      </div>
 
       <Modal
         open={deleteConfirmation}
@@ -98,9 +142,6 @@ function Message(props) {
 
 export default Chat;
 
-// Opção de deletar mensagem
-// Exibir datas no chat e na parte superior
-// Quando eu mandar mensagem, fz scroll
-// Quando receber mensagem, fz scroll se estiver vendo a ultima mensagem, e se não, mostrar unviewed messages
+// Exibir datas no chat e na parte superior da tela
 // Alinhar hora com pseudo element
-// Criar componente para unviewed messages e botão scroll down
+// Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
