@@ -37,8 +37,6 @@ function Chat(props) {
     const difference = newMessages.length - messages.length;
 
     if (difference > 0) {
-      setMessages(newMessages);
-
       if (!scrollDown.current) {
         if (isLastMessageVisible()) {
           scrollDown.current = true;
@@ -46,6 +44,7 @@ function Chat(props) {
           setUnviewedMessages((pum) => pum + difference);
         }
       }
+      setMessages(newMessages);
     }
   }, [props.messages]);
 
@@ -150,6 +149,6 @@ function Message(props) {
 
 export default Chat;
 
-// Exibir datas no chat e na parte superior da tela
 // Alinhar hora com pseudo element
 // Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
+// Exibir datas no chat e na parte superior da tela

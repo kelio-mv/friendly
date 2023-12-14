@@ -17,7 +17,7 @@ function Profile(props) {
         <h1>Perfil</h1>
         <div className="top-bar__grow" />
         {userId !== storage.userId && (
-          <Icon name="send" onClick={() => navigate(`/chat/${userId}`)} />
+          <Icon name="chat" onClick={() => navigate(`/chat/${userId}`)} />
         )}
       </div>
 
