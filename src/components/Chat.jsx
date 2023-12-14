@@ -63,9 +63,10 @@ function Chat(props) {
   }
 
   function isLastMessageVisible() {
+    // If the chat is empty, lc is set to null, and the function returns true.
     const cb = chatBodyRef.current;
     const lc = cb.lastElementChild;
-    return cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight;
+    return !lc || cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight;
   }
 
   function sendMessage(content) {
@@ -149,5 +150,6 @@ function Message(props) {
 
 export default Chat;
 
+// Salvar data de ultimo login
 // Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
 // Exibir datas no chat e na parte superior da tela
