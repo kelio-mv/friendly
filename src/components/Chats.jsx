@@ -37,6 +37,7 @@ function Chats(props) {
         {props.chats.map((chat) => {
           const user = props.users[chat.interlocutorId];
           const lastMessage = getLastMessage(chat.interlocutorId);
+          if (!user) return;
 
           return (
             <div

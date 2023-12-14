@@ -52,12 +52,12 @@ function App() {
 
   function addPosts(posts) {
     setPosts((prevPosts) => [...prevPosts, ...posts].sort((a, b) => b.id - a.id));
-    requestUnfetchedUsers(posts.map((post) => post.userId));
+    requestUnfetchedUsers(posts.map((post) => post.authorId));
   }
 
   function addComments(comments) {
     setComments((prevComments) => [...prevComments, ...comments]);
-    requestUnfetchedUsers(comments.map((comment) => comment.userId));
+    requestUnfetchedUsers(comments.map((comment) => comment.authorId));
   }
 
   function addChats(chats) {

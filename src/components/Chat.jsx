@@ -12,20 +12,17 @@ function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
   const interlocutor = props.users[interlocutorId];
   const chat = props.chats.find((chat) => chat.interlocutorId === interlocutorId);
-  const messages = props.messages.filter(
-    (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
-  );
+  const [messages, setMessages] = useState([]);
   const [unviewedMessages, setUnviewedMessages] = useState(0);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
   const scrollDown = useRef(true);
-  const messagesLength = useRef(messages.length);
   const unviewedElemRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (chat) {
-      const fetchedMessages = messages.map((message) => message.id);
+      const fetchedMessages = getMessages().map((message) => message.id);
       socket.emit("get_messages", interlocutorId, fetchedMessages);
     }
     const handleDelChat = (_interlocutorId) => {
@@ -36,35 +33,40 @@ function Chat(props) {
   }, []);
 
   useEffect(() => {
-    // We need the previous sibling because this is run after the update.
-    // Maybe i should have comments as a state that is only updated after running this
-    const difference = messages.length - messagesLength.current;
-    const cb = chatBodyRef.current;
-    const lc = cb.lastElementChild;
-    const ps = lc.previousElementSibling;
-    messagesLength.current = messages.length;
+    const newMessages = getMessages();
+    const difference = newMessages.length - messages.length;
 
     if (difference > 0) {
-      if (scrollDown.current) {
-        cb.scrollTo(0, cb.scrollHeight);
-        scrollDown.current = false;
-      } else if (
-        cb.clientHeight + cb.scrollTop >
-        cb.scrollHeight - lc.offsetHeight - ps.offsetHeight
-      ) {
-        cb.scrollTo(0, cb.scrollHeight);
-      } else {
-        setUnviewedMessages((pum) => pum + difference);
+      setMessages(newMessages);
+
+      if (!scrollDown.current) {
+        if (isLastMessageVisible()) {
+          scrollDown.current = true;
+        } else {
+          setUnviewedMessages((pum) => pum + difference);
+        }
       }
     }
   }, [props.messages]);
 
-  function onScroll() {
+  useEffect(() => {
+    if (scrollDown.current) {
+      const cb = chatBodyRef.current;
+      cb.scrollTo(0, cb.scrollHeight);
+      scrollDown.current = false;
+    }
+  }, [messages]);
+
+  function getMessages() {
+    return props.messages.filter(
+      (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
+    );
+  }
+
+  function isLastMessageVisible() {
     const cb = chatBodyRef.current;
     const lc = cb.lastElementChild;
-    if (cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight) {
-      setUnviewedMessages(0);
-    }
+    return cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight;
   }
 
   function sendMessage(content) {
@@ -89,7 +91,13 @@ function Chat(props) {
         <div className="top-bar__grow"></div>
         <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
-      <div className="chat__body" ref={chatBodyRef} onScroll={onScroll}>
+      <div
+        className="chat__body"
+        ref={chatBodyRef}
+        onScroll={() => {
+          if (isLastMessageVisible()) setUnviewedMessages(0);
+        }}
+      >
         {messages.map((message) => (
           <Message key={message.id} {...message} />
         ))}

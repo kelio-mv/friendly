@@ -7,7 +7,7 @@ import storage from "../storage";
 function Profile(props) {
   const userId = parseInt(useParams().id);
   const user = props.users[userId];
-  const posts = props.posts.filter((post) => post.userId === userId);
+  const posts = props.posts.filter((post) => post.authorId === userId);
   const navigate = useNavigate();
 
   return (

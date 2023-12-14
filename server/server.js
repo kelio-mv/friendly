@@ -7,7 +7,7 @@ const io = new Server(3000, {
 
 function getSocket(userId) {
   for (const [_, socket] of io.of("/").sockets) {
-    if (socket.userId === userId) {
+    if (socket.uid === userId) {
       return socket;
     }
   }
@@ -45,12 +45,12 @@ io.on("connection", (socket) => {
           "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
         ];
       } else {
-        socket.userId = storage.createUser(username, password);
+        socket.uid = storage.createUser(username, password);
       }
     } else {
       if (user) {
         if (user.password === password) {
-          socket.userId = user.id;
+          socket.uid = user.id;
         } else {
           errorMessage = ["Senha incorreta", "Sua senha está incorreta. Por favor, verifique-a."];
         }
@@ -65,9 +65,9 @@ io.on("connection", (socket) => {
   }
 
   function handleGetData(callback) {
-    const user = storage.getUserData(socket.userId);
+    const user = storage.getUserData(socket.uid);
     const posts = storage.getPosts(15);
-    const chats = storage.getChats(socket.userId);
+    const chats = storage.getChats(socket.uid);
     const lastMessages = chats.map((chat) =>
       storage.getLastMessage(chat.userId, chat.interlocutorId)
     );
@@ -99,7 +99,7 @@ io.on("connection", (socket) => {
   }
 
   function handleGetMessages(interlocutorId, fetched) {
-    const all = storage.getMessages(socket.userId, interlocutorId);
+    const all = storage.getMessages(socket.uid, interlocutorId);
     const unfetched = all.filter(({ id }) => !fetched.includes(id));
     if (unfetched.length > 0) socket.emit("add_messages", unfetched);
   }
@@ -114,27 +114,27 @@ io.on("connection", (socket) => {
   }
 
   function handleCreatePost(content, callback) {
-    const post = storage.createPost(socket.userId, content);
+    const post = storage.createPost(socket.uid, content);
     callback(post);
     socket.broadcast.emit("add_posts", [post]);
   }
 
   function handleCreateComment(postId, content, callback) {
-    const comment = storage.createComment(socket.userId, postId, content);
+    const comment = storage.createComment(socket.uid, postId, content);
     callback(comment);
     socket.broadcast.to(comment.postId).emit("add_comments", [comment]);
   }
 
   function handleCreateChat(interlocutorId) {
-    const userChat = storage.createChat(socket.userId, interlocutorId);
-    const interlocutorChat = storage.createChat(interlocutorId, socket.userId);
+    const userChat = storage.createChat(socket.uid, interlocutorId);
+    const interlocutorChat = storage.createChat(interlocutorId, socket.uid);
     const interlocutor = getSocket(interlocutorId);
     socket.emit("add_chats", [userChat]);
     if (interlocutor) interlocutor.emit("add_chats", [interlocutorChat]);
   }
 
   function handleCreateMessage(receiverId, content, callback) {
-    const message = storage.createMessage(socket.userId, receiverId, content);
+    const message = storage.createMessage(socket.uid, receiverId, content);
     const receiver = getSocket(receiverId);
     callback(message);
     if (receiver) receiver.emit("add_messages", [message]);
@@ -153,16 +153,16 @@ io.on("connection", (socket) => {
   }
 
   function handleDelChat(interlocutorId) {
-    storage.deleteChat(socket.userId, interlocutorId);
-    storage.deleteChat(interlocutorId, socket.userId);
-    storage.deleteMessages(socket.userId, interlocutorId);
+    storage.deleteChat(socket.uid, interlocutorId);
+    storage.deleteChat(interlocutorId, socket.uid);
+    storage.deleteMessages(socket.uid, interlocutorId);
     socket.emit("del_chat", interlocutorId);
     const interlocutor = getSocket(interlocutorId);
-    if (interlocutor) interlocutor.emit("del_chat", socket.userId);
+    if (interlocutor) interlocutor.emit("del_chat", socket.uid);
   }
 
   function handleEditUser({ field, value, currentPassword }, callback) {
-    const user = storage.getUser("id", socket.userId);
+    const user = storage.getUser("id", socket.uid);
     let errorMessage;
 
     switch (field) {
@@ -186,10 +186,10 @@ io.on("connection", (socket) => {
     }
 
     if (!errorMessage) {
-      storage.editUser(socket.userId, field, value);
+      storage.editUser(socket.uid, field, value);
       if (["profilePicture", "username"].includes(field)) {
-        socket.emit("update_user", socket.userId);
-        socket.broadcast.emit("update_user", socket.userId);
+        socket.emit("update_user", socket.uid);
+        socket.broadcast.emit("update_user", socket.uid);
       }
     }
 

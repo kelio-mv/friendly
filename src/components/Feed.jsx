@@ -35,7 +35,7 @@ function Feed(props) {
           <Article
             key={post.id}
             data={post}
-            user={props.users[post.userId]}
+            user={props.users[post.authorId]}
             onClick={() => navigate(`post/${post.id}`)}
             truncate
           />

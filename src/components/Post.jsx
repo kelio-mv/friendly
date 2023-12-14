@@ -82,10 +82,10 @@ function Post(props) {
         {post && (
           <Article
             data={post}
-            user={props.users[post.userId]}
-            deletable={post.userId === storage.userId}
+            user={props.users[post.authorId]}
+            deletable={post.authorId === storage.userId}
             delete={() => setDeleteConfirmation("post")}
-            onProfileClick={() => navigate(`/profile/${post.userId}`)}
+            onProfileClick={() => navigate(`/profile/${post.authorId}`)}
             highlight
           />
         )}
@@ -93,13 +93,13 @@ function Post(props) {
           <Article
             key={comment.id}
             data={comment}
-            user={props.users[comment.userId]}
-            deletable={comment.userId === storage.userId}
+            user={props.users[comment.authorId]}
+            deletable={comment.authorId === storage.userId}
             delete={() => {
               setCommentId(comment.id);
               setDeleteConfirmation("comment");
             }}
-            onProfileClick={() => navigate(`/profile/${comment.userId}`)}
+            onProfileClick={() => navigate(`/profile/${comment.authorId}`)}
           />
         ))}
       </div>

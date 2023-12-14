@@ -14,18 +14,18 @@ class Storage {
     )`);
     db.exec(`CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      userId INTEGER NOT NULL,
+      authorId INTEGER NOT NULL,
       timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       content TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+      FOREIGN KEY (authorId) REFERENCES users (id) ON DELETE CASCADE
     )`);
     db.exec(`CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      userId INTEGER NOT NULL,
+      authorId INTEGER NOT NULL,
       postId INTEGER NOT NULL,
       timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       content TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+      FOREIGN KEY (authorId) REFERENCES users (id) ON DELETE CASCADE,
       FOREIGN KEY (postId) REFERENCES posts (id) ON DELETE CASCADE
     )`);
     db.exec(`CREATE TABLE IF NOT EXISTS chats (
@@ -65,9 +65,9 @@ class Storage {
     db.prepare(`UPDATE users SET ${field} = ? WHERE id = ?`).run(value, id);
   }
 
-  createPost(userId, content) {
-    const stmt = db.prepare("INSERT INTO posts (userId, content) VALUES (?, ?)");
-    return this.getPost(stmt.run(userId, content).lastInsertRowid);
+  createPost(authorId, content) {
+    const stmt = db.prepare("INSERT INTO posts (authorId, content) VALUES (?, ?)");
+    return this.getPost(stmt.run(authorId, content).lastInsertRowid);
   }
 
   getPost(id) {
@@ -83,9 +83,9 @@ class Storage {
     db.prepare("DELETE FROM posts WHERE id = ?").run(id);
   }
 
-  createComment(userId, postId, content) {
-    const stmt = db.prepare("INSERT INTO comments (userId, postId, content) VALUES (?, ?, ?)");
-    return this.getComment(stmt.run(userId, postId, content).lastInsertRowid);
+  createComment(authorId, postId, content) {
+    const stmt = db.prepare("INSERT INTO comments (authorId, postId, content) VALUES (?, ?, ?)");
+    return this.getComment(stmt.run(authorId, postId, content).lastInsertRowid);
   }
 
   getComment(id) {
@@ -129,8 +129,8 @@ class Storage {
     return this.getMessage(stmt.run(senderId, receiverId, content).lastInsertRowid);
   }
 
-  getMessage(messageId) {
-    return db.prepare("SELECT * FROM messages WHERE id = ?").get(messageId);
+  getMessage(id) {
+    return db.prepare("SELECT * FROM messages WHERE id = ?").get(id);
   }
 
   getMessages(userId, interlocutorId) {
