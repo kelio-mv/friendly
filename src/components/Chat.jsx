@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
@@ -11,8 +11,10 @@ import "./Chat.scss";
 function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
   const interlocutor = props.users[interlocutorId];
-  const chat = useMemo(getChat, [props.chats]);
-  const messages = useMemo(getMessages, [props.messages]);
+  const chat = props.chats.find((chat) => chat.interlocutorId === interlocutorId);
+  const messages = props.messages.filter(
+    (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
+  );
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
   const navigate = useNavigate();
@@ -33,16 +35,6 @@ function Chat(props) {
     const cb = chatBodyRef.current;
     cb.scrollTo(0, cb.scrollHeight);
   }, [messages]);
-
-  function getChat() {
-    return props.chats.find((chat) => chat.interlocutorId === interlocutorId);
-  }
-
-  function getMessages() {
-    return props.messages.filter(
-      (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
-    );
-  }
 
   function sendMessage(content) {
     socket.emit("create_message", interlocutorId, content);
@@ -94,7 +86,7 @@ function Chat(props) {
 
 function Message(props) {
   const fromMe = props.senderId === storage.userId;
-  const time = useMemo(() => new Date(props.timestamp * 1000).toTimeString().substring(0, 5), []);
+  const time = new Date(props.timestamp * 1000).toTimeString().substring(0, 5);
 
   return (
     <div className={`message ${fromMe ? "message--from-me" : ""}`}>

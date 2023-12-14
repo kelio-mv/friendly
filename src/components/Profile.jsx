@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
@@ -8,7 +7,7 @@ import storage from "../storage";
 function Profile(props) {
   const userId = parseInt(useParams().id);
   const user = props.users[userId];
-  const posts = useMemo(() => props.posts.filter((post) => post.userId === userId), [props.posts]);
+  const posts = props.posts.filter((post) => post.userId === userId);
   const navigate = useNavigate();
 
   return (

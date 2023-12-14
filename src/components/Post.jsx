@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Article from "./Article";
 import Icon from "./Icon";
@@ -9,11 +9,8 @@ import socket from "../socket";
 
 function Post(props) {
   const postId = parseInt(useParams().id);
-  const post = useMemo(() => props.posts.find((post) => post.id === postId), [props.posts]);
-  const comments = useMemo(
-    () => props.comments.filter((comment) => comment.postId === postId),
-    [props.comments]
-  );
+  const post = props.posts.find((post) => post.id === postId);
+  const comments = props.comments.filter((comment) => comment.postId === postId);
   const [unviewedComments, setUnviewedComments] = useState(0);
   const [scrollDown, setScrollDown] = useState(false);
   const [commentId, setCommentId] = useState(null);
