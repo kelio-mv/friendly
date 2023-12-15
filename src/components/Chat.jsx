@@ -40,7 +40,7 @@ function Chat(props) {
       const cb = chatBodyRef.current;
       const scrollable = cb.clientHeight < cb.scrollHeight;
       if (scrollable) cb.scrollTo(0, cb.scrollHeight);
-      else if (lastMessage) props.setLastViewedMessageId(chat.id, lastMessage.id);
+      else updateLastViewedMessageId();
     } else {
       updateUnviewedMessages();
     }
@@ -49,21 +49,21 @@ function Chat(props) {
   useEffect(() => updateUnviewedMessages(), [props.chats]);
 
   function onScroll() {
-    if (isLastMessageVisible()) {
-      if (lastMessage.id !== chat.lastViewedMessageId) {
-        props.setLastViewedMessageId(chat.id, lastMessage.id);
-      }
-      scrollDown.current = true;
-    } else {
-      scrollDown.current = false;
-    }
-  }
-
-  function isLastMessageVisible() {
     const cb = chatBodyRef.current;
     const lc = cb.lastElementChild;
     const cbpb = parseInt(getComputedStyle(cb).paddingBottom);
-    return !lc || cb.clientHeight + cb.scrollTop > cb.scrollHeight - cbpb - lc.clientHeight;
+    const isLastMessageVisible =
+      cb.clientHeight + cb.scrollTop > cb.scrollHeight - cbpb - lc.clientHeight;
+
+    if (isLastMessageVisible) updateLastViewedMessageId();
+    scrollDown.current = isLastMessageVisible;
+  }
+
+  function updateLastViewedMessageId() {
+    if (lastMessage && lastMessage.id !== chat.lastViewedMessageId) {
+      props.setLastViewedMessageId(interlocutorId, lastMessage.id);
+      socket.emit("edit_chat", interlocutorId, lastMessage.id);
+    }
   }
 
   function updateUnviewedMessages() {
@@ -145,5 +145,4 @@ function Message(props) {
 
 export default Chat;
 
-//Salvar ultima mensagem visualizada no servidor e destacar mensagens não visualizadas
 // Exibir datas no chat e na parte superior da tela

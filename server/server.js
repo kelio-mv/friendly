@@ -28,6 +28,7 @@ io.on("connection", (socket) => {
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
   socket.on("del_chat", handleDelChat);
+  socket.on("edit_chat", handleEditChat);
   socket.on("edit_user", handleEditUser);
 
   function handleAuth(signUp, username, password, callback) {
@@ -69,12 +70,12 @@ io.on("connection", (socket) => {
     const posts = storage.getPosts(15);
     const chats = storage.getChats(socket.uid);
     const lastMessages = chats.map((chat) =>
-      storage.getLastMessage(chat.userId, chat.interlocutorId)
+      storage.getMessages(chat.userId, chat.interlocutorId, chat.lastViewedMessageId)
     );
     callback(user);
     socket.emit("add_posts", posts);
     socket.emit("add_chats", chats);
-    socket.emit("add_messages", lastMessages);
+    socket.emit("add_messages", lastMessages.flat());
   }
 
   function handleGetPosts(before, callback) {
@@ -159,6 +160,10 @@ io.on("connection", (socket) => {
     socket.emit("del_chat", interlocutorId);
     const interlocutor = getSocket(interlocutorId);
     if (interlocutor) interlocutor.emit("del_chat", socket.uid);
+  }
+
+  function handleEditChat(interlocutorId, lastViewedMessageId) {
+    storage.editChat(socket.uid, interlocutorId, "lastViewedMessageId", lastViewedMessageId);
   }
 
   function handleEditUser({ field, value, currentPassword }, callback) {

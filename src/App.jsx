@@ -102,9 +102,11 @@ function App() {
     });
   }
 
-  function setLastViewedMessageId(chatId, lastViewedMessageId) {
+  function setLastViewedMessageId(interlocutorId, lastViewedMessageId) {
     setChats((prevChats) =>
-      prevChats.map((chat) => (chat.id === chatId ? { ...chat, lastViewedMessageId } : chat))
+      prevChats.map((chat) =>
+        chat.interlocutorId === interlocutorId ? { ...chat, lastViewedMessageId } : chat
+      )
     );
   }
 

@@ -117,6 +117,13 @@ class Storage {
     return db.prepare("SELECT * FROM chats WHERE userId = ?").all(userId);
   }
 
+  editChat(userId, interlocutorId, field, value) {
+    const stmt = db.prepare(
+      `UPDATE chats SET ${field} = ? WHERE userId = ? AND interlocutorId = ?`
+    );
+    stmt.run(value, userId, interlocutorId);
+  }
+
   deleteChat(userId, interlocutorId) {
     const stmt = db.prepare("DELETE FROM chats WHERE userId = ? AND interlocutorId = ?");
     stmt.run(userId, interlocutorId);
@@ -133,21 +140,15 @@ class Storage {
     return db.prepare("SELECT * FROM messages WHERE id = ?").get(id);
   }
 
-  getMessages(userId, interlocutorId) {
+  getMessages(userId, interlocutorId, after) {
     const stmt = db.prepare(`
       SELECT * FROM messages
-      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
+      WHERE ((senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?))
+      ${after ? "AND id >= ?" : ""}
     `);
-    return stmt.all(userId, interlocutorId, interlocutorId, userId);
-  }
-
-  getLastMessage(userId, interlocutorId) {
-    const stmt = db.prepare(`
-      SELECT * FROM messages
-      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
-      ORDER BY id DESC LIMIT 1
-    `);
-    return stmt.get(userId, interlocutorId, interlocutorId, userId);
+    const params = [userId, interlocutorId, interlocutorId, userId];
+    if (after) params.push(after);
+    return stmt.all(...params);
   }
 
   deleteMessages(userId, interlocutorId) {
