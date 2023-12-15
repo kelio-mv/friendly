@@ -102,6 +102,12 @@ function App() {
     });
   }
 
+  function setLastViewedMessageId(chatId, lastViewedMessageId) {
+    setChats((prevChats) =>
+      prevChats.map((chat) => (chat.id === chatId ? { ...chat, lastViewedMessageId } : chat))
+    );
+  }
+
   function resetState() {
     setUsers({});
     setPosts([]);
@@ -138,7 +144,10 @@ function App() {
 
         <Route path="chats" element={<Chats {...{ users, chats, messages }} />} />
 
-        <Route path="chat/:id" element={<Chat {...{ users, chats, messages, addMessages }} />} />
+        <Route
+          path="chat/:id"
+          element={<Chat {...{ users, chats, messages, addMessages, setLastViewedMessageId }} />}
+        />
 
         <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
 

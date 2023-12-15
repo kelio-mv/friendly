@@ -37,6 +37,7 @@ function Chats(props) {
         {props.chats.map((chat) => {
           const user = props.users[chat.interlocutorId];
           const lastMessage = getLastMessage(chat.interlocutorId);
+          const unviewedMessages = 0;
           if (!user) return;
 
           return (
@@ -51,8 +52,15 @@ function Chats(props) {
                 <p>@{user.username}</p>
                 <p className="chats__last-message">{lastMessage.content}</p>
               </div>
-
-              <p className="chats__date">{parseTimestamp(lastMessage.timestamp)}</p>
+              <div>
+                <p className="chats__date">{parseTimestamp(lastMessage.timestamp)}</p>
+                <div
+                  className="chats__unviewed"
+                  style={{ visibility: unviewedMessages ? null : "hidden" }}
+                >
+                  {unviewedMessages}
+                </div>
+              </div>
             </div>
           );
         })}

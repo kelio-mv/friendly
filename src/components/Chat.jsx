@@ -33,19 +33,10 @@ function Chat(props) {
   }, []);
 
   useEffect(() => {
-    const newMessages = getMessages();
-    const difference = newMessages.length - messages.length;
-
-    if (difference > 0) {
-      if (!scrollDown.current) {
-        if (isLastMessageVisible()) {
-          scrollDown.current = true;
-        } else {
-          setUnviewedMessages((pum) => pum + difference);
-        }
-      }
-      setMessages(newMessages);
+    if (!scrollDown.current && isLastMessageVisible()) {
+      scrollDown.current = true;
     }
+    setMessages(getMessages());
   }, [props.messages]);
 
   useEffect(() => {
@@ -53,8 +44,14 @@ function Chat(props) {
       const cb = chatBodyRef.current;
       cb.scrollTo(0, cb.scrollHeight);
       scrollDown.current = false;
+    } else {
+      updateUnviewedMessages();
     }
   }, [messages]);
+
+  useEffect(() => {
+    updateUnviewedMessages();
+  }, [props.chats]);
 
   function getMessages() {
     return props.messages.filter(
@@ -62,11 +59,15 @@ function Chat(props) {
     );
   }
 
+  function updateUnviewedMessages() {
+    setUnviewedMessages(messages.filter((message) => message.id > chat.lastViewedMessageId).length);
+  }
+
   function isLastMessageVisible() {
-    // If the chat is empty, lc is set to null, and the function returns true.
     const cb = chatBodyRef.current;
     const lc = cb.lastElementChild;
-    return !lc || cb.clientHeight + cb.scrollTop > cb.scrollHeight - lc.offsetHeight;
+    const cbpb = parseInt(getComputedStyle(cb).paddingBottom);
+    return !lc || cb.clientHeight + cb.scrollTop > cb.scrollHeight - cbpb - lc.clientHeight;
   }
 
   function sendMessage(content) {
@@ -95,7 +96,10 @@ function Chat(props) {
         className="chat__body"
         ref={chatBodyRef}
         onScroll={() => {
-          if (isLastMessageVisible()) setUnviewedMessages(0);
+          if (isLastMessageVisible()) {
+            const lastMessageId = messages[messages.length - 1].id;
+            props.setLastViewedMessageId(chat.id, lastMessageId);
+          }
         }}
       >
         {messages.map((message) => (
@@ -150,6 +154,5 @@ function Message(props) {
 
 export default Chat;
 
-// Salvar data de ultimo login
 // Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
 // Exibir datas no chat e na parte superior da tela
