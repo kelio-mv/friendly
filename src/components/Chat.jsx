@@ -12,7 +12,10 @@ function Chat(props) {
   const interlocutorId = parseInt(useParams().id);
   const interlocutor = props.users[interlocutorId];
   const chat = props.chats.find((chat) => chat.interlocutorId === interlocutorId);
-  const [messages, setMessages] = useState(getMessages());
+  const messages = props.messages.filter(
+    (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
+  );
+  const lastMessage = messages[messages.length - 1];
   const [unviewedMessages, setUnviewedMessages] = useState(0);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const chatBodyRef = useRef();
@@ -33,34 +36,27 @@ function Chat(props) {
   }, []);
 
   useEffect(() => {
-    if (!scrollDown.current && isLastMessageVisible()) {
-      scrollDown.current = true;
-    }
-    setMessages(getMessages());
-  }, [props.messages]);
-
-  useEffect(() => {
     if (scrollDown.current) {
       const cb = chatBodyRef.current;
-      cb.scrollTo(0, cb.scrollHeight);
-      scrollDown.current = false;
+      const scrollable = cb.clientHeight < cb.scrollHeight;
+      if (scrollable) cb.scrollTo(0, cb.scrollHeight);
+      else if (lastMessage) props.setLastViewedMessageId(chat.id, lastMessage.id);
     } else {
       updateUnviewedMessages();
     }
-  }, [messages]);
+  }, [props.messages]);
 
-  useEffect(() => {
-    updateUnviewedMessages();
-  }, [props.chats]);
+  useEffect(() => updateUnviewedMessages(), [props.chats]);
 
-  function getMessages() {
-    return props.messages.filter(
-      (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
-    );
-  }
-
-  function updateUnviewedMessages() {
-    setUnviewedMessages(messages.filter((message) => message.id > chat.lastViewedMessageId).length);
+  function onScroll() {
+    if (isLastMessageVisible()) {
+      if (lastMessage.id !== chat.lastViewedMessageId) {
+        props.setLastViewedMessageId(chat.id, lastMessage.id);
+      }
+      scrollDown.current = true;
+    } else {
+      scrollDown.current = false;
+    }
   }
 
   function isLastMessageVisible() {
@@ -70,12 +66,16 @@ function Chat(props) {
     return !lc || cb.clientHeight + cb.scrollTop > cb.scrollHeight - cbpb - lc.clientHeight;
   }
 
+  function updateUnviewedMessages() {
+    setUnviewedMessages(messages.filter((message) => message.id > chat.lastViewedMessageId).length);
+  }
+
   function sendMessage(content) {
+    if (!chat) socket.emit("create_chat", interlocutorId);
     socket.emit("create_message", interlocutorId, content, (message) => {
       props.addMessages([message]);
       scrollDown.current = true;
     });
-    if (!chat) socket.emit("create_chat", interlocutorId);
   }
 
   function deleteChat() {
@@ -92,16 +92,7 @@ function Chat(props) {
         <div className="top-bar__grow"></div>
         <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
-      <div
-        className="chat__body"
-        ref={chatBodyRef}
-        onScroll={() => {
-          if (isLastMessageVisible()) {
-            const lastMessageId = messages[messages.length - 1].id;
-            props.setLastViewedMessageId(chat.id, lastMessageId);
-          }
-        }}
-      >
+      <div className="chat__body" ref={chatBodyRef} onScroll={onScroll}>
         {messages.map((message) => (
           <Message key={message.id} {...message} />
         ))}
@@ -154,5 +145,5 @@ function Message(props) {
 
 export default Chat;
 
-// Exibir número de novas mensagens nos chats e destacar mensagens não visualizadas
+//Salvar ultima mensagem visualizada no servidor e destacar mensagens não visualizadas
 // Exibir datas no chat e na parte superior da tela

@@ -5,11 +5,10 @@ import ProfilePicture from "./ProfilePicture";
 function Chats(props) {
   const navigate = useNavigate();
 
-  function getLastMessage(interlocutorId) {
-    const messages = props.messages.filter(
+  function getMessages(interlocutorId) {
+    return props.messages.filter(
       (message) => message.senderId === interlocutorId || message.receiverId === interlocutorId
     );
-    return messages[messages.length - 1];
   }
 
   function parseTimestamp(timestamp) {
@@ -36,9 +35,11 @@ function Chats(props) {
       <div className="chats__body">
         {props.chats.map((chat) => {
           const user = props.users[chat.interlocutorId];
-          const lastMessage = getLastMessage(chat.interlocutorId);
-          const unviewedMessages = 0;
-          if (!user) return;
+          const messages = getMessages(chat.interlocutorId);
+          const lastMessage = messages[messages.length - 1];
+          const unviewedMessages = messages.filter((m) => m.id > chat.lastViewedMessageId).length;
+
+          if (!user || !lastMessage) return;
 
           return (
             <div
