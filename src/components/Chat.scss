@@ -8,6 +8,15 @@
     overflow: auto;
     padding: 0.75rem;
   }
+
+  &__date {
+    width: fit-content;
+    margin: 12px auto;
+    padding: 3px 7px;
+    background-color: #0f766e;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
 }
 
 .message {

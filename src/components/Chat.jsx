@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
@@ -48,6 +48,23 @@ function Chat(props) {
 
   useEffect(() => updateUnviewedMessages(), [props.chats]);
 
+  function getMessageDate(message) {
+    return message && new Date(message.timestamp * 1000).toDateString();
+  }
+
+  function getLocaleMessageDate(message) {
+    const now = new Date();
+    const date = new Date(message.timestamp * 1000).toLocaleDateString();
+    if (date === now.toLocaleDateString()) {
+      return "Hoje";
+    }
+    now.setDate(now.getDate() - 1);
+    if (date === now.toLocaleDateString()) {
+      return "Ontem";
+    }
+    return date;
+  }
+
   function onScroll() {
     const cb = chatBodyRef.current;
     const lc = cb.lastElementChild;
@@ -92,10 +109,19 @@ function Chat(props) {
         <div className="top-bar__grow"></div>
         <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
+
       <div className="chat__body" ref={chatBodyRef} onScroll={onScroll}>
-        {messages.map((message) => (
-          <Message key={message.id} {...message} />
-        ))}
+        {messages.map((message, i) => {
+          const messageDate = getMessageDate(message);
+          const prevMessageDate = getMessageDate(messages[i - 1]);
+          const displayDate = messageDate !== prevMessageDate;
+          return (
+            <Fragment key={message.id}>
+              {displayDate && <p className="chat__date">{getLocaleMessageDate(message)}</p>}
+              <Message {...message} />
+            </Fragment>
+          );
+        })}
       </div>
 
       <TextArea
