@@ -171,4 +171,4 @@ function Message(props) {
 
 export default Chat;
 
-// Exibir datas no chat e na parte superior da tela
+// Exibir na parte superior da tela, a data da mensagem mais antiga visível.

@@ -13,7 +13,7 @@
     width: fit-content;
     margin: 12px auto;
     padding: 3px 7px;
-    background-color: #0f766e;
+    background: var(--teal-800);
     border-radius: 0.5rem;
     font-size: 0.875rem;
   }
@@ -28,7 +28,7 @@
   width: fit-content;
   max-width: 90%;
   padding: var(--padding-y) var(--padding-x);
-  background: #0f766e;
+  background: var(--teal-700);
   border-radius: 0.5rem;
 
   &:not(:last-child) {

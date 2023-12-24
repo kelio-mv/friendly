@@ -4,7 +4,7 @@
   animation: fade-in 0.5s ease;
 
   &--highlight {
-    border-bottom: 1px solid #0f766e;
+    border-bottom: 1px solid var(--teal-800);
   }
 
   &__header {

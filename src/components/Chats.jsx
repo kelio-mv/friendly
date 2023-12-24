@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
+import "./Chats.scss";
 
 function Chats(props) {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ function Chats(props) {
             >
               <ProfilePicture src={user.profilePicture} size={48} />
 
-              <div style={{ marginLeft: "0.75rem", marginRight: "auto" }}>
+              <div className="chats__wrapper">
                 <p>@{user.username}</p>
                 <p className="chats__last-message">{lastMessage.content}</p>
               </div>
