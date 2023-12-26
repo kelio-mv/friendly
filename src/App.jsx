@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import Auth from "./components/Auth";
 import Home from "./components/Home";
-import Feed from "./components/Feed";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
 import Chats from "./components/Chats";
@@ -125,7 +125,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Home onAuth={onAuth} onReauth={() => {}} onReauthError={resetState} />}
+          element={<Auth onAuth={onAuth} onReauth={() => {}} onReauthError={resetState} />}
         />
         <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>
@@ -137,7 +137,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Feed {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
+          element={<Home {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
         />
 
         <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
