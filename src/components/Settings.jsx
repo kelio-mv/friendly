@@ -11,7 +11,7 @@ import "./Settings.scss";
 function Settings(props) {
   const [modal, setModal] = useState("");
   const [profilePicture, setProfilePicture] = useState(props.user.profilePicture);
-  const [bio, setBio] = useState(props.user.bio);
+  const [about, setAbout] = useState(props.user.about);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -49,7 +49,7 @@ function Settings(props) {
     const functions = {
       modal: () => setModal(""),
       profilePicture: () => setProfilePicture(props.user.profilePicture),
-      bio: () => setBio(props.user.bio),
+      about: () => setAbout(props.user.about),
       username: () => setUsername(""),
       password: () => setPassword(""),
       currentPassword: () => setCurrentPassword(""),
@@ -72,7 +72,7 @@ function Settings(props) {
             <Icon name="photo_camera" />
             Imagem de perfil
           </div>
-          <div className="settings__item" onClick={() => setModal("Bio")}>
+          <div className="settings__item" onClick={() => setModal("About")}>
             <Icon name="person_book" />
             Sobre mim
           </div>
@@ -131,30 +131,31 @@ function Settings(props) {
         </button>
       </Modal>
 
+      {/* About */}
       <Modal
-        open={modal === "Bio"}
+        open={modal === "About"}
         header="Sobre mim"
         footer={
           <button
             className="modal__btn"
             onClick={() => {
               setSaving(true);
-              setBio(bio.trim());
-              const data = { field: "bio", value: bio.trim() };
+              setAbout(about.trim());
+              const data = { field: "about", value: about.trim() };
               const callback = () => reset("modal", "saving");
               socket.emit("edit_user", data, callback);
             }}
-            disabled={bio === props.user.bio || saving}
+            disabled={about === props.user.about || saving}
           >
             Salvar
           </button>
         }
-        close={() => reset("modal", "bio")}
+        close={() => reset("modal", "about")}
       >
         <textarea
           placeholder="Escreva algo..."
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          value={about}
+          onChange={(e) => setAbout(e.target.value)}
           rows="4"
           maxLength="150"
         />
