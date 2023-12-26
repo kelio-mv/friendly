@@ -76,8 +76,24 @@ class Storage {
   }
 
   getPosts(limit, before) {
-    const where = before ? `WHERE id < ${before}` : "";
-    return db.prepare(`SELECT * FROM posts ${where} ORDER BY id DESC LIMIT ?`).all(limit);
+    // const where = before ? `WHERE id < ${before}` : "";
+    // return db.prepare(`SELECT * FROM posts ${where} ORDER BY id DESC LIMIT ?`).all(limit);
+    return db.prepare("SELECT * FROM posts").all();
+  }
+
+  getFollowingPosts(userId) {
+    const userPostIds = db
+      .prepare("SELECT id FROM posts WHERE authorId = ?")
+      .all(userId)
+      .map(({ id }) => id);
+
+    const commentedPostIds = db
+      .prepare("SELECT DISTINCT postId FROM comments WHERE authorId = ?")
+      .all(userId)
+      .map(({ postId }) => postId);
+
+    const postIds = [...new Set([...userPostIds, ...commentedPostIds])];
+    return postIds.map((id) => this.getPost(id));
   }
 
   deletePost(id) {

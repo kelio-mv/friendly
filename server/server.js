@@ -67,21 +67,23 @@ io.on("connection", (socket) => {
 
   function handleGetData(callback) {
     const user = storage.getUserData(socket.uid);
-    const posts = storage.getPosts(15);
+    const posts = storage.getPosts();
+    const followingPosts = storage.getFollowingPosts(socket.uid);
     const chats = storage.getChats(socket.uid);
     const lastMessages = chats.map((chat) =>
       storage.getMessages(chat.userId, chat.interlocutorId, chat.lastViewedMessageId)
     );
     callback(user);
-    socket.emit("add_posts", posts);
+    socket.emit("add_posts", "recent", posts);
+    socket.emit("add_posts", "following", followingPosts);
     socket.emit("add_chats", chats);
     socket.emit("add_messages", lastMessages.flat());
   }
 
   function handleGetPosts(before, callback) {
-    const posts = storage.getPosts(15, before);
-    if (posts.length > 0) socket.emit("add_posts", posts);
-    callback();
+    // const posts = storage.getPosts(16, before);
+    // if (posts.length > 0) socket.emit("add_posts", posts);
+    // callback();
   }
 
   function handleGetComments(postId, fetched) {
@@ -117,7 +119,7 @@ io.on("connection", (socket) => {
   function handleCreatePost(content, callback) {
     const post = storage.createPost(socket.uid, content);
     callback(post);
-    socket.broadcast.emit("add_posts", [post]);
+    socket.broadcast.emit("add_posts", "recent", [post]);
   }
 
   function handleCreateComment(postId, content, callback) {
@@ -147,9 +149,9 @@ io.on("connection", (socket) => {
     socket.broadcast.to(postId).emit("del_post", postId);
   }
 
-  function handleDelComment(id) {
+  function handleDelComment(id, callback) {
     const { postId } = storage.deleteComment(id);
-    socket.emit("del_comments", [id]);
+    callback();
     socket.broadcast.to(postId).emit("del_comments", [id]);
   }
 

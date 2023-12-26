@@ -1,7 +1,17 @@
 // Simple styles
 
-.home__body {
-  overflow: "auto";
+.home {
+  &__body {
+    overflow: auto;
+    flex-grow: 1;
+  }
+
+  &__bottom-bar {
+    display: flex;
+    padding: 0.875rem;
+    justify-content: space-around;
+    border-top: 1px solid var(--bg-300);
+  }
 }
 
 .post__body {
@@ -13,34 +23,6 @@
   flex-grow: 1;
   padding: 1rem;
   background: var(--bg-200);
-}
-
-.profile {
-  &__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.5rem 0.75rem 0.75rem;
-    border-bottom: 1px solid var(--teal-800);
-  }
-
-  &__username {
-    font-size: 1.125rem;
-  }
-
-  &__about {
-    align-self: flex-start;
-  }
-
-  &__about-header {
-    color: var(--clr-300);
-  }
-
-  &__about-content {
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
 }
 
 // Reused styles

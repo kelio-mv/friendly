@@ -3,6 +3,7 @@ import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Article from "./Article";
 import storage from "../storage";
+import "./Profile.scss";
 
 function Profile(props) {
   const userId = parseInt(useParams().id);

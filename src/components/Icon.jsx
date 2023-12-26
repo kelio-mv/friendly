@@ -1,10 +1,13 @@
 function Icon(props) {
+  const highlightFilter =
+    "brightness(0) saturate(100%) invert(55%) sepia(57%) saturate(617%) hue-rotate(124deg) brightness(95%) contrast(89%)";
+
   return (
     <img
       src={`/friendly/${props.name}.svg`}
       onClick={props.onClick}
       style={{
-        filter: "invert(1)",
+        filter: props.highlight ? highlightFilter : "invert(1)",
         display: props.inline ? "inline" : null,
         verticalAlign: props.inline ? "middle" : null,
         opacity: props.dimmed || props.disabled ? 0.5 : 1,

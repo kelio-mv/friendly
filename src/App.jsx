@@ -50,14 +50,22 @@ function App() {
     }));
   }
 
-  function addPosts(posts) {
-    setPosts((prevPosts) => [...prevPosts, ...posts].sort((a, b) => b.id - a.id));
+  function addPosts(section, posts) {
+    setPosts((prevPosts) =>
+      [...prevPosts, ...posts.map((post) => ({ ...post, section }))].sort((a, b) => b.id - a.id)
+    );
     requestUnfetchedUsers(posts.map((post) => post.authorId));
   }
 
-  function addComments(comments) {
+  function addComments(comments, postId) {
     setComments((prevComments) => [...prevComments, ...comments]);
     requestUnfetchedUsers(comments.map((comment) => comment.authorId));
+
+    if (postId) {
+      const matches = posts.filter((post) => post.id === postId);
+      const following = matches.find((post) => post.section === "following");
+      if (!following) addPosts("following", [matches[0]]);
+    }
   }
 
   function addChats(chats) {
@@ -74,8 +82,19 @@ function App() {
     setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
-  function delComments(ids) {
+  function delComments(ids, postId) {
     setComments((prevComments) => prevComments.filter((comment) => !ids.includes(comment.id)));
+
+    if (postId) {
+      const userHasComments = comments.find(
+        (c) => c.postId === postId && c.authorId === storage.userId && c.id !== ids[0]
+      );
+      if (!userHasComments) {
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => !(post.id === postId && post.section === "following"))
+        );
+      }
+    }
   }
 
   function delChat(interlocutorId) {
@@ -140,7 +159,10 @@ function App() {
           element={<Home {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
         />
 
-        <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
+        <Route
+          path="post/:id"
+          element={<Post {...{ users, posts, comments, addComments, delComments }} />}
+        />
 
         <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
 
