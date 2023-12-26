@@ -10,6 +10,7 @@ class Storage {
       username VARCHAR(16) NOT NULL,
       password VARCHAR(16) NOT NULL,
       profilePicture TEXT NOT NULL DEFAULT 'default_avatar.png',
+      bio TEXT NOT NULL DEFAULT '',
       lastLoginAt INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )`);
     db.exec(`CREATE TABLE IF NOT EXISTS posts (
@@ -58,7 +59,7 @@ class Storage {
   }
 
   getUserData(id) {
-    return db.prepare(`SELECT id, username, profilePicture FROM users WHERE id = ?`).get(id);
+    return db.prepare(`SELECT id, username, profilePicture, bio FROM users WHERE id = ?`).get(id);
   }
 
   editUser(id, field, value) {

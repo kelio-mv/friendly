@@ -23,7 +23,11 @@ function Profile(props) {
 
       <div className="profile__header">
         <ProfilePicture src={user.profilePicture} />
-        <p>@{user.username}</p>
+        <p className="profile__username">@{user.username}</p>
+        <div className="profile__about">
+          {user.bio && <p className="profile__about-header">Sobre</p>}
+          <p className="profile__about-content">{user.bio}</p>
+        </div>
       </div>
 
       {posts.map((post) => (

@@ -192,7 +192,7 @@ io.on("connection", (socket) => {
 
     if (!errorMessage) {
       storage.editUser(socket.uid, field, value);
-      if (["profilePicture", "username"].includes(field)) {
+      if (["username", "profilePicture", "bio"].includes(field)) {
         socket.emit("update_user", socket.uid);
         socket.broadcast.emit("update_user", socket.uid);
       }

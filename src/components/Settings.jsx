@@ -9,8 +9,9 @@ import socket from "../socket";
 import "./Settings.scss";
 
 function Settings(props) {
-  const [display, setDisplay] = useState("");
+  const [modal, setModal] = useState("");
   const [profilePicture, setProfilePicture] = useState(props.user.profilePicture);
+  const [bio, setBio] = useState(props.user.bio);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -46,8 +47,9 @@ function Settings(props) {
 
   function reset(...variables) {
     const functions = {
-      display: () => setDisplay(""),
+      modal: () => setModal(""),
       profilePicture: () => setProfilePicture(props.user.profilePicture),
+      bio: () => setBio(props.user.bio),
       username: () => setUsername(""),
       password: () => setPassword(""),
       currentPassword: () => setCurrentPassword(""),
@@ -66,15 +68,19 @@ function Settings(props) {
           <h1>Configurações</h1>
         </div>
         <div className="settings__body">
-          <div className="settings__item" onClick={() => setDisplay("ProfilePicture")}>
+          <div className="settings__item" onClick={() => setModal("ProfilePicture")}>
             <Icon name="photo_camera" />
             Imagem de perfil
           </div>
-          <div className="settings__item" onClick={() => setDisplay("Username")}>
+          <div className="settings__item" onClick={() => setModal("Bio")}>
+            <Icon name="person_book" />
+            Sobre mim
+          </div>
+          <div className="settings__item" onClick={() => setModal("Username")}>
             <Icon name="alternate_email" />
             Nome de usuário
           </div>
-          <div className="settings__item" onClick={() => setDisplay("Password")}>
+          <div className="settings__item" onClick={() => setModal("Password")}>
             <Icon name="key" />
             Senha
           </div>
@@ -83,7 +89,7 @@ function Settings(props) {
 
       {/* Profile Picture */}
       <Modal
-        open={display === "ProfilePicture"}
+        open={modal === "ProfilePicture"}
         header="Imagem de perfil"
         footer={
           <button
@@ -91,7 +97,7 @@ function Settings(props) {
             onClick={() => {
               setSaving(true);
               const data = { field: "profilePicture", value: profilePicture };
-              const callback = () => reset("display", "saving");
+              const callback = () => reset("modal", "saving");
               socket.emit("edit_user", data, callback);
             }}
             disabled={profilePicture === props.user.profilePicture || saving}
@@ -99,7 +105,7 @@ function Settings(props) {
             Salvar
           </button>
         }
-        close={() => reset("display", "profilePicture")}
+        close={() => reset("modal", "profilePicture")}
         center
       >
         <ProfilePicture src={profilePicture} />
@@ -125,9 +131,38 @@ function Settings(props) {
         </button>
       </Modal>
 
+      <Modal
+        open={modal === "Bio"}
+        header="Sobre mim"
+        footer={
+          <button
+            className="modal__btn"
+            onClick={() => {
+              setSaving(true);
+              setBio(bio.trim());
+              const data = { field: "bio", value: bio.trim() };
+              const callback = () => reset("modal", "saving");
+              socket.emit("edit_user", data, callback);
+            }}
+            disabled={bio === props.user.bio || saving}
+          >
+            Salvar
+          </button>
+        }
+        close={() => reset("modal", "bio")}
+      >
+        <textarea
+          placeholder="Escreva algo..."
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          rows="4"
+          maxLength="150"
+        />
+      </Modal>
+
       {/* Username */}
       <Modal
-        open={display === "Username"}
+        open={modal === "Username"}
         header="Nome de usuário"
         footer={
           <button
@@ -141,7 +176,7 @@ function Settings(props) {
                   setSaving(false);
                 } else {
                   storage.saveCredentials(username, storage.password);
-                  reset("display", "saving", "errorMessage", "username", "currentPassword");
+                  reset("modal", "saving", "errorMessage", "username", "currentPassword");
                 }
               };
               socket.emit("edit_user", data, callback);
@@ -151,7 +186,7 @@ function Settings(props) {
             Salvar
           </button>
         }
-        close={() => reset("display", "errorMessage", "username", "currentPassword")}
+        close={() => reset("modal", "errorMessage", "username", "currentPassword")}
         center
       >
         <TextField
@@ -175,7 +210,7 @@ function Settings(props) {
 
       {/* Password */}
       <Modal
-        open={display === "Password"}
+        open={modal === "Password"}
         header="Senha"
         footer={
           <button
@@ -189,7 +224,7 @@ function Settings(props) {
                   setSaving(false);
                 } else {
                   storage.saveCredentials(storage.username, password);
-                  reset("display", "saving", "errorMessage", "currentPassword", "password");
+                  reset("modal", "saving", "errorMessage", "currentPassword", "password");
                 }
               };
               socket.emit("edit_user", data, callback);
@@ -199,7 +234,7 @@ function Settings(props) {
             Salvar
           </button>
         }
-        close={() => reset("display", "errorMessage", "currentPassword", "password")}
+        close={() => reset("modal", "errorMessage", "currentPassword", "password")}
         center
       >
         <TextField
