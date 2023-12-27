@@ -2,7 +2,7 @@ const { Server } = require("socket.io");
 const storage = require("./storage");
 const developmentEnv = true;
 const io = new Server(3000, {
-  cors: { origin: developmentEnv ? "http://192.168.1.5:5173" : "https://kelio-mv.github.io" },
+  cors: { origin: developmentEnv ? "http://192.168.1.2:5173" : "https://kelio-mv.github.io" },
 });
 
 function getSocket(userId) {
@@ -123,9 +123,11 @@ io.on("connection", (socket) => {
   }
 
   function handleCreateComment(postId, content, callback) {
+    const isFirstComment = !storage.getComments(postId).find((c) => c.authorId === socket.uid);
     const comment = storage.createComment(socket.uid, postId, content);
     callback(comment);
     socket.broadcast.to(comment.postId).emit("add_comments", [comment]);
+    if (isFirstComment) socket.emit("add_posts", "following", [storage.getPost(postId)]);
   }
 
   function handleCreateChat(interlocutorId) {
@@ -151,8 +153,10 @@ io.on("connection", (socket) => {
 
   function handleDelComment(id, callback) {
     const { postId } = storage.deleteComment(id);
-    callback();
+    const isLastComment = !storage.getComments(postId).find((c) => c.authorId === socket.uid);
+    socket.emit("del_comments", [id]);
     socket.broadcast.to(postId).emit("del_comments", [id]);
+    if (isLastComment) socket.emit("del_post", postId, "following");
   }
 
   function handleDelChat(interlocutorId) {

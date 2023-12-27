@@ -57,15 +57,9 @@ function App() {
     requestUnfetchedUsers(posts.map((post) => post.authorId));
   }
 
-  function addComments(comments, postId) {
+  function addComments(comments) {
     setComments((prevComments) => [...prevComments, ...comments]);
     requestUnfetchedUsers(comments.map((comment) => comment.authorId));
-
-    if (postId) {
-      const matches = posts.filter((post) => post.id === postId);
-      const following = matches.find((post) => post.section === "following");
-      if (!following) addPosts("following", [matches[0]]);
-    }
   }
 
   function addChats(chats) {
@@ -77,24 +71,19 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, ...messages].sort((a, b) => a.id - b.id));
   }
 
-  function delPost(id) {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+  function delPost(id, section) {
+    if (section) {
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => !(post.id === id && post.section === section))
+      );
+    } else {
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    }
     setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
-  function delComments(ids, postId) {
+  function delComments(ids) {
     setComments((prevComments) => prevComments.filter((comment) => !ids.includes(comment.id)));
-
-    if (postId) {
-      const userHasComments = comments.find(
-        (c) => c.postId === postId && c.authorId === storage.userId && c.id !== ids[0]
-      );
-      if (!userHasComments) {
-        setPosts((prevPosts) =>
-          prevPosts.filter((post) => !(post.id === postId && post.section === "following"))
-        );
-      }
-    }
   }
 
   function delChat(interlocutorId) {
@@ -159,10 +148,7 @@ function App() {
           element={<Home {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
         />
 
-        <Route
-          path="post/:id"
-          element={<Post {...{ users, posts, comments, addComments, delComments }} />}
-        />
+        <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
 
         <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
 

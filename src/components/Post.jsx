@@ -57,7 +57,7 @@ function Post(props) {
 
   function sendComment(content) {
     socket.emit("create_comment", postId, content, (comment) => {
-      props.addComments([comment], postId);
+      props.addComments([comment]);
       scrollDown.current = true;
     });
   }
@@ -66,7 +66,7 @@ function Post(props) {
     if (deleteConfirmation === "post") {
       socket.emit("del_post", postId);
     } else {
-      socket.emit("del_comment", commentId, () => props.delComments([commentId], postId));
+      socket.emit("del_comment", commentId);
     }
     setDeleteConfirmation(null);
   }
