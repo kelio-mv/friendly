@@ -78,8 +78,8 @@ function App() {
       );
     } else {
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+      setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
     }
-    setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
   function delComments(ids) {
