@@ -4,7 +4,6 @@ import Auth from "./components/Auth";
 import Home from "./components/Home";
 import Post from "./components/Post";
 import NewPost from "./components/NewPost";
-import Chats from "./components/Chats";
 import Chat from "./components/Chat";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
@@ -16,6 +15,7 @@ import "./App.scss";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [tab, setTab] = useState("recent");
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState([]);
@@ -33,6 +33,18 @@ function App() {
     socket.on("del_comments", delComments);
     socket.on("del_chat", delChat);
     socket.on("update_user", updateUser);
+
+    return () => {
+      socket.off("add_users");
+      socket.off("add_posts");
+      socket.off("add_comments");
+      socket.off("add_chats");
+      socket.off("add_messages");
+      socket.off("del_post");
+      socket.off("del_comments");
+      socket.off("del_chat");
+      socket.off("update_user");
+    };
   }, []);
 
   function onAuth() {
@@ -119,13 +131,14 @@ function App() {
   }
 
   function resetState() {
+    setAuthenticated(false);
+    setTab("recent");
+    setModal(null);
     setUsers({});
     setPosts([]);
     setComments([]);
     setChats([]);
     setMessages([]);
-    setModal(null);
-    setAuthenticated(false);
   }
 
   if (!authenticated) {
@@ -145,21 +158,24 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Home {...{ users, posts }} openSidebar={() => setModal("Sidebar")} />}
+          element={
+            <Home
+              {...{ tab, users, posts, chats, messages, setTab }}
+              openSidebar={() => setModal("Sidebar")}
+            />
+          }
         />
 
         <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
-
-        <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
-
-        <Route path="chats" element={<Chats {...{ users, chats, messages }} />} />
 
         <Route
           path="chat/:id"
           element={<Chat {...{ users, chats, messages, addMessages, setLastViewedMessageId }} />}
         />
 
-        <Route path="profile/:id" element={<Profile {...{ users, posts, chats }} />} />
+        <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
+
+        <Route path="profile/:id" element={<Profile {...{ users, posts }} />} />
 
         <Route path="settings" element={<Settings user={users[storage.userId]} />} />
       </Routes>

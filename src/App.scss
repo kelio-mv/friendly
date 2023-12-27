@@ -1,17 +1,20 @@
 // Simple styles
 
-.home {
-  &__body {
-    overflow: auto;
-    flex-grow: 1;
-  }
+.home__bottom-bar {
+  display: flex;
+  padding: 0.875rem;
+  justify-content: space-around;
+  border-top: 1px solid var(--bg-300);
+}
 
-  &__bottom-bar {
-    display: flex;
-    padding: 0.875rem;
-    justify-content: space-around;
-    border-top: 1px solid var(--bg-300);
-  }
+.posts__body {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.chats__body {
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .post__body {
