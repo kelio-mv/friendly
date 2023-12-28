@@ -15,7 +15,7 @@ import "./App.scss";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
-  const [tab, setTab] = useState("recent");
+  const [tab, setTab] = useState("posts");
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState([]);
@@ -62,10 +62,8 @@ function App() {
     }));
   }
 
-  function addPosts(section, posts) {
-    setPosts((prevPosts) =>
-      [...prevPosts, ...posts.map((post) => ({ ...post, section }))].sort((a, b) => b.id - a.id)
-    );
+  function addPosts(posts) {
+    setPosts((prevPosts) => [...prevPosts, ...posts].sort((a, b) => b.id - a.id));
     requestUnfetchedUsers(posts.map((post) => post.authorId));
   }
 
@@ -83,15 +81,9 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, ...messages].sort((a, b) => a.id - b.id));
   }
 
-  function delPost(id, section) {
-    if (section) {
-      setPosts((prevPosts) =>
-        prevPosts.filter((post) => !(post.id === id && post.section === section))
-      );
-    } else {
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-      setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
-    }
+  function delPost(id) {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
   function delComments(ids) {

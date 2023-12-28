@@ -19,8 +19,7 @@ function NewPost(props) {
           onClick={() => {
             setSending(true);
             socket.emit("create_post", content.trim(), (post) => {
-              props.addPosts("recent", [post]);
-              props.addPosts("following", [post]);
+              props.addPosts([post]);
               navigate(`/post/${post.id}`, { replace: true });
             });
           }}
