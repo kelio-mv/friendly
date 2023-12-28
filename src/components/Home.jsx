@@ -1,31 +1,32 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Posts from "./Posts";
 import Chats from "./Chats";
 import Icon from "./Icon";
 
 function Home(props) {
+  const prevTab = sessionStorage.getItem("homeTab");
+  const [tab, setTab] = useState(prevTab || "posts");
   const navigate = useNavigate();
+
+  useEffect(() => sessionStorage.setItem("homeTab", tab), [tab]);
 
   return (
     <div className="flex-page">
       <div className="top-bar">
         <Icon name="menu" onClick={props.openSidebar} />
-        <h1>{props.tab === "posts" ? "Publicações" : "Conversas"}</h1>
+        <h1>{tab === "posts" ? "Publicações" : "Conversas"}</h1>
       </div>
 
-      {props.tab === "posts" ? (
+      {tab === "posts" ? (
         <Posts users={props.users} posts={props.posts} />
       ) : (
         <Chats users={props.users} chats={props.chats} messages={props.messages} />
       )}
 
       <div className="home__bottom-bar">
-        <Icon
-          name="article"
-          highlight={props.tab === "posts"}
-          onClick={() => props.setTab("posts")}
-        />
-        <Icon name="chat" highlight={props.tab === "chats"} onClick={() => props.setTab("chats")} />
+        <Icon name="article" highlight={tab === "posts"} onClick={() => setTab("posts")} />
+        <Icon name="chat" highlight={tab === "chats"} onClick={() => setTab("chats")} />
         <Icon name="add" onClick={() => navigate("new-post")} />
       </div>
     </div>

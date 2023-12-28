@@ -1,8 +1,6 @@
 const Database = require("better-sqlite3");
 const db = new Database(".data/storage.db");
 
-// Salvar statements pra otimizar queries
-
 class Storage {
   constructor() {
     db.exec(`CREATE TABLE IF NOT EXISTS users (
@@ -66,9 +64,14 @@ class Storage {
     db.prepare(`UPDATE users SET ${field} = ? WHERE id = ?`).run(value, id);
   }
 
+  deleteUser(id) {
+    db.prepare("DELETE FROM users WHERE id = ?").run(id);
+  }
+
   createPost(authorId, content) {
     const stmt = db.prepare("INSERT INTO posts (authorId, content) VALUES (?, ?)");
-    return this.getPost(stmt.run(authorId, content).lastInsertRowid);
+    const id = stmt.run(authorId, content).lastInsertRowid;
+    return this.getPost(id);
   }
 
   getPost(id) {
@@ -85,7 +88,8 @@ class Storage {
 
   createComment(authorId, postId, content) {
     const stmt = db.prepare("INSERT INTO comments (authorId, postId, content) VALUES (?, ?, ?)");
-    return this.getComment(stmt.run(authorId, postId, content).lastInsertRowid);
+    const id = stmt.run(authorId, postId, content).lastInsertRowid;
+    return this.getComment(id);
   }
 
   getComment(id) {
@@ -131,7 +135,8 @@ class Storage {
     const stmt = db.prepare(
       "INSERT INTO messages (senderId, receiverId, content) VALUES (?, ?, ?)"
     );
-    return this.getMessage(stmt.run(senderId, receiverId, content).lastInsertRowid);
+    const id = stmt.run(senderId, receiverId, content).lastInsertRowid;
+    return this.getMessage(id);
   }
 
   getMessage(id) {
@@ -156,3 +161,5 @@ class Storage {
 }
 
 module.exports = new Storage();
+
+// SQL statements need to be compiled. Saving them can speed up execution.

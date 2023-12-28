@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, Fragment } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import useScrollRestoration from "../useScrollRestoration";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Modal from "./Modal";
@@ -18,16 +19,13 @@ function Chat(props) {
   const lastMessage = messages[messages.length - 1];
   const [unviewedMessages, setUnviewedMessages] = useState(0);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
-  const chatBodyRef = useRef();
-  const scrollDown = useRef(true);
-  const unviewedElemRef = useRef();
+  const location = useLocation();
   const navigate = useNavigate();
+  const chatBodyRef = useScrollRestoration();
+  const scrollDown = useRef(!sessionStorage.getItem(location.key));
+  const unviewedElemRef = useRef();
 
   useEffect(() => {
-    if (chat) {
-      const fetchedMessages = messages.map((message) => message.id);
-      socket.emit("get_messages", interlocutorId, fetchedMessages);
-    }
     const handleDelChat = (_interlocutorId) => {
       if (_interlocutorId === interlocutorId) navigate(-1);
     };
@@ -95,6 +93,10 @@ function Chat(props) {
     });
   }
 
+  function openProfile() {
+    navigate(`/profile/${interlocutorId}`);
+  }
+
   function deleteChat() {
     socket.emit("del_chat", interlocutorId);
     setDeleteConfirmation(false);
@@ -104,8 +106,10 @@ function Chat(props) {
     <div className="flex-page">
       <div className="top-bar" style={{ padding: "5px 0.875rem" }}>
         <Icon name="arrow_back" onClick={() => navigate(-1)} />
-        <ProfilePicture src={interlocutor.profilePicture} size={48} />
-        <p className="chat__username">@{interlocutor.username}</p>
+        <ProfilePicture src={interlocutor.profilePicture} size={48} onClick={openProfile} />
+        <p className="chat__username" onClick={openProfile}>
+          @{interlocutor.username}
+        </p>
         <div className="top-bar__grow"></div>
         <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
       </div>
@@ -170,5 +174,3 @@ function Message(props) {
 }
 
 export default Chat;
-
-// Exibir na parte superior da tela, a data da mensagem mais antiga visível.

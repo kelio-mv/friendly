@@ -3,7 +3,16 @@ import ProfilePicture from "./ProfilePicture";
 import "./Chats.scss";
 
 function Chats(props) {
+  const chats = getSortedChats(props.chats);
   const navigate = useNavigate();
+
+  function getSortedChats(chats) {
+    return [...chats].sort((a, b) => {
+      const [ma, mb] = [getMessages(a.interlocutorId), getMessages(b.interlocutorId)];
+      const [lma, lmb] = [ma[ma.length - 1], mb[mb.length - 1]];
+      return lmb.id - lma.id;
+    });
+  }
 
   function getMessages(interlocutorId) {
     return props.messages.filter(
@@ -26,7 +35,7 @@ function Chats(props) {
 
   return (
     <div className="chats__body">
-      {props.chats.map((chat) => {
+      {chats.map((chat) => {
         const user = props.users[chat.interlocutorId];
         const messages = getMessages(chat.interlocutorId);
         const lastMessage = messages[messages.length - 1];

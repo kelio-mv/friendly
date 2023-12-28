@@ -15,7 +15,6 @@ import "./App.scss";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
-  const [tab, setTab] = useState("posts");
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState({});
   const [posts, setPosts] = useState([]);
@@ -124,7 +123,6 @@ function App() {
 
   function resetState() {
     setAuthenticated(false);
-    setTab("recent");
     setModal(null);
     setUsers({});
     setPosts([]);
@@ -151,10 +149,7 @@ function App() {
         <Route
           path="/"
           element={
-            <Home
-              {...{ tab, users, posts, chats, messages, setTab }}
-              openSidebar={() => setModal("Sidebar")}
-            />
+            <Home {...{ users, posts, chats, messages }} openSidebar={() => setModal("Sidebar")} />
           }
         />
 
