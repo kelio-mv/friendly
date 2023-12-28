@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useScrollRestoration from "../useScrollRestoration";
 import Article from "./Article";
 import Icon from "./Icon";
 import Modal from "./Modal";
@@ -14,7 +15,7 @@ function Post(props) {
   const [unviewedComments, setUnviewedComments] = useState(0);
   const [commentId, setCommentId] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
-  const postBodyRef = useRef();
+  const postBodyRef = useScrollRestoration();
   const scrollDown = useRef(false);
   const commentsLength = useRef(comments.length);
   const unviewedElemRef = useRef();
