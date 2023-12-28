@@ -16,7 +16,6 @@ function getSocket(userId) {
 io.on("connection", (socket) => {
   socket.on("auth", handleAuth);
   socket.on("get_data", handleGetData);
-  socket.on("get_messages", handleGetMessages);
   socket.on("get_users", handleGetUsers);
   socket.on("create_post", handleCreatePost);
   socket.on("create_comment", handleCreateComment);
@@ -67,20 +66,12 @@ io.on("connection", (socket) => {
     const posts = storage.getPosts();
     const comments = storage.getComments();
     const chats = storage.getChats(socket.uid);
-    const messages = chats.map((chat) =>
-      storage.getMessages(chat.userId, chat.interlocutorId, chat.lastViewedMessageId)
-    );
+    const messages = chats.map((chat) => storage.getMessages(chat.userId, chat.interlocutorId));
     callback(user);
     socket.emit("add_posts", posts);
     socket.emit("add_comments", comments);
     socket.emit("add_chats", chats);
     socket.emit("add_messages", messages.flat());
-  }
-
-  function handleGetMessages(interlocutorId, fetched) {
-    const all = storage.getMessages(socket.uid, interlocutorId);
-    const unfetched = all.filter(({ id }) => !fetched.includes(id));
-    if (unfetched.length > 0) socket.emit("add_messages", unfetched);
   }
 
   function handleGetUsers(ids) {

@@ -138,15 +138,12 @@ class Storage {
     return db.prepare("SELECT * FROM messages WHERE id = ?").get(id);
   }
 
-  getMessages(userId, interlocutorId, after) {
+  getMessages(userId, interlocutorId) {
     const stmt = db.prepare(`
       SELECT * FROM messages
-      WHERE ((senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?))
-      ${after ? "AND id >= ?" : ""}
+      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
     `);
-    const params = [userId, interlocutorId, interlocutorId, userId];
-    if (after) params.push(after);
-    return stmt.all(...params);
+    return stmt.all(userId, interlocutorId, interlocutorId, userId);
   }
 
   deleteMessages(userId, interlocutorId) {
