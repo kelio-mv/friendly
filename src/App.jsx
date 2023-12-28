@@ -30,7 +30,7 @@ function App() {
     socket.on("add_chats", addChats);
     socket.on("add_messages", addMessages);
     socket.on("del_post", delPost);
-    socket.on("del_comments", delComments);
+    socket.on("del_comment", delComment);
     socket.on("del_chat", delChat);
     socket.on("update_user", updateUser);
 
@@ -41,7 +41,7 @@ function App() {
       socket.off("add_chats");
       socket.off("add_messages");
       socket.off("del_post");
-      socket.off("del_comments");
+      socket.off("del_comment");
       socket.off("del_chat");
       socket.off("update_user");
     };
@@ -86,8 +86,8 @@ function App() {
     setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
   }
 
-  function delComments(ids) {
-    setComments((prevComments) => prevComments.filter((comment) => !ids.includes(comment.id)));
+  function delComment(id) {
+    setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
   }
 
   function delChat(interlocutorId) {

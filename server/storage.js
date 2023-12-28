@@ -92,14 +92,12 @@ class Storage {
     return db.prepare("SELECT * FROM comments WHERE id = ?").get(id);
   }
 
-  getComments(postId) {
-    return db.prepare("SELECT * FROM comments WHERE postId = ?").all(postId);
+  getComments() {
+    return db.prepare("SELECT * FROM comments").all();
   }
 
   deleteComment(id) {
-    const comment = this.getComment(id);
     db.prepare("DELETE FROM comments WHERE id = ?").run(id);
-    return comment;
   }
 
   createChat(userId, interlocutorId) {

@@ -16,10 +16,8 @@ function getSocket(userId) {
 io.on("connection", (socket) => {
   socket.on("auth", handleAuth);
   socket.on("get_data", handleGetData);
-  socket.on("get_comments", handleGetComments);
   socket.on("get_messages", handleGetMessages);
   socket.on("get_users", handleGetUsers);
-  socket.on("leave_room", handleLeaveRoom);
   socket.on("create_post", handleCreatePost);
   socket.on("create_comment", handleCreateComment);
   socket.on("create_chat", handleCreateChat);
@@ -67,25 +65,16 @@ io.on("connection", (socket) => {
   function handleGetData(callback) {
     const user = storage.getUserData(socket.uid);
     const posts = storage.getPosts();
+    const comments = storage.getComments();
     const chats = storage.getChats(socket.uid);
     const messages = chats.map((chat) =>
       storage.getMessages(chat.userId, chat.interlocutorId, chat.lastViewedMessageId)
     );
     callback(user);
     socket.emit("add_posts", posts);
+    socket.emit("add_comments", comments);
     socket.emit("add_chats", chats);
     socket.emit("add_messages", messages.flat());
-  }
-
-  function handleGetComments(postId, fetched) {
-    const all = storage.getComments(postId);
-    const allIds = all.map(({ id }) => id);
-    const unfetched = all.filter((c) => !fetched.includes(c.id));
-    const deleted = fetched.filter((id) => !allIds.includes(id));
-
-    if (unfetched.length > 0) socket.emit("add_comments", unfetched);
-    if (deleted.length > 0) socket.emit("del_comments", deleted);
-    socket.join(postId);
   }
 
   function handleGetMessages(interlocutorId, fetched) {
@@ -99,10 +88,6 @@ io.on("connection", (socket) => {
     socket.emit("add_users", users);
   }
 
-  function handleLeaveRoom(postId) {
-    socket.leave(postId);
-  }
-
   function handleCreatePost(content, callback) {
     const post = storage.createPost(socket.uid, content);
     callback(post);
@@ -112,7 +97,7 @@ io.on("connection", (socket) => {
   function handleCreateComment(postId, content, callback) {
     const comment = storage.createComment(socket.uid, postId, content);
     callback(comment);
-    socket.broadcast.to(comment.postId).emit("add_comments", [comment]);
+    socket.broadcast.emit("add_comments", [comment]);
   }
 
   function handleCreateChat(interlocutorId) {
@@ -137,9 +122,9 @@ io.on("connection", (socket) => {
   }
 
   function handleDelComment(id) {
-    const { postId } = storage.deleteComment(id);
-    socket.emit("del_comments", [id]);
-    socket.broadcast.to(postId).emit("del_comments", [id]);
+    storage.deleteComment(id);
+    socket.emit("del_comment", id);
+    socket.broadcast.emit("del_comment", id);
   }
 
   function handleDelChat(interlocutorId) {

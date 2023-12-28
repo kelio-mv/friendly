@@ -22,13 +22,7 @@ function Post(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (post) {
-      const fetchedComments = comments.map((comment) => comment.id);
-      socket.emit("get_comments", postId, fetchedComments);
-    } else {
-      navigate(-1);
-    }
-    return () => socket.emit("leave_room", postId);
+    if (!post) navigate(-1);
   }, [post]);
 
   useEffect(() => {
