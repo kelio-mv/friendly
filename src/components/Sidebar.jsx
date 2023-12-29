@@ -71,6 +71,12 @@ function Sidebar(props) {
             Sair
           </div>
         </div>
+
+        <div className="sidebar__footer">
+          <a href="https://www.flaticon.com/free-icons/talking" title="talking icons">
+            Talking icons created by Freepik - Flaticon
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -7,16 +7,8 @@
   border-top: 1px solid var(--bg-300);
 }
 
-.posts__body {
-  flex-grow: 1;
-  overflow: auto;
-}
-
-.chats__body {
-  flex-grow: 1;
-  overflow: auto;
-}
-
+.posts__body,
+.chats__body,
 .post__body {
   flex-grow: 1;
   overflow: auto;

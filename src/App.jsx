@@ -54,6 +54,15 @@ function App() {
     });
   }
 
+  function onReauth() {
+    socket.emit("get_data", () => {
+      setPosts([]);
+      setComments([]);
+      setChats([]);
+      setMessages([]);
+    });
+  }
+
   function addUsers(users) {
     setUsers((prevUsers) => ({
       ...prevUsers,
@@ -136,7 +145,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Auth onAuth={onAuth} onReauth={() => {}} onReauthError={resetState} />}
+          element={<Auth onAuth={onAuth} onReauth={onReauth} onReauthError={resetState} />}
         />
         <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>

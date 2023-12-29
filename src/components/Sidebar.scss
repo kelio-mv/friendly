@@ -46,4 +46,11 @@
       background: var(--bg-300);
     }
   }
+
+  &__footer {
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--clr-300);
+  }
 }
