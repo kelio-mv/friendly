@@ -96,6 +96,15 @@
   }
 }
 
+@keyframes rotate {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
 /*
 Possíveis causas do antigo bug dos 18px:
 

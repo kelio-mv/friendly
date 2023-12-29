@@ -71,10 +71,6 @@ function Sidebar(props) {
             Sair
           </div>
         </div>
-
-        <footer className="sidebar__footer">
-          <Icon name="code" dimmed /> Em desenvolvimento
-        </footer>
       </div>
     </div>
   );
