@@ -38,9 +38,9 @@ function Settings(props) {
   function saveUsername() {
     setSaving(true);
     const data = { field: "username", value: username, currentPassword };
-    const callback = (errorMessage) => {
-      if (errorMessage) {
-        setErrorMessage(errorMessage);
+    const callback = (err) => {
+      if (err) {
+        setErrorMessage(err);
         setSaving(false);
       } else {
         storage.saveCredentials(username, storage.password);
@@ -53,9 +53,9 @@ function Settings(props) {
   function savePassword() {
     setSaving(true);
     const data = { field: "password", value: password, currentPassword };
-    const callback = (errorMessage) => {
-      if (errorMessage) {
-        setErrorMessage(errorMessage);
+    const callback = (err) => {
+      if (err) {
+        setErrorMessage(err);
         setSaving(false);
       } else {
         storage.saveCredentials(storage.username, password);
@@ -67,9 +67,9 @@ function Settings(props) {
 
   function deleteAccount() {
     setSaving(true);
-    const callback = (errorMessage) => {
-      if (errorMessage) {
-        setErrorMessage(errorMessage);
+    const callback = (err) => {
+      if (err) {
+        setErrorMessage(err);
         setSaving(false);
       } else {
         props.onAccountDelete();
