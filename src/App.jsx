@@ -28,10 +28,11 @@ function App() {
     socket.on("add_comments", addComments);
     socket.on("add_chats", addChats);
     socket.on("add_messages", addMessages);
+    socket.on("update_user", updateUser);
     socket.on("del_post", delPost);
     socket.on("del_comment", delComment);
     socket.on("del_chat", delChat);
-    socket.on("update_user", updateUser);
+    socket.on("del_user", delUser);
 
     return () => {
       socket.off("add_users");
@@ -43,6 +44,7 @@ function App() {
       socket.off("del_comment");
       socket.off("del_chat");
       socket.off("update_user");
+      socket.off("del_user");
     };
   }, []);
 
@@ -89,6 +91,13 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, ...messages].sort((a, b) => a.id - b.id));
   }
 
+  function updateUser(id) {
+    setUsers((users) => {
+      if (id in users) socket.emit("get_users", [id]);
+      return users;
+    });
+  }
+
   function delPost(id) {
     setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
     setComments((prevComments) => prevComments.filter((comment) => comment.postId !== id));
@@ -107,11 +116,13 @@ function App() {
     );
   }
 
-  function updateUser(id) {
-    setUsers((users) => {
-      if (id in users) socket.emit("get_users", [id]);
-      return users;
-    });
+  function delUser(id) {
+    setUsers((prevUsers) =>
+      Object.fromEntries(Object.entries(prevUsers).filter(([_, user]) => user.id !== id))
+    );
+    setPosts((prevPosts) => prevPosts.filter((post) => post.authorId !== id));
+    setComments((prevComments) => prevComments.filter((comment) => comment.authorId !== id));
+    delChat(id);
   }
 
   function requestUnfetchedUsers(ids) {
@@ -173,7 +184,10 @@ function App() {
 
         <Route path="/profile/:id" element={<Profile {...{ users, posts }} />} />
 
-        <Route path="/settings" element={<Settings user={users[storage.userId]} />} />
+        <Route
+          path="/settings"
+          element={<Settings user={users[storage.userId]} onAccountDelete={resetState} />}
+        />
       </Routes>
 
       {modal === "Sidebar" && (

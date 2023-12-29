@@ -52,5 +52,9 @@
       opacity: 0.5;
       pointer-events: none;
     }
+
+    &--danger {
+      background: #b91c1c;
+    }
   }
 }

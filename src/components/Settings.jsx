@@ -20,6 +20,67 @@ function Settings(props) {
   const fileRef = useRef();
   const navigate = useNavigate();
 
+  function saveProfilePicture() {
+    setSaving(true);
+    const data = { field: "profilePicture", value: profilePicture };
+    const callback = () => reset("modal", "saving");
+    socket.emit("edit_user", data, callback);
+  }
+
+  function saveAbout() {
+    setSaving(true);
+    setAbout(about.trim());
+    const data = { field: "about", value: about.trim() };
+    const callback = () => reset("modal", "saving");
+    socket.emit("edit_user", data, callback);
+  }
+
+  function saveUsername() {
+    setSaving(true);
+    const data = { field: "username", value: username, currentPassword };
+    const callback = (errorMessage) => {
+      if (errorMessage) {
+        setErrorMessage(errorMessage);
+        setSaving(false);
+      } else {
+        storage.saveCredentials(username, storage.password);
+        reset("modal", "saving", "errorMessage", "username", "currentPassword");
+      }
+    };
+    socket.emit("edit_user", data, callback);
+  }
+
+  function savePassword() {
+    setSaving(true);
+    const data = { field: "password", value: password, currentPassword };
+    const callback = (errorMessage) => {
+      if (errorMessage) {
+        setErrorMessage(errorMessage);
+        setSaving(false);
+      } else {
+        storage.saveCredentials(storage.username, password);
+        reset("modal", "saving", "errorMessage", "currentPassword", "password");
+      }
+    };
+    socket.emit("edit_user", data, callback);
+  }
+
+  function deleteAccount() {
+    setSaving(true);
+    const callback = (errorMessage) => {
+      if (errorMessage) {
+        setErrorMessage(errorMessage);
+        setSaving(false);
+      } else {
+        storage.deleteCredentials();
+        socket.off("disconnect");
+        socket.close();
+        props.onAccountDelete();
+      }
+    };
+    socket.emit("del_user", currentPassword, callback);
+  }
+
   function onFileLoad(file) {
     if (!file) return;
 
@@ -84,6 +145,10 @@ function Settings(props) {
             <Icon name="key" />
             Senha
           </div>
+          <div className="settings__item" onClick={() => setModal("DeleteAccount")}>
+            <Icon name="delete_forever" />
+            Excluir conta
+          </div>
         </div>
       </div>
 
@@ -94,12 +159,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={() => {
-              setSaving(true);
-              const data = { field: "profilePicture", value: profilePicture };
-              const callback = () => reset("modal", "saving");
-              socket.emit("edit_user", data, callback);
-            }}
+            onClick={saveProfilePicture}
             disabled={profilePicture === props.user.profilePicture || saving}
           >
             Salvar
@@ -138,13 +198,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={() => {
-              setSaving(true);
-              setAbout(about.trim());
-              const data = { field: "about", value: about.trim() };
-              const callback = () => reset("modal", "saving");
-              socket.emit("edit_user", data, callback);
-            }}
+            onClick={saveAbout}
             disabled={about === props.user.about || saving}
           >
             Salvar
@@ -168,20 +222,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={() => {
-              setSaving(true);
-              const data = { field: "username", value: username, currentPassword };
-              const callback = (errorMessage) => {
-                if (errorMessage) {
-                  setErrorMessage(errorMessage);
-                  setSaving(false);
-                } else {
-                  storage.saveCredentials(username, storage.password);
-                  reset("modal", "saving", "errorMessage", "username", "currentPassword");
-                }
-              };
-              socket.emit("edit_user", data, callback);
-            }}
+            onClick={saveUsername}
             disabled={!username || !currentPassword || saving}
           >
             Salvar
@@ -216,20 +257,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={() => {
-              setSaving(true);
-              const data = { field: "password", value: password, currentPassword };
-              const callback = (errorMessage) => {
-                if (errorMessage) {
-                  setErrorMessage(errorMessage);
-                  setSaving(false);
-                } else {
-                  storage.saveCredentials(storage.username, password);
-                  reset("modal", "saving", "errorMessage", "currentPassword", "password");
-                }
-              };
-              socket.emit("edit_user", data, callback);
-            }}
+            onClick={savePassword}
             disabled={!currentPassword || !password || saving}
           >
             Salvar
@@ -251,6 +279,33 @@ function Settings(props) {
           placeholder="Nova senha"
           value={password}
           onChange={(v) => setPassword(v)}
+          modalChild
+        />
+
+        {errorMessage && <p className="settings__error">{errorMessage}</p>}
+      </Modal>
+
+      <Modal
+        open={modal === "DeleteAccount"}
+        header="Excluir conta"
+        footer={
+          <button
+            className="modal__btn modal__btn--danger"
+            onClick={deleteAccount}
+            disabled={!currentPassword || saving}
+          >
+            Sim
+          </button>
+        }
+        close={() => reset("modal", "errorMessage", "currentPassword")}
+        center
+      >
+        <p>Você tem certeza que deseja excluir sua conta?</p>
+        <TextField
+          type="password"
+          placeholder="Confirmar senha"
+          value={currentPassword}
+          onChange={(v) => setCurrentPassword(v)}
           modalChild
         />
 

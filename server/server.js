@@ -21,11 +21,12 @@ io.on("connection", (socket) => {
   socket.on("create_comment", handleCreateComment);
   socket.on("create_chat", handleCreateChat);
   socket.on("create_message", handleCreateMessage);
+  socket.on("edit_chat", handleEditChat);
+  socket.on("edit_user", handleEditUser);
   socket.on("del_post", handleDelPost);
   socket.on("del_comment", handleDelComment);
   socket.on("del_chat", handleDelChat);
-  socket.on("edit_chat", handleEditChat);
-  socket.on("edit_user", handleEditUser);
+  socket.on("del_user", handleDelUser);
 
   function handleAuth(signUp, username, password, callback) {
     const user = storage.getUser("username", username);
@@ -106,27 +107,6 @@ io.on("connection", (socket) => {
     if (receiver) receiver.emit("add_messages", [message]);
   }
 
-  function handleDelPost(postId) {
-    storage.deletePost(postId);
-    socket.emit("del_post", postId);
-    socket.broadcast.emit("del_post", postId);
-  }
-
-  function handleDelComment(id) {
-    storage.deleteComment(id);
-    socket.emit("del_comment", id);
-    socket.broadcast.emit("del_comment", id);
-  }
-
-  function handleDelChat(interlocutorId) {
-    storage.deleteChat(socket.uid, interlocutorId);
-    storage.deleteChat(interlocutorId, socket.uid);
-    storage.deleteMessages(socket.uid, interlocutorId);
-    socket.emit("del_chat", interlocutorId);
-    const interlocutor = getSocket(interlocutorId);
-    if (interlocutor) interlocutor.emit("del_chat", socket.uid);
-  }
-
   function handleEditChat(interlocutorId, lastViewedMessageId) {
     storage.editChat(socket.uid, interlocutorId, "lastViewedMessageId", lastViewedMessageId);
   }
@@ -164,6 +144,38 @@ io.on("connection", (socket) => {
     }
 
     callback(errorMessage);
+  }
+
+  function handleDelPost(postId) {
+    storage.deletePost(postId);
+    socket.emit("del_post", postId);
+    socket.broadcast.emit("del_post", postId);
+  }
+
+  function handleDelComment(id) {
+    storage.deleteComment(id);
+    socket.emit("del_comment", id);
+    socket.broadcast.emit("del_comment", id);
+  }
+
+  function handleDelChat(interlocutorId) {
+    storage.deleteChat(socket.uid, interlocutorId);
+    storage.deleteChat(interlocutorId, socket.uid);
+    storage.deleteMessages(socket.uid, interlocutorId);
+    socket.emit("del_chat", interlocutorId);
+    const interlocutor = getSocket(interlocutorId);
+    if (interlocutor) interlocutor.emit("del_chat", socket.uid);
+  }
+
+  function handleDelUser(currentPassword, callback) {
+    const { password } = storage.getUser("id", socket.uid);
+    if (password === currentPassword) {
+      storage.deleteUser(socket.uid);
+      callback();
+      socket.broadcast.emit("del_user", socket.uid);
+    } else {
+      callback("Sua senha está incorreta. Por favor, verifique-a.");
+    }
   }
 });
 
