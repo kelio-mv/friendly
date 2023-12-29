@@ -69,8 +69,12 @@ function Post(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <Icon name="arrow_back" onClick={() => navigate(-1)} />
+        <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
         <h1>Publicação</h1>
+        <div className="top-bar__grow" />
+        {post && post.authorId === storage.userId && (
+          <Icon name="delete" onClick={() => setDeleteConfirmation("post")} invert />
+        )}
       </div>
 
       <div className="post__body" ref={postBodyRef} onScroll={onScroll}>
@@ -78,8 +82,6 @@ function Post(props) {
           <Article
             data={post}
             user={props.users[post.authorId]}
-            deletable={post.authorId === storage.userId}
-            delete={() => setDeleteConfirmation("post")}
             onProfileClick={() => navigate(`/profile/${post.authorId}`)}
             highlight
           />

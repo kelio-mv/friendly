@@ -14,7 +14,7 @@ function Home(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <Icon name="menu" onClick={props.openSidebar} />
+        <Icon name="menu" onClick={props.openSidebar} invert />
         <h1>{tab === "posts" ? "Publicações" : "Conversas"}</h1>
       </div>
 

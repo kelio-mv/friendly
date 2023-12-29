@@ -105,13 +105,13 @@ function Chat(props) {
   return (
     <div className="flex-page">
       <div className="top-bar" style={{ padding: "5px 0.875rem" }}>
-        <Icon name="arrow_back" onClick={() => navigate(-1)} />
+        <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
         <ProfilePicture src={interlocutor.profilePicture} size={48} onClick={openProfile} />
         <p className="chat__username" onClick={openProfile}>
           @{interlocutor.username}
         </p>
         <div className="top-bar__grow"></div>
-        <Icon name="delete" onClick={() => setDeleteConfirmation(true)} />
+        <Icon name="delete" onClick={() => setDeleteConfirmation(true)} invert />
       </div>
 
       <div className="chat__body" ref={chatBodyRef} onScroll={onScroll}>

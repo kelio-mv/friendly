@@ -14,11 +14,11 @@ function Profile(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <Icon name="arrow_back" onClick={() => navigate(-1)} />
+        <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
         <h1>Perfil</h1>
         <div className="top-bar__grow" />
         {userId !== storage.userId && (
-          <Icon name="chat" onClick={() => navigate(`/chat/${userId}`)} />
+          <Icon name="chat" onClick={() => navigate(`/chat/${userId}`)} invert />
         )}
       </div>
 

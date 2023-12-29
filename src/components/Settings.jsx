@@ -64,7 +64,7 @@ function Settings(props) {
       {/* Home */}
       <div className="flex-page">
         <div className="top-bar">
-          <Icon name="arrow_back" onClick={() => navigate(-1)} />
+          <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
           <h1>Configurações</h1>
         </div>
         <div className="settings__body">

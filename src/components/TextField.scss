@@ -7,19 +7,20 @@
     width: 16rem;
     padding: 0.5rem;
     background: var(--bg-200);
-    color: white;
-    border: 2px solid transparent;
+    color: var(--clr-000);
+    border: 2px solid var(--bg-300);
     border-radius: 0.25rem;
 
     &:focus {
-      border: 2px solid var(--bg-300);
+      border: 2px solid var(--bg-400);
     }
 
     &--modal-child {
       background: var(--bg-300);
+      border: 2px solid var(--bg-400);
 
       &:focus {
-        border: 2px solid var(--bg-400);
+        border: 2px solid var(--bg-500);
       }
     }
   }

@@ -92,8 +92,7 @@ function Auth(props) {
       </p>
 
       <div className="auth__ads">
-        <Icon name="favorite" dimmed />
-        <p>Não exibimos anúncios</p>
+        Made with <Icon name="favorite" dimmed /> by @kelio_mv
       </div>
 
       <Modal

@@ -56,7 +56,6 @@
   min-width: 16rem;
   padding: 0.5rem 0.75rem;
   border-radius: 0.25rem;
-  color: white;
   font-size: 1.125rem;
   cursor: pointer;
 
@@ -67,10 +66,12 @@
 
   &--primary {
     background: var(--teal-700);
+    color: white;
   }
 
   &--danger {
     padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+    color: var(--clr-000);
     border: 1px solid #991b1b;
   }
 }

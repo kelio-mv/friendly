@@ -11,7 +11,7 @@
 
   &__content {
     width: 20rem;
-    background: var(--bg-200);
+    background: var(--bg-modal);
     border-radius: 0.5rem;
   }
 
@@ -43,14 +43,10 @@
 
   &__btn {
     padding: 2px 6px;
-    background: rgba(var(--teal-700-rgb), 0.15);
+    background: var(--teal-700);
     border-radius: 9999px;
-    color: var(--teal-400);
+    color: white;
     cursor: pointer;
-
-    &:hover {
-      background: rgba(var(--teal-700-rgb), 0.25);
-    }
 
     &:disabled {
       opacity: 0.5;

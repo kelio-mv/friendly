@@ -15,6 +15,7 @@
     margin: 12px auto;
     padding: 3px 7px;
     background: var(--teal-800);
+    color: white;
     border-radius: 0.5rem;
     font-size: 0.875rem;
   }
@@ -24,6 +25,8 @@
   --padding-x: 10px;
   --padding-y: 6px;
   --time-width: 36px;
+  --clr-content: white;
+  --clr-time: rgb(188, 188, 188);
 
   position: relative;
   width: fit-content;
@@ -37,11 +40,14 @@
   }
 
   &--from-me {
+    --clr-content: var(--clr-000);
+    --clr-time: var(--clr-300);
     margin-left: auto;
     background: var(--bg-200);
   }
 
   &__content {
+    color: var(--clr-content);
     word-break: break-word;
     white-space: pre-wrap;
 
@@ -57,6 +63,6 @@
     bottom: var(--padding-y);
     right: var(--padding-x);
     font: 0.75rem "Source Code Pro", monospace;
-    color: var(--clr-300);
+    color: var(--clr-time);
   }
 }

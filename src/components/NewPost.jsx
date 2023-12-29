@@ -11,7 +11,7 @@ function NewPost(props) {
   return (
     <div className="flex-page">
       <div className="top-bar">
-        <Icon name="close" onClick={() => navigate(-1)} />
+        <Icon name="close" onClick={() => navigate(-1)} invert />
         <h1>Nova publicação</h1>
         <div className="top-bar__grow" />
         <Icon
@@ -24,6 +24,7 @@ function NewPost(props) {
             });
           }}
           disabled={!content.trim() || sending}
+          invert
         />
       </div>
 

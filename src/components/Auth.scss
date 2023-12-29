@@ -28,8 +28,12 @@
   }
 
   &__switch-mode-btn {
-    color: var(--teal-500);
+    color: var(--teal-800);
     cursor: pointer;
+
+    @media (prefers-color-scheme: dark) {
+      color: var(--teal-500);
+    }
   }
 
   &__ads {

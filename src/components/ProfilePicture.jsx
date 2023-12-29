@@ -1,5 +1,6 @@
 function ProfilePicture(props) {
   const isDefault = ["default_avatar.png", "loading_pfp.png"].includes(props.src);
+  const isDarkMode = matchMedia("(prefers-color-scheme: dark)").matches;
 
   return (
     <img
@@ -8,7 +9,7 @@ function ProfilePicture(props) {
       style={{
         width: props.size ? props.size : 72,
         borderRadius: "50%",
-        filter: isDefault ? "invert(1)" : null,
+        filter: isDefault && isDarkMode ? "invert(1)" : null,
         cursor: props.onClick ? "pointer" : null,
       }}
     />
