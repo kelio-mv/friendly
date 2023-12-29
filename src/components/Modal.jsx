@@ -10,7 +10,9 @@ function Modal(props) {
         <div className={`modal__body ${props.center ? "modal__body--center" : ""}`}>
           {props.children}
         </div>
-        {props.footer && <footer className="modal__footer">{props.footer}</footer>}
+        {(props.footer || props.center) && (
+          <footer className="modal__footer">{props.footer}</footer>
+        )}
       </div>
     </div>
   );
