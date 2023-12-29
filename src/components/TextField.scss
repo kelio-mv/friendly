@@ -8,19 +8,19 @@
     padding: 0.5rem;
     background: var(--bg-200);
     color: var(--clr-000);
-    border: 2px solid var(--bg-300);
+    border: 1px solid var(--bg-300);
     border-radius: 0.25rem;
 
     &:focus {
-      border: 2px solid var(--bg-400);
+      outline: 1px solid var(--bg-400);
     }
 
     &--modal-child {
       background: var(--bg-300);
-      border: 2px solid var(--bg-400);
+      border: 1px solid var(--bg-400);
 
       &:focus {
-        border: 2px solid var(--bg-500);
+        outline: 1px solid var(--bg-500);
       }
     }
   }
