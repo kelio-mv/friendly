@@ -41,15 +41,8 @@ function Auth(props) {
       disconnect event are ignored as socket.io thinks they were sent.
       Stored credentials are used because the user might have changed their credentials in Settings.
     */
-    socket.emit("auth", false, storage.username, storage.password, (errorMessage) => {
-      if (errorMessage) {
-        storage.deleteCredentials();
-        socket.off("disconnect");
-        socket.close();
-        props.onReauthError();
-      } else {
-        props.onReauth();
-      }
+    socket.emit("auth", false, storage.username, storage.password, (e) => {
+      e ? props.onReauthError() : props.onReauth();
     });
   }
 

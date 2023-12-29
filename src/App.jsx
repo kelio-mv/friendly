@@ -65,6 +65,19 @@ function App() {
     });
   }
 
+  function logout() {
+    storage.deleteCredentials();
+    socket.off("disconnect");
+    socket.close();
+    setAuthenticated(false);
+    setModal(null);
+    setUsers({});
+    setPosts([]);
+    setComments([]);
+    setChats([]);
+    setMessages([]);
+  }
+
   function addUsers(users) {
     setUsers((prevUsers) => ({
       ...prevUsers,
@@ -141,22 +154,12 @@ function App() {
     );
   }
 
-  function resetState() {
-    setAuthenticated(false);
-    setModal(null);
-    setUsers({});
-    setPosts([]);
-    setComments([]);
-    setChats([]);
-    setMessages([]);
-  }
-
   if (!authenticated) {
     return (
       <Routes>
         <Route
           path="/"
-          element={<Auth onAuth={onAuth} onReauth={onReauth} onReauthError={resetState} />}
+          element={<Auth onAuth={onAuth} onReauth={onReauth} onReauthError={logout} />}
         />
         <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>
@@ -186,7 +189,7 @@ function App() {
 
         <Route
           path="/settings"
-          element={<Settings user={users[storage.userId]} onAccountDelete={resetState} />}
+          element={<Settings user={users[storage.userId]} onAccountDelete={logout} />}
         />
       </Routes>
 
@@ -195,7 +198,7 @@ function App() {
           close={() => setModal(null)}
           user={users[storage.userId]}
           openInstall={() => setModal("Install")}
-          onLogout={resetState}
+          logout={logout}
         />
       )}
 

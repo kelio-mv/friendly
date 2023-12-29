@@ -72,9 +72,6 @@ function Settings(props) {
         setErrorMessage(errorMessage);
         setSaving(false);
       } else {
-        storage.deleteCredentials();
-        socket.off("disconnect");
-        socket.close();
         props.onAccountDelete();
       }
     };
