@@ -1,9 +1,11 @@
+import basename from "../../basename";
+
 function ProfilePicture(props) {
   const isDefault = ["default_avatar.png", "loading_pfp.png"].includes(props.src);
 
   return (
     <img
-      src={isDefault ? `/friendly/${props.src}` : props.src}
+      src={isDefault ? `/${basename}/${props.src}` : props.src}
       className={isDefault ? "profile-picture--default" : null}
       onClick={props.onClick}
       style={{

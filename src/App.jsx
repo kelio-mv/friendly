@@ -162,18 +162,18 @@ function App() {
           }
         />
 
-        <Route path="post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
+        <Route path="/post/:id" element={<Post {...{ users, posts, comments, addComments }} />} />
 
         <Route
-          path="chat/:id"
+          path="/chat/:id"
           element={<Chat {...{ users, chats, messages, addMessages, setLastViewedMessageId }} />}
         />
 
-        <Route path="new-post" element={<NewPost addPosts={addPosts} />} />
+        <Route path="/new-post" element={<NewPost addPosts={addPosts} />} />
 
-        <Route path="profile/:id" element={<Profile {...{ users, posts }} />} />
+        <Route path="/profile/:id" element={<Profile {...{ users, posts }} />} />
 
-        <Route path="settings" element={<Settings user={users[storage.userId]} />} />
+        <Route path="/settings" element={<Settings user={users[storage.userId]} />} />
       </Routes>
 
       {modal === "Sidebar" && (
