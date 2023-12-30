@@ -62,6 +62,7 @@ class Storage {
 
   editUser(id, field, value) {
     db.prepare(`UPDATE users SET ${field} = ? WHERE id = ?`).run(value, id);
+    return this.getUser("id", id);
   }
 
   deleteUser(id) {

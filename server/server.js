@@ -138,18 +138,18 @@ io.on("connection", (socket) => {
         break;
 
       case "password":
-        if (currentPassword !== user.password) {
-          err = errors.password.incorrect;
-        } else if (value.length < 6) {
+        if (value.length < 6) {
           err = errors.password.minLength;
+        } else if (currentPassword !== user.password) {
+          err = errors.password.incorrect;
         }
         break;
     }
 
     if (!err) {
-      storage.editUser(socket.uid, field, value);
+      const user = storage.editUser(socket.uid, field, value);
       if (["username", "profilePicture", "about"].includes(field)) {
-        socket.emit("update_user", socket.uid);
+        socket.emit("add_users", [user]);
         socket.broadcast.emit("update_user", socket.uid);
       }
     }
@@ -157,13 +157,19 @@ io.on("connection", (socket) => {
     callback(err);
   }
 
-  function handleDelPost(postId) {
-    storage.deletePost(postId);
-    socket.emit("del_post", postId);
-    socket.broadcast.emit("del_post", postId);
+  function handleDelPost(id) {
+    const post = storage.getPost(id);
+    if (!post || post.authorId !== socket.uid) return;
+
+    storage.deletePost(id);
+    socket.emit("del_post", id);
+    socket.broadcast.emit("del_post", id);
   }
 
   function handleDelComment(id) {
+    const comment = storage.getComment(id);
+    if (!comment || comment.authorId !== socket.uid) return;
+
     storage.deleteComment(id);
     socket.emit("del_comment", id);
     socket.broadcast.emit("del_comment", id);
