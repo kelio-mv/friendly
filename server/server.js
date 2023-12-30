@@ -4,6 +4,17 @@ const developmentEnv = true;
 const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://192.168.1.2:5173" : "https://kelio-mv.github.io" },
 });
+const errors = {
+  username: {
+    minLength: "O nome de usuário precisa ter pelo menos 3 caracteres.",
+    alreadyUsed: "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
+    notFound: "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
+  },
+  password: {
+    minLength: "A senha precisa ter pelo menos 6 caracteres.",
+    incorrect: "Sua senha está incorreta. Por favor, verifique-a.",
+  },
+};
 
 function getSocket(userId) {
   for (const [_, socket] of io.of("/").sockets) {
@@ -30,18 +41,15 @@ io.on("connection", (socket) => {
 
   function handleAuth(signUp, username, password, callback) {
     const user = storage.getUser("username", username);
-    let errorMessage;
+    let err;
 
     if (signUp) {
       if (username.length < 3) {
-        errorMessage = ["Nome inválido", "O nome de usuário precisa ter pelo menos 3 caracteres."];
+        err = errors.username.minLength;
       } else if (password.length < 6) {
-        errorMessage = ["Senha inválida", "A senha precisa ter pelo menos 6 caracteres."];
+        err = errors.password.minLength;
       } else if (user) {
-        errorMessage = [
-          "Nome indisponível",
-          "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
-        ];
+        err = errors.username.alreadyUsed;
       } else {
         socket.uid = storage.createUser(username, password);
       }
@@ -50,16 +58,13 @@ io.on("connection", (socket) => {
         if (user.password === password) {
           socket.uid = user.id;
         } else {
-          errorMessage = ["Senha incorreta", "Sua senha está incorreta. Por favor, verifique-a."];
+          err = errors.password.incorrect;
         }
       } else {
-        errorMessage = [
-          "Não encontrado",
-          "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
-        ];
+        err = errors.username.notFound;
       }
     }
-    callback(errorMessage);
+    callback(err);
   }
 
   function handleGetData(callback) {
@@ -113,29 +118,29 @@ io.on("connection", (socket) => {
 
   function handleEditUser({ field, value, currentPassword }, callback) {
     const user = storage.getUser("id", socket.uid);
-    let errorMessage;
+    let err;
 
     switch (field) {
       case "username":
         if (value.length < 3) {
-          errorMessage = "O nome de usuário precisa ter pelo menos 3 caracteres.";
+          err = errors.username.minLength;
         } else if (currentPassword !== user.password) {
-          errorMessage = "Sua senha está incorreta. Por favor, verifique-a.";
+          err = errors.password.incorrect;
         } else if (storage.getUser("username", value)) {
-          errorMessage = "Este nome de usuário já está em uso. Por favor, escolha outro nome.";
+          err = errors.username.alreadyUsed;
         }
         break;
 
       case "password":
         if (currentPassword !== user.password) {
-          errorMessage = "Sua senha está incorreta. Por favor, verifique-a.";
+          err = errors.password.incorrect;
         } else if (value.length < 6) {
-          errorMessage = "A senha precisa ter pelo menos 6 caracteres.";
+          err = errors.password.minLength;
         }
         break;
     }
 
-    if (!errorMessage) {
+    if (!err) {
       storage.editUser(socket.uid, field, value);
       if (["username", "profilePicture", "about"].includes(field)) {
         socket.emit("update_user", socket.uid);
@@ -143,7 +148,7 @@ io.on("connection", (socket) => {
       }
     }
 
-    callback(errorMessage);
+    callback(err);
   }
 
   function handleDelPost(postId) {

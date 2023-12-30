@@ -11,7 +11,7 @@ function Auth(props) {
   const [password, setPassword] = useState(storage.password);
   const [signUp, setSignUp] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (storage.credentials) auth(false);
@@ -89,15 +89,15 @@ function Auth(props) {
       </div>
 
       <Modal
-        open={errorMessage.length > 0}
-        header={errorMessage[0]}
+        open={errorMessage}
+        header="Erro de autenticação"
         footer={
-          <p className="modal__btn" onClick={() => setErrorMessage([])}>
+          <p className="modal__btn" onClick={() => setErrorMessage(null)}>
             OK
           </p>
         }
       >
-        {errorMessage[1]}
+        {errorMessage}
       </Modal>
     </div>
   );
