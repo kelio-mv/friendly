@@ -9,7 +9,7 @@ import Profile from "./components/Profile";
 import Settings from "./components/Settings";
 import Sidebar from "./components/Sidebar";
 import Install from "./components/Install";
-import storage from "./storage";
+import credentials from "./credentials";
 import socket from "./socket";
 import "./App.scss";
 
@@ -50,7 +50,7 @@ function App() {
 
   function onAuth() {
     socket.emit("get_data", (user) => {
-      storage.userId = user.id;
+      credentials.userId = user.id;
       setUsers({ [user.id]: user });
       setAuthenticated(true);
     });
@@ -187,14 +187,14 @@ function App() {
 
         <Route
           path="/settings"
-          element={<Settings user={users[storage.userId]} onAccountDelete={reset} />}
+          element={<Settings user={users[credentials.userId]} onAccountDelete={reset} />}
         />
       </Routes>
 
       {modal === "Sidebar" && (
         <Sidebar
           close={() => setModal(null)}
-          user={users[storage.userId]}
+          user={users[credentials.userId]}
           openInstall={() => setModal("Install")}
           onLogout={reset}
         />

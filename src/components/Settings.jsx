@@ -4,7 +4,7 @@ import Modal from "./Modal";
 import ProfilePicture from "./ProfilePicture";
 import TextField from "./TextField";
 import Icon from "./Icon";
-import storage from "../storage";
+import credentials from "../credentials";
 import socket from "../socket";
 import "./Settings.scss";
 
@@ -43,8 +43,8 @@ function Settings(props) {
         setErrorMessage(err);
         setSaving(false);
       } else {
-        storage.username = username;
-        storage.saveCredentials();
+        credentials.username = username;
+        credentials.save();
         reset("modal", "saving", "errorMessage", "username", "currentPassword");
       }
     };
@@ -59,8 +59,8 @@ function Settings(props) {
         setErrorMessage(err);
         setSaving(false);
       } else {
-        storage.password = password;
-        storage.saveCredentials();
+        credentials.password = password;
+        credentials.save();
         reset("modal", "saving", "errorMessage", "currentPassword", "password");
       }
     };
@@ -75,7 +75,7 @@ function Settings(props) {
         setSaving(false);
       } else {
         socket.close();
-        storage.deleteCredentials();
+        credentials.delete();
         props.onAccountDelete();
       }
     };

@@ -5,7 +5,7 @@ import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Modal from "./Modal";
 import TextArea from "./TextArea";
-import storage from "../storage";
+import credentials from "../credentials";
 import socket from "../socket";
 import "./Chat.scss";
 
@@ -162,7 +162,7 @@ function Chat(props) {
 }
 
 function Message(props) {
-  const fromMe = props.senderId === storage.userId;
+  const fromMe = props.senderId === credentials.userId;
   const time = new Date(props.timestamp * 1000).toTimeString().substring(0, 5);
 
   return (

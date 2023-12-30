@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import TextField from "./TextField";
 import Icon from "./Icon";
-import storage from "../storage";
+import credentials from "../credentials";
 import socket from "../socket";
 import "./Auth.scss";
 
 function Auth(props) {
-  const [username, setUsername] = useState(storage.username);
-  const [password, setPassword] = useState(storage.password);
+  const [username, setUsername] = useState(credentials.username);
+  const [password, setPassword] = useState(credentials.password);
   const [signUp, setSignUp] = useState(false);
-  const [connecting, setConnecting] = useState(storage.credentials);
+  const [connecting, setConnecting] = useState(credentials.data);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
@@ -18,16 +18,16 @@ function Auth(props) {
     socket.off("connect_error");
     socket.on("connect", onConnect);
     socket.on("connect_error", onConnectError);
-    if (storage.credentials) socket.connect();
+    if (credentials.data) socket.connect();
   }, []);
 
   function onConnect() {
-    if (storage.userId) {
+    if (credentials.userId) {
       props.onReauth();
     } else {
-      if (!storage.credentials) {
-        storage.saveCredentials();
-        storage.signUp = false;
+      if (!credentials.data) {
+        credentials.save();
+        credentials.signUp = false;
       }
       props.onAuth();
     }
@@ -36,12 +36,12 @@ function Auth(props) {
   function onConnectError(err) {
     if (err.message !== "auth error") return;
 
-    if (storage.userId) {
-      storage.deleteCredentials();
+    if (credentials.userId) {
+      credentials.delete();
       props.onReauthError();
     } else {
-      if (storage.credentials) {
-        storage.deleteCredentials();
+      if (credentials.data) {
+        credentials.delete();
       }
       setConnecting(false);
       setErrorMessage(err.data);
@@ -50,7 +50,7 @@ function Auth(props) {
 
   function auth() {
     setConnecting(true);
-    Object.assign(storage, { username, password, signUp });
+    Object.assign(credentials, { username, password, signUp });
     socket.connect();
   }
 

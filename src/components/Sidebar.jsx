@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import ProfilePicture from "./ProfilePicture";
 import Icon from "./Icon";
 import socket from "../socket";
-import storage from "../storage";
+import credentials from "../credentials";
 import "./Sidebar.scss";
 
 function Sidebar(props) {
@@ -10,7 +10,7 @@ function Sidebar(props) {
 
   function openProfile() {
     props.close();
-    navigate(`profile/${storage.userId}`);
+    navigate(`profile/${credentials.userId}`);
   }
 
   function share() {
@@ -32,7 +32,7 @@ function Sidebar(props) {
 
   function logout() {
     socket.close();
-    storage.deleteCredentials();
+    credentials.delete();
     props.onLogout();
   }
 

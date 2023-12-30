@@ -5,7 +5,7 @@ import Article from "./Article";
 import Icon from "./Icon";
 import Modal from "./Modal";
 import TextArea from "./TextArea";
-import storage from "../storage";
+import credentials from "../credentials";
 import socket from "../socket";
 
 function Post(props) {
@@ -72,7 +72,7 @@ function Post(props) {
         <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
         <h1>Publicação</h1>
         <div className="top-bar__grow" />
-        {post && post.authorId === storage.userId && (
+        {post && post.authorId === credentials.userId && (
           <Icon name="delete" onClick={() => setDeleteConfirmation("post")} invert />
         )}
       </div>
@@ -91,7 +91,7 @@ function Post(props) {
             key={comment.id}
             data={comment}
             user={props.users[comment.authorId]}
-            deletable={comment.authorId === storage.userId}
+            deletable={comment.authorId === credentials.userId}
             delete={() => {
               setCommentId(comment.id);
               setDeleteConfirmation("comment");

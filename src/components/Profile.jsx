@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 import ProfilePicture from "./ProfilePicture";
 import Article from "./Article";
-import storage from "../storage";
+import credentials from "../credentials";
 import "./Profile.scss";
 
 function Profile(props) {
@@ -17,7 +17,7 @@ function Profile(props) {
         <Icon name="arrow_back" onClick={() => navigate(-1)} invert />
         <h1>Perfil</h1>
         <div className="top-bar__grow" />
-        {userId !== storage.userId && (
+        {userId !== credentials.userId && (
           <Icon name="chat" onClick={() => navigate(`/chat/${userId}`)} invert />
         )}
       </div>

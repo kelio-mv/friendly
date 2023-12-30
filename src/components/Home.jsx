@@ -5,11 +5,11 @@ import Chats from "./Chats";
 import Icon from "./Icon";
 
 function Home(props) {
-  const prevTab = sessionStorage.getItem("homeTab");
+  const prevTab = sessionStorage.getItem("tab");
   const [tab, setTab] = useState(prevTab || "posts");
   const navigate = useNavigate();
 
-  useEffect(() => sessionStorage.setItem("homeTab", tab), [tab]);
+  useEffect(() => sessionStorage.setItem("tab", tab), [tab]);
 
   return (
     <div className="flex-page">
