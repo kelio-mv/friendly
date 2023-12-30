@@ -24,8 +24,42 @@ function getSocket(userId) {
   }
 }
 
+io.use((socket, next) => {
+  const { signUp, username, password } = socket.handshake.auth;
+  const user = storage.getUser("username", username);
+  let err;
+
+  if (signUp) {
+    if (username.length < 3) {
+      err = errors.username.minLength;
+    } else if (password.length < 6) {
+      err = errors.password.minLength;
+    } else if (user) {
+      err = errors.username.alreadyUsed;
+    } else {
+      socket.uid = storage.createUser(username, password);
+    }
+  } else {
+    if (user) {
+      if (user.password === password) {
+        socket.uid = user.id;
+      } else {
+        err = errors.password.incorrect;
+      }
+    } else {
+      err = errors.username.notFound;
+    }
+  }
+  if (err) {
+    const error = new Error("auth error");
+    error.data = err;
+    next(error);
+  } else {
+    next();
+  }
+});
+
 io.on("connection", (socket) => {
-  socket.on("auth", handleAuth);
   socket.on("get_data", handleGetData);
   socket.on("get_users", handleGetUsers);
   socket.on("create_post", handleCreatePost);
@@ -38,34 +72,6 @@ io.on("connection", (socket) => {
   socket.on("del_comment", handleDelComment);
   socket.on("del_chat", handleDelChat);
   socket.on("del_user", handleDelUser);
-
-  function handleAuth(signUp, username, password, callback) {
-    const user = storage.getUser("username", username);
-    let err;
-
-    if (signUp) {
-      if (username.length < 3) {
-        err = errors.username.minLength;
-      } else if (password.length < 6) {
-        err = errors.password.minLength;
-      } else if (user) {
-        err = errors.username.alreadyUsed;
-      } else {
-        socket.uid = storage.createUser(username, password);
-      }
-    } else {
-      if (user) {
-        if (user.password === password) {
-          socket.uid = user.id;
-        } else {
-          err = errors.password.incorrect;
-        }
-      } else {
-        err = errors.username.notFound;
-      }
-    }
-    callback(err);
-  }
 
   function handleGetData(callback) {
     const user = storage.getUserData(socket.uid);

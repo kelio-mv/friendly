@@ -66,9 +66,8 @@ function App() {
   }
 
   function logout() {
-    storage.deleteCredentials();
-    socket.off("disconnect");
     socket.close();
+    storage.deleteCredentials();
     setAuthenticated(false);
     setModal(null);
     setUsers({});

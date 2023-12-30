@@ -43,7 +43,8 @@ function Settings(props) {
         setErrorMessage(err);
         setSaving(false);
       } else {
-        storage.saveCredentials(username, storage.password);
+        storage.username = username;
+        storage.saveCredentials();
         reset("modal", "saving", "errorMessage", "username", "currentPassword");
       }
     };
@@ -58,7 +59,8 @@ function Settings(props) {
         setErrorMessage(err);
         setSaving(false);
       } else {
-        storage.saveCredentials(storage.username, password);
+        storage.password = password;
+        storage.saveCredentials();
         reset("modal", "saving", "errorMessage", "currentPassword", "password");
       }
     };

@@ -10,40 +10,42 @@ function Auth(props) {
   const [username, setUsername] = useState(storage.username);
   const [password, setPassword] = useState(storage.password);
   const [signUp, setSignUp] = useState(false);
-  const [connecting, setConnecting] = useState(false);
+  const [connecting, setConnecting] = useState(storage.credentials);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    if (storage.credentials) auth(false);
-  }, []);
+    if (storage.credentials) socket.connect();
 
-  function auth(requestedByUser) {
-    setConnecting(true);
-    socket.connect();
-    socket.emit("auth", signUp, username, password, (errorMessage) => {
-      if (errorMessage) {
-        if (!requestedByUser) storage.deleteCredentials();
-        socket.close();
-        setConnecting(false);
-        setErrorMessage(errorMessage);
-      } else {
-        if (requestedByUser) storage.saveCredentials(username, password);
-        socket.on("disconnect", reauth);
-        props.onAuth();
+    socket.off("connect");
+    socket.off("connect_error");
+    socket.on("connect", () => {
+      const isUserRequest = !storage.credentials;
+      const isFirstAuth = !storage.userId;
+      if (isUserRequest) {
+        storage.saveCredentials();
+        storage.signUp = false;
+      }
+      isFirstAuth ? props.onAuth() : props.onReauth();
+    });
+    socket.on("connect_error", (err) => {
+      if (err.message === "auth error") {
+        const isUserRequest = !storage.credentials;
+        const isFirstAuth = !storage.userId;
+        if (!isUserRequest) storage.deleteCredentials();
+        if (isFirstAuth) {
+          setConnecting(false);
+          setErrorMessage(err.data);
+        } else {
+          props.onReauthError();
+        }
       }
     });
-  }
+  }, []);
 
-  function reauth() {
-    /*
-      This function re-authenticates the user when the connection is reestablished so that the
-      buffered messages can be sent safely. But apparently, messages sent before triggering the
-      disconnect event are ignored as socket.io thinks they were sent.
-      Stored credentials are used because the user might have changed their credentials in Settings.
-    */
-    socket.emit("auth", false, storage.username, storage.password, (e) => {
-      e ? props.onReauthError() : props.onReauth();
-    });
+  function auth() {
+    setConnecting(true);
+    Object.assign(storage, { username, password, signUp });
+    socket.connect();
   }
 
   return (
@@ -68,11 +70,7 @@ function Auth(props) {
         onChange={(v) => setPassword(v)}
       />
 
-      <button
-        className="auth__btn btn btn--primary"
-        onClick={() => auth(true)}
-        disabled={connecting}
-      >
+      <button className="auth__btn btn btn--primary" onClick={auth} disabled={connecting}>
         {signUp ? "Cadastrar-se" : "Entrar"}
       </button>
 
