@@ -65,9 +65,8 @@ function App() {
     });
   }
 
-  function logout() {
-    socket.close();
-    storage.deleteCredentials();
+  function reset() {
+    // Socket closing and/or credentials deletion must be done before calling this function
     setAuthenticated(false);
     setModal(null);
     setUsers({});
@@ -158,7 +157,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Auth onAuth={onAuth} onReauth={onReauth} onReauthError={logout} />}
+          element={<Auth onAuth={onAuth} onReauth={onReauth} onReauthError={reset} />}
         />
         <Route path="*" element={<Navigate to="/ " replace />} />
       </Routes>
@@ -188,7 +187,7 @@ function App() {
 
         <Route
           path="/settings"
-          element={<Settings user={users[storage.userId]} onAccountDelete={logout} />}
+          element={<Settings user={users[storage.userId]} onAccountDelete={reset} />}
         />
       </Routes>
 
@@ -197,7 +196,7 @@ function App() {
           close={() => setModal(null)}
           user={users[storage.userId]}
           openInstall={() => setModal("Install")}
-          logout={logout}
+          onLogout={reset}
         />
       )}
 

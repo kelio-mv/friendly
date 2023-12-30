@@ -2,10 +2,7 @@ import storage from "./storage";
 
 const socket = io("wss://friendly2.glitch.me", {
   autoConnect: false,
-  auth: (cb) => {
-    const { username, password, signUp } = storage;
-    cb({ username, password, signUp });
-  },
+  auth: storage.sendCredentials,
 });
 
 export default socket;

@@ -5,6 +5,11 @@ class Storage {
   signUp = false;
   userId = null;
 
+  sendCredentials = (callback) => {
+    const { username, password, signUp } = this;
+    callback({ username, password, signUp });
+  };
+
   saveCredentials() {
     this.credentials = { username: this.username, password: this.password };
     localStorage.setItem("friendly", JSON.stringify(this.credentials));

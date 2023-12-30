@@ -14,33 +14,39 @@ function Auth(props) {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    if (storage.credentials) socket.connect();
-
     socket.off("connect");
     socket.off("connect_error");
-    socket.on("connect", () => {
-      const isUserRequest = !storage.credentials;
-      const isFirstAuth = !storage.userId;
-      if (isUserRequest) {
+    socket.on("connect", onConnect);
+    socket.on("connect_error", onConnectError);
+    if (storage.credentials) socket.connect();
+  }, []);
+
+  function onConnect() {
+    if (storage.userId) {
+      props.onReauth();
+    } else {
+      if (!storage.credentials) {
         storage.saveCredentials();
         storage.signUp = false;
       }
-      isFirstAuth ? props.onAuth() : props.onReauth();
-    });
-    socket.on("connect_error", (err) => {
-      if (err.message === "auth error") {
-        const isUserRequest = !storage.credentials;
-        const isFirstAuth = !storage.userId;
-        if (!isUserRequest) storage.deleteCredentials();
-        if (isFirstAuth) {
-          setConnecting(false);
-          setErrorMessage(err.data);
-        } else {
-          props.onReauthError();
-        }
+      props.onAuth();
+    }
+  }
+
+  function onConnectError(err) {
+    if (err.message !== "auth error") return;
+
+    if (storage.userId) {
+      storage.deleteCredentials();
+      props.onReauthError();
+    } else {
+      if (storage.credentials) {
+        storage.deleteCredentials();
       }
-    });
-  }, []);
+      setConnecting(false);
+      setErrorMessage(err.data);
+    }
+  }
 
   function auth() {
     setConnecting(true);

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import ProfilePicture from "./ProfilePicture";
 import Icon from "./Icon";
+import socket from "../socket";
 import storage from "../storage";
 import "./Sidebar.scss";
 
@@ -27,6 +28,12 @@ function Sidebar(props) {
   function openSettings() {
     props.close();
     navigate("settings");
+  }
+
+  function logout() {
+    socket.close();
+    storage.deleteCredentials();
+    props.onLogout();
   }
 
   return (
@@ -58,7 +65,7 @@ function Sidebar(props) {
             Configurações
           </div>
 
-          <div className="sidebar__item" onClick={props.logout}>
+          <div className="sidebar__item" onClick={logout}>
             <Icon name="logout" />
             Sair
           </div>
