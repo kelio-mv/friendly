@@ -86,7 +86,6 @@ function Chat(props) {
   }
 
   function sendMessage(content) {
-    if (!chat) socket.emit("create_chat", interlocutorId);
     socket.emit("create_message", interlocutorId, content, (message) => {
       props.addMessages([message]);
       scrollDown.current = true;
@@ -130,7 +129,6 @@ function Chat(props) {
 
       <TextArea
         placeholder="Mensagem..."
-        maxLength="500"
         onHeightChange={(height) => {
           unviewedElemRef.current.style.transform = `translateY(-${height})`;
         }}

@@ -16,7 +16,7 @@ function TextField(props) {
           const value = e.target.value;
           props.onChange(props.type === "username" ? value.replace(/[^a-zA-Z0-9_]/g, "") : value);
         }}
-        maxLength={["username", "password"].includes(props.type) ? 16 : null}
+        maxLength="16"
       />
       {props.type === "password" && (
         <div className="text-field__visibility">

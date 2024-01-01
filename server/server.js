@@ -17,13 +17,29 @@ const errors = {
 };
 
 function vt(...args) {
+  // validateTypes
   const [variable, ...types] = args;
   const matches = types.map((type) => {
-    if (type === "integer") return Number.isInteger(variable);
+    if (type === "id") return Number.isInteger(variable) && variable > 0;
     if (type === "array") return Array.isArray(variable);
     return typeof variable === type;
   });
   return matches.includes(true);
+}
+
+function vet(array, type) {
+  // validateElementTypes
+  return !array.map((element) => vt(element, type)).includes(false);
+}
+
+function vl(string) {
+  // validateLength
+  return string.length === string.trim().length && string.length > 0 && string.length <= 1000;
+}
+
+function dv(array) {
+  // distinctValues
+  return new Set(array).size === array.length;
 }
 
 function getSocket(userId) {
@@ -79,7 +95,6 @@ io.on("connection", (socket) => {
   socket.on("get_users", handleGetUsers);
   socket.on("create_post", handleCreatePost);
   socket.on("create_comment", handleCreateComment);
-  socket.on("create_chat", handleCreateChat);
   socket.on("create_message", handleCreateMessage);
   socket.on("edit_chat", handleEditChat);
   socket.on("edit_user", handleEditUser);
@@ -104,14 +119,14 @@ io.on("connection", (socket) => {
   }
 
   function handleGetUsers(ids) {
-    if (vt(ids, "array")) {
-      const users = ids.map((id) => storage.getUserData(id));
+    if (vt(ids, "array") && vet(ids, "id") && dv(ids)) {
+      const users = ids.map((id) => storage.getUserData(id)).filter((user) => user);
       socket.emit("add_users", users);
     }
   }
 
   function handleCreatePost(content, callback) {
-    if (vt(content, "string") && vt(callback, "function")) {
+    if (vt(content, "string") && vt(callback, "function") && vl(content)) {
       const post = storage.createPost(socket.uid, content);
       callback(post);
       socket.broadcast.emit("add_posts", [post]);
@@ -119,25 +134,34 @@ io.on("connection", (socket) => {
   }
 
   function handleCreateComment(postId, content, callback) {
-    if (vt(postId, "integer") && vt(content, "string") && vt(callback, "function")) {
+    if (
+      vt(postId, "id") &&
+      vt(content, "string") &&
+      vt(callback, "function") &&
+      vl(content) &&
+      storage.getPost(postId)
+    ) {
       const comment = storage.createComment(socket.uid, postId, content);
       callback(comment);
       socket.broadcast.emit("add_comments", [comment]);
     }
   }
 
-  function handleCreateChat(interlocutorId) {
-    if (vt(interlocutorId, "integer")) {
-      const userChat = storage.createChat(socket.uid, interlocutorId);
-      const interlocutorChat = storage.createChat(interlocutorId, socket.uid);
-      const interlocutor = getSocket(interlocutorId);
-      socket.emit("add_chats", [userChat]);
-      if (interlocutor) interlocutor.emit("add_chats", [interlocutorChat]);
-    }
-  }
-
   function handleCreateMessage(receiverId, content, callback) {
-    if (vt(receiverId, "integer") && vt(content, "string") && vt(callback, "function")) {
+    if (
+      vt(receiverId, "id") &&
+      vt(content, "string") &&
+      vt(callback, "function") &&
+      storage.getUser("id", receiverId)
+    ) {
+      if (!storage.getChat(socket.uid, receiverId)) {
+        const chat = storage.createChat(socket.uid, receiverId);
+        const interlocutorChat = storage.createChat(receiverId, socket.uid);
+        const interlocutor = getSocket(receiverId);
+        socket.emit("add_chats", [chat]);
+        if (interlocutor) interlocutor.emit("add_chats", [interlocutorChat]);
+      }
+
       const message = storage.createMessage(socket.uid, receiverId, content);
       const receiver = getSocket(receiverId);
       callback(message);
@@ -146,14 +170,18 @@ io.on("connection", (socket) => {
   }
 
   function handleEditChat(interlocutorId, lastViewedMessageId) {
-    if (vt(interlocutorId, "integer") && vt(lastViewedMessageId, "integer")) {
+    if (
+      vt(interlocutorId, "id") &&
+      vt(lastViewedMessageId, "id") &&
+      storage.getMessage(lastViewedMessageId)
+    ) {
       storage.editChat(socket.uid, interlocutorId, "lastViewedMessageId", lastViewedMessageId);
     }
   }
 
   function handleEditUser({ field, value, currentPassword }, callback) {
     if (
-      vt(field, "string") &&
+      ["username", "password", "profilePicture", "about"].includes(field) &&
       vt(value, "string") &&
       vt(currentPassword, "string", "undefined") &&
       vt(callback, "function")
@@ -194,7 +222,7 @@ io.on("connection", (socket) => {
   }
 
   function handleDelPost(id) {
-    if (vt(id, "integer")) {
+    if (vt(id, "id")) {
       const post = storage.getPost(id);
       if (!post || post.authorId !== socket.uid) return;
 
@@ -205,7 +233,7 @@ io.on("connection", (socket) => {
   }
 
   function handleDelComment(id) {
-    if (vt(id, "integer")) {
+    if (vt(id, "id")) {
       const comment = storage.getComment(id);
       if (!comment || comment.authorId !== socket.uid) return;
 
@@ -216,7 +244,7 @@ io.on("connection", (socket) => {
   }
 
   function handleDelChat(interlocutorId) {
-    if (vt(interlocutorId, "integer")) {
+    if (vt(interlocutorId, "id") && storage.getChat(socket.uid, interlocutorId)) {
       storage.deleteChat(socket.uid, interlocutorId);
       storage.deleteChat(interlocutorId, socket.uid);
       storage.deleteMessages(socket.uid, interlocutorId);

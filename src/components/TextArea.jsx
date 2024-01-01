@@ -37,7 +37,7 @@ function TextArea(props) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows="1"
-        maxLength={props.maxLength}
+        maxLength="1000"
         onKeyDown={onKeyDown}
       />
       <Icon name="send" onClick={send} disabled={!content.trim()} />

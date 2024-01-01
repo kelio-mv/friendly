@@ -103,7 +103,6 @@ function Post(props) {
 
       <TextArea
         placeholder="Comente algo..."
-        maxLength="500"
         onHeightChange={(height) => {
           unviewedElemRef.current.style.transform = `translateY(-${height})`;
         }}
