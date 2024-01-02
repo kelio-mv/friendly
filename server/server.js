@@ -1,6 +1,6 @@
 const { Server } = require("socket.io");
 const storage = require("./storage");
-const developmentEnv = true;
+const developmentEnv = false;
 const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://192.168.1.4:5173" : "https://kelio-mv.github.io" },
 });
