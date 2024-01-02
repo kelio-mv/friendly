@@ -10,10 +10,13 @@
   &__wrapper {
     margin-left: 0.75rem;
     margin-right: auto;
+    overflow: hidden;
   }
 
   &__last-message {
     color: var(--clr-300);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__date {

@@ -152,6 +152,7 @@ io.on("connection", (socket) => {
       vt(receiverId, "id") &&
       vt(content, "string") &&
       vt(callback, "function") &&
+      vl(content) &&
       storage.getUser("id", receiverId)
     ) {
       if (!storage.getChat(socket.uid, receiverId)) {
@@ -262,7 +263,7 @@ io.on("connection", (socket) => {
         callback();
         socket.broadcast.emit("del_user", socket.uid);
       } else {
-        callback("Sua senha está incorreta. Por favor, verifique-a.");
+        callback(errors.password.incorrect);
       }
     }
   }
