@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import ProfilePicture from "./ProfilePicture";
+import Form from "./Form";
 import TextField from "./TextField";
 import Icon from "./Icon";
 import credentials from "../credentials";
@@ -223,7 +224,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={saveUsername}
+            form="settings__username"
             disabled={!username || !currentPassword || saving}
           >
             Salvar
@@ -232,21 +233,23 @@ function Settings(props) {
         close={() => reset("modal", "errorMessage", "username", "currentPassword")}
         center
       >
-        <TextField
-          type="username"
-          placeholder={props.user.username}
-          value={username}
-          onChange={(v) => setUsername(v)}
-          modalChild
-        />
+        <Form id="settings__username" onSubmit={saveUsername}>
+          <TextField
+            type="username"
+            placeholder={props.user.username}
+            value={username}
+            onChange={(v) => setUsername(v)}
+            modalChild
+          />
 
-        <TextField
-          type="password"
-          placeholder="Senha atual"
-          value={currentPassword}
-          onChange={(v) => setCurrentPassword(v)}
-          modalChild
-        />
+          <TextField
+            type="password"
+            placeholder="Senha atual"
+            value={currentPassword}
+            onChange={(v) => setCurrentPassword(v)}
+            modalChild
+          />
+        </Form>
 
         {errorMessage && <p className="settings__error">{errorMessage}</p>}
       </Modal>
@@ -258,7 +261,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn"
-            onClick={savePassword}
+            form="settings__password"
             disabled={!currentPassword || !password || saving}
           >
             Salvar
@@ -267,21 +270,23 @@ function Settings(props) {
         close={() => reset("modal", "errorMessage", "currentPassword", "password")}
         center
       >
-        <TextField
-          type="password"
-          placeholder="Senha atual"
-          value={currentPassword}
-          onChange={(v) => setCurrentPassword(v)}
-          modalChild
-        />
+        <Form id="settings__password" onSubmit={savePassword}>
+          <TextField
+            type="password"
+            placeholder="Senha atual"
+            value={currentPassword}
+            onChange={(v) => setCurrentPassword(v)}
+            modalChild
+          />
 
-        <TextField
-          type="password"
-          placeholder="Nova senha"
-          value={password}
-          onChange={(v) => setPassword(v)}
-          modalChild
-        />
+          <TextField
+            type="password"
+            placeholder="Nova senha"
+            value={password}
+            onChange={(v) => setPassword(v)}
+            modalChild
+          />
+        </Form>
 
         {errorMessage && <p className="settings__error">{errorMessage}</p>}
       </Modal>
@@ -292,7 +297,7 @@ function Settings(props) {
         footer={
           <button
             className="modal__btn modal__btn--danger"
-            onClick={deleteAccount}
+            form="settings__delete-account"
             disabled={!currentPassword || saving}
           >
             Sim
@@ -302,13 +307,16 @@ function Settings(props) {
         center
       >
         <p>Você tem certeza que deseja excluir sua conta?</p>
-        <TextField
-          type="password"
-          placeholder="Confirmar senha"
-          value={currentPassword}
-          onChange={(v) => setCurrentPassword(v)}
-          modalChild
-        />
+
+        <Form id="settings__delete-account" onSubmit={deleteAccount}>
+          <TextField
+            type="password"
+            placeholder="Confirmar senha"
+            value={currentPassword}
+            onChange={(v) => setCurrentPassword(v)}
+            modalChild
+          />
+        </Form>
 
         {errorMessage && <p className="settings__error">{errorMessage}</p>}
       </Modal>

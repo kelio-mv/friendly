@@ -2,10 +2,9 @@
   display: flex;
   align-items: center;
   position: relative;
-  width: 16rem;
 
   &__input {
-    width: 100%;
+    width: 16rem;
     padding: 0.5rem;
     background: var(--bg-200);
     color: var(--clr-000);

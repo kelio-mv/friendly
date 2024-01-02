@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
+import Form from "./Form";
 import TextField from "./TextField";
 import Icon from "./Icon";
 import credentials from "../credentials";
@@ -62,23 +63,25 @@ function Auth(props) {
 
       <p className="auth__description">Um lugar para desabafar e fazer novos amigos</p>
 
-      <TextField
-        type="username"
-        placeholder="Nome de usuário"
-        value={username}
-        onChange={(v) => setUsername(v)}
-      />
+      <Form className="auth__form" onSubmit={auth}>
+        <TextField
+          type="username"
+          placeholder="Nome de usuário"
+          value={username}
+          onChange={(v) => setUsername(v)}
+        />
 
-      <TextField
-        type="password"
-        placeholder="Senha"
-        value={password}
-        onChange={(v) => setPassword(v)}
-      />
+        <TextField
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(v) => setPassword(v)}
+        />
 
-      <button className="auth__btn btn btn--primary" onClick={auth} disabled={connecting}>
-        {signUp ? "Cadastrar-se" : "Entrar"}
-      </button>
+        <button className="btn btn--primary" disabled={connecting}>
+          {signUp ? "Cadastrar-se" : "Entrar"}
+        </button>
+      </Form>
 
       <p className="auth__switch-mode">
         {signUp ? "Já tem uma conta? " : "Não tem uma conta? "}

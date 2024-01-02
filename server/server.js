@@ -5,26 +5,16 @@ const io = new Server(3000, {
   cors: { origin: developmentEnv ? "http://192.168.1.4:5173" : "https://kelio-mv.github.io" },
 });
 const errors = {
-  username: {
-    minLength: "O nome de usuário precisa ter pelo menos 3 caracteres.",
-    alreadyUsed: "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
-    notFound: "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
-  },
-  password: {
-    minLength: "A senha precisa ter pelo menos 6 caracteres.",
-    incorrect: "Sua senha está incorreta. Por favor, verifique-a.",
-  },
+  usernameNotFound: "Seu nome de usuário não foi encontrado. Por favor verifique-o.",
+  usernameAlreadyUsed: "Este nome de usuário já está em uso. Por favor, escolha outro nome.",
+  passwordIncorrect: "Sua senha está incorreta. Por favor, verifique-a.",
 };
 
-function vt(...args) {
+function vt(variable, type) {
   // validateTypes
-  const [variable, ...types] = args;
-  const matches = types.map((type) => {
-    if (type === "id") return Number.isInteger(variable) && variable > 0;
-    if (type === "array") return Array.isArray(variable);
-    return typeof variable === type;
-  });
-  return matches.includes(true);
+  if (type === "id") return Number.isInteger(variable) && variable > 0;
+  if (type === "array") return Array.isArray(variable);
+  return typeof variable === type;
 }
 
 function vet(array, type) {
@@ -32,9 +22,19 @@ function vet(array, type) {
   return !array.map((element) => vt(element, type)).includes(false);
 }
 
-function vl(string) {
+function vu(u) {
+  // validateUsername
+  return u === u.replace(/[^a-zA-Z0-9_]/g, "") && u.length >= 3 && u.length <= 16;
+}
+
+function vp(p) {
+  // validatePassword
+  return p.length >= 6 && p.length <= 16;
+}
+
+function vl(s) {
   // validateLength
-  return string.length === string.trim().length && string.length > 0 && string.length <= 1000;
+  return s.length === s.trim().length && s.length > 0 && s.length <= 1000;
 }
 
 function dv(array) {
@@ -53,17 +53,19 @@ function getSocket(userId) {
 io.use((socket, next) => {
   const { signUp, username, password } = socket.handshake.auth;
 
-  if (vt(signUp, "boolean") && vt(username, "string") && vt(password, "string")) {
+  if (
+    vt(signUp, "boolean") &&
+    vt(username, "string") &&
+    vt(password, "string") &&
+    vu(username) &&
+    vp(password)
+  ) {
     const user = storage.getUser("username", username);
     let err;
 
     if (signUp) {
-      if (username.length < 3) {
-        err = errors.username.minLength;
-      } else if (password.length < 6) {
-        err = errors.password.minLength;
-      } else if (user) {
-        err = errors.username.alreadyUsed;
+      if (user) {
+        err = errors.usernameAlreadyUsed;
       } else {
         socket.uid = storage.createUser(username, password);
       }
@@ -72,10 +74,10 @@ io.use((socket, next) => {
         if (user.password === password) {
           socket.uid = user.id;
         } else {
-          err = errors.password.incorrect;
+          err = errors.passwordIncorrect;
         }
       } else {
-        err = errors.username.notFound;
+        err = errors.usernameNotFound;
       }
     }
     if (err) {
@@ -184,28 +186,26 @@ io.on("connection", (socket) => {
     if (
       ["username", "password", "profilePicture", "about"].includes(field) &&
       vt(value, "string") &&
-      vt(currentPassword, "string", "undefined") &&
-      vt(callback, "function")
+      vt(currentPassword, ["username", "password"].includes(field) ? "string" : "undefined") &&
+      vt(callback, "function") &&
+      (field !== "username" || vu(value)) &&
+      (field !== "password" || vp(value))
     ) {
       const user = storage.getUser("id", socket.uid);
       let err;
 
       switch (field) {
         case "username":
-          if (value.length < 3) {
-            err = errors.username.minLength;
-          } else if (currentPassword !== user.password) {
-            err = errors.password.incorrect;
+          if (currentPassword !== user.password) {
+            err = errors.passwordIncorrect;
           } else if (storage.getUser("username", value)) {
-            err = errors.username.alreadyUsed;
+            err = errors.usernameAlreadyUsed;
           }
           break;
 
         case "password":
-          if (value.length < 6) {
-            err = errors.password.minLength;
-          } else if (currentPassword !== user.password) {
-            err = errors.password.incorrect;
+          if (currentPassword !== user.password) {
+            err = errors.passwordIncorrect;
           }
           break;
       }
@@ -263,7 +263,7 @@ io.on("connection", (socket) => {
         callback();
         socket.broadcast.emit("del_user", socket.uid);
       } else {
-        callback(errors.password.incorrect);
+        callback(errors.passwordIncorrect);
       }
     }
   }
