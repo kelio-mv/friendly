@@ -11,7 +11,7 @@ const errors = {
 };
 
 function vt(variable, type) {
-  // validateTypes
+  // validateType
   if (type === "id") return Number.isInteger(variable) && variable > 0;
   if (type === "array") return Array.isArray(variable);
   return typeof variable === type;
@@ -32,8 +32,8 @@ function vp(p) {
   return p.length >= 6 && p.length <= 16;
 }
 
-function vl(s) {
-  // validateLength
+function vc(s) {
+  // validateContent
   return s.length === s.trim().length && s.length > 0 && s.length <= 1000;
 }
 
@@ -127,7 +127,7 @@ io.on("connection", (socket) => {
   }
 
   function handleCreatePost(content, callback) {
-    if (vt(content, "string") && vt(callback, "function") && vl(content)) {
+    if (vt(content, "string") && vt(callback, "function") && vc(content)) {
       const post = storage.createPost(socket.uid, content);
       callback(post);
       socket.broadcast.emit("add_posts", [post]);
@@ -139,7 +139,7 @@ io.on("connection", (socket) => {
       vt(postId, "id") &&
       vt(content, "string") &&
       vt(callback, "function") &&
-      vl(content) &&
+      vc(content) &&
       storage.getPost(postId)
     ) {
       const comment = storage.createComment(socket.uid, postId, content);
@@ -153,7 +153,7 @@ io.on("connection", (socket) => {
       vt(receiverId, "id") &&
       vt(content, "string") &&
       vt(callback, "function") &&
-      vl(content) &&
+      vc(content) &&
       receiverId !== socket.uid &&
       storage.getUser("id", receiverId)
     ) {
