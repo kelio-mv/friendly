@@ -57,8 +57,7 @@ io.use((socket, next) => {
     vt(signUp, "boolean") &&
     vt(username, "string") &&
     vt(password, "string") &&
-    vu(username) &&
-    vp(password)
+    (signUp ? vu(username) && vp(password) : true)
   ) {
     const user = storage.getUser("username", username);
     let err;
@@ -155,6 +154,7 @@ io.on("connection", (socket) => {
       vt(content, "string") &&
       vt(callback, "function") &&
       vl(content) &&
+      receiverId !== socket.uid &&
       storage.getUser("id", receiverId)
     ) {
       if (!storage.getChat(socket.uid, receiverId)) {
@@ -188,26 +188,16 @@ io.on("connection", (socket) => {
       vt(value, "string") &&
       vt(currentPassword, ["username", "password"].includes(field) ? "string" : "undefined") &&
       vt(callback, "function") &&
-      (field !== "username" || vu(value)) &&
-      (field !== "password" || vp(value))
+      (field === "username" ? vu(value) : true) &&
+      (field === "password" ? vp(value) : true)
     ) {
       const user = storage.getUser("id", socket.uid);
       let err;
 
-      switch (field) {
-        case "username":
-          if (currentPassword !== user.password) {
-            err = errors.passwordIncorrect;
-          } else if (storage.getUser("username", value)) {
-            err = errors.usernameAlreadyUsed;
-          }
-          break;
-
-        case "password":
-          if (currentPassword !== user.password) {
-            err = errors.passwordIncorrect;
-          }
-          break;
+      if (["username", "password"].includes(field) && currentPassword !== user.password) {
+        err = errors.passwordIncorrect;
+      } else if (field === "username" && storage.getUser("username", value)) {
+        err = errors.usernameAlreadyUsed;
       }
 
       if (!err) {

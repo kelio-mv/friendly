@@ -239,6 +239,7 @@ function Settings(props) {
             placeholder={props.user.username}
             value={username}
             onChange={(v) => setUsername(v)}
+            validateLength
             modalChild
           />
 
@@ -284,6 +285,7 @@ function Settings(props) {
             placeholder="Nova senha"
             value={password}
             onChange={(v) => setPassword(v)}
+            validateLength
             modalChild
           />
         </Form>

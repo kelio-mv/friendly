@@ -69,6 +69,7 @@ function Auth(props) {
           placeholder="Nome de usuário"
           value={username}
           onChange={(v) => setUsername(v)}
+          validateLength={signUp}
         />
 
         <TextField
@@ -76,6 +77,7 @@ function Auth(props) {
           placeholder="Senha"
           value={password}
           onChange={(v) => setPassword(v)}
+          validateLength={signUp}
         />
 
         <button className="btn btn--primary" disabled={connecting}>
