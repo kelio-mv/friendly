@@ -1,5 +1,3 @@
-import basename from "../../basename";
-
 function Icon(props) {
   const filter = props.invert ? "invert(1)" : null;
   const highlightFilter =
@@ -7,7 +5,7 @@ function Icon(props) {
 
   return (
     <img
-      src={`/${basename}/${props.name}.svg`}
+      src={`/${props.name}.svg`}
       className="icon"
       onClick={props.onClick}
       style={{
