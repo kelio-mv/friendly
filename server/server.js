@@ -32,9 +32,9 @@ function vp(p) {
   return p.length >= 6 && p.length <= 16;
 }
 
-function vc(s) {
+function vc(c) {
   // validateContent
-  return s.length === s.trim().length && s.length > 0 && s.length <= 1000;
+  return c.length === c.trim().length && c.length > 0 && c.length <= 1000;
 }
 
 function dv(array) {
