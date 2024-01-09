@@ -1,0 +1,68 @@
+.chat {
+  &__username {
+    font-size: 1.125rem;
+    cursor: pointer;
+  }
+
+  &__body {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 0.75rem;
+  }
+
+  &__date {
+    width: fit-content;
+    margin: 12px auto;
+    padding: 3px 7px;
+    background: var(--teal-800);
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+.message {
+  --padding-x: 10px;
+  --padding-y: 6px;
+  --time-width: 36px;
+  --clr-content: white;
+  --clr-time: rgb(188, 188, 188);
+
+  position: relative;
+  width: fit-content;
+  max-width: 90%;
+  padding: var(--padding-y) var(--padding-x);
+  background: var(--teal-700);
+  border-radius: 0.5rem;
+
+  &:not(:last-child) {
+    margin-bottom: 6px;
+  }
+
+  &--from-me {
+    --clr-content: var(--clr-000);
+    --clr-time: var(--clr-300);
+    margin-left: auto;
+    background: var(--bg-200);
+  }
+
+  &__content {
+    color: var(--clr-content);
+    word-break: break-word;
+    white-space: pre-wrap;
+
+    &::after {
+      content: "";
+      display: inline-block;
+      width: calc(var(--padding-x) + var(--time-width));
+    }
+  }
+
+  &__time {
+    position: absolute;
+    bottom: var(--padding-y);
+    right: var(--padding-x);
+    font: 0.75rem "Source Code Pro", monospace;
+    color: var(--clr-time);
+  }
+}

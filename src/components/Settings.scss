@@ -1,0 +1,27 @@
+.settings {
+  &__body {
+    flex: 1;
+    padding: 0.75rem 0;
+    font-size: 1.125rem;
+  }
+
+  &__item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--bg-300);
+    }
+
+    &:hover {
+      background: var(--bg-300);
+    }
+  }
+
+  &__error {
+    font-size: 0.875rem;
+    color: var(--clr-300);
+  }
+}

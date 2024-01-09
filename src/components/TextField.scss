@@ -1,0 +1,32 @@
+.text-field {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &__input {
+    width: 16rem;
+    padding: 0.5rem;
+    background: var(--bg-200);
+    color: var(--clr-000);
+    border: 1px solid var(--bg-300);
+    border-radius: 0.25rem;
+
+    &:focus {
+      outline: 1px solid var(--bg-400);
+    }
+
+    &--modal-child {
+      background: var(--bg-300);
+      border: 1px solid var(--bg-400);
+
+      &:focus {
+        outline: 1px solid var(--bg-500);
+      }
+    }
+  }
+
+  &__visibility {
+    position: absolute;
+    right: 0.5rem;
+  }
+}

@@ -1,0 +1,29 @@
+.article {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--bg-300);
+  animation: fade-in 0.5s ease;
+
+  &--highlight {
+    border-bottom: 1px solid var(--teal-800);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__date {
+    color: var(--clr-300);
+  }
+
+  &__grow {
+    flex-grow: 1;
+  }
+
+  &__body {
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+}

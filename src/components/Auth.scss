@@ -1,0 +1,45 @@
+.auth {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__logo {
+    width: 4rem;
+  }
+
+  &__greeting {
+    font-size: 1.5rem;
+  }
+
+  &__description {
+    margin-bottom: 3rem;
+    color: var(--clr-300);
+  }
+
+  &__form {
+    margin-bottom: 1rem;
+  }
+
+  &__switch-mode {
+    color: var(--clr-200);
+    margin-bottom: 2rem;
+  }
+
+  &__switch-mode-btn {
+    color: var(--teal-800);
+    cursor: pointer;
+
+    @media (prefers-color-scheme: dark) {
+      color: var(--teal-500);
+    }
+  }
+
+  &__ads {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: gray;
+  }
+}

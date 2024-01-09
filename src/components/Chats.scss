@@ -1,0 +1,35 @@
+.chats {
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--bg-300);
+    animation: fade-in 0.5s ease;
+  }
+
+  &__wrapper {
+    margin-left: 0.75rem;
+    margin-right: auto;
+    overflow: hidden;
+  }
+
+  &__last-message {
+    color: var(--clr-300);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__date {
+    color: var(--clr-300);
+  }
+
+  &__unviewed {
+    width: fit-content;
+    min-width: 1.25rem;
+    margin: auto;
+    padding: 0 0.25rem;
+    text-align: center;
+    background: var(--teal-800);
+    border-radius: 9999px;
+  }
+}

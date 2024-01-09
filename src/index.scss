@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Gantari:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500&display=swap");
+
+/* CSS Reset */
+/* Sources: https://tailwindcss.com/docs/preflight https://youtube.com/shorts/2lyDv0wOQuQ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  border: none;
+  outline: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+img,
+picture,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+}
+
+img,
+picture,
+svg,
+video {
+  max-width: 100%;
+}
+
+textarea {
+  resize: none;
+}
+
+/* End of CSS Reset */
+
+body {
+  overscroll-behavior: contain;
+}
+
+:root {
+  background: var(--bg-100);
+  color: var(--clr-100);
+  font: 16px "Gantari", system-ui, sans-serif;
+  line-height: 1.25;
+  user-select: none;
+  color-scheme: light dark;
+
+  --bg-100: rgb(249, 249, 249);
+  --bg-200: rgb(225, 225, 225);
+  --bg-300: rgb(213, 213, 213);
+  --bg-400: rgb(201, 201, 201);
+  --bg-500: rgb(189, 189, 189);
+  --bg-modal: rgb(237, 237, 237);
+  --clr-000: rgb(0, 0, 0);
+  --clr-100: rgb(19, 19, 19);
+  --clr-200: rgb(43, 43, 43);
+  --clr-300: rgb(67, 67, 67);
+  --clr-400: rgb(91, 91, 91);
+  --clr-500: rgb(115, 115, 115);
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-700: #0f766e;
+  --teal-700-rgb: 15, 118, 110;
+  --teal-800: #115e59;
+  --scrollbar-width: 10px;
+
+  @media (prefers-color-scheme: dark) {
+    --bg-100: rgb(18, 18, 18);
+    --bg-200: rgb(30, 30, 30);
+    --bg-300: rgb(42, 42, 42);
+    --bg-400: rgb(54, 54, 54);
+    --bg-500: rgb(66, 66, 66);
+    --bg-modal: var(--bg-200);
+    --clr-000: rgb(255, 255, 255);
+    --clr-100: rgb(236, 236, 236);
+    --clr-200: rgb(212, 212, 212);
+    --clr-300: rgb(188, 188, 188);
+    --clr-400: rgb(164, 164, 164);
+    --clr-500: rgb(140, 140, 140);
+  }
+}
+
+#root > * {
+  height: 100%;
+}
+
+:is(input, textarea)::placeholder {
+  color: var(--clr-500);
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-400);
+  border: 2px solid var(--bg-200);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-500);
+}
