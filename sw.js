@@ -15,13 +15,13 @@ async function handleRequest(req) {
   const match = await caches.match(req);
   if (match) return match;
   const res = await fetch(req);
-  putInCache(req, res);
+  putInCache(req, res.clone());
   return res;
 }
 
 async function putInCache(req, res) {
   const cache = await caches.open("friendly");
-  await cache.put(req, res.clone());
+  await cache.put(req, res);
 }
 
 // if (match) return match;
