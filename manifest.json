@@ -1,12 +1,12 @@
 {
   "name": "Friendly",
-  "start_url": "..",
+  "start_url": "https://kelio-mv.github.io/friendly",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#115e59",
   "icons": [
     {
-      "src": "../favicon.png",
+      "src": "https://kelio-mv.github.io/friendly/favicon.png",
       "type": "image/png",
       "sizes": "192x192"
     }

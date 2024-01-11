@@ -3,6 +3,7 @@ import credentials from "./credentials";
 const socket = io("wss://friendly2.glitch.me", {
   autoConnect: false,
   auth: credentials.send,
+  transports: ["websocket"],
 });
 
 export default socket;
