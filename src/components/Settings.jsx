@@ -245,7 +245,7 @@ function Settings(props) {
 
           <TextField
             type="password"
-            placeholder="Senha atual"
+            placeholder="Confirmar senha"
             value={currentPassword}
             onChange={(v) => setCurrentPassword(v)}
             modalChild
