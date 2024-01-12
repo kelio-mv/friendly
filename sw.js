@@ -23,7 +23,6 @@ async function networkFirst(request) {
     store(request, response.clone());
     return response;
   } catch {
-    console.log(request);
     return caches.match(request);
   }
 }
