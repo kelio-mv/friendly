@@ -20,10 +20,11 @@ function Install(props) {
         <>
           <p>1. Abra o menu do seu navegador, conforme na figura abaixo.</p>
           <img src={`menu_${isIPhone ? "iphone" : "android"}.png`} />
-          <p>2. Clique em: Adicionar à {isIPhone ? "Tela de Início" : "tela inicial"}.</p>
+          <p>2. Clique em: {isIPhone ? "Adicionar à Tela de Início" : "Instalar aplicativo"}.</p>
           <p>3. Após concluir o processo, feche o navegador.</p>
           <p>
-            Pronto, você já pode abrir o Friendly pela tela inicial do seu dispositivo. &#x1F389;
+            Pronto, você já pode abrir o Friendly pela{" "}
+            {isIPhone ? "tela inicial" : "gaveta de aplicativos"} do seu dispositivo. &#x1F389;
           </p>
         </>
       )}
