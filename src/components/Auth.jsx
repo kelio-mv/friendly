@@ -85,10 +85,10 @@ function Auth(props) {
         </button>
       </Form>
 
-      <p className="auth__switch-mode">
+      <p className="auth__toggle-sign-up">
         {signUp ? "Já tem uma conta? " : "Não tem uma conta? "}
 
-        <span className="auth__switch-mode-btn" onClick={() => setSignUp(!signUp)}>
+        <span className="auth__toggle-sign-up-btn" onClick={() => setSignUp(!signUp)}>
           {signUp ? "Faça login" : "Cadastre-se"}
         </span>
       </p>
